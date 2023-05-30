@@ -1,0 +1,6 @@
+{"message":"Inaccessible host: `kapesha001-bucket.s3.ap-southeast-1.amazonaws.com' at port `undefined'. This service may not be available in the `ap-southeast-1' region.","code":"UnknownEndpoint","region":"ap-southeast-1","hostname":"kapesha001-bucket.s3.ap-southeast-1.amazonaws.com","retryable":true,"originalError":{"message":"getaddrinfo EAI_AGAIN kapesha001-bucket.s3.ap-southeast-1.amazonaws.com","errno":-3001,"code":"NetworkingError","syscall":"getaddrinfo","hostname":"kapesha001-bucket.s3.ap-southeast-1.amazonaws.com","region":"ap-southeast-1","retryable":true,"time":"2023-01-18T19:34:39.662Z"},"time":"2023-01-18T19:34:39.662Z","statusCode":400}
+
+
+{"message":"Your socket connection to the server was not read from or written to within the timeout period. Idle connections will be closed.","code":"RequestTimeout","region":null,"time":"2023-01-18T19:42:32.034Z","requestId":"9J0YEHVH3Q5E9MY8","extendedRequestId":"ksatwNQIioxzMcvvlHa1S7uCma/3re9SHqD0GcwDBaFE/NqzWpx6WSjgg0EgFZnhSP+CY+hLSTc=","statusCode":400,"retryable":true}
+
+{"message":"write EPIPE","errno":-32,"code":"TimeoutError","syscall":"write","time":"2023-01-18T19:47:56.872Z","region":"ap-southeast-1","hostname":"kapesha001-bucket.s3.ap-southeast-1.amazonaws.com","retryable":true,"statusCode":400}
