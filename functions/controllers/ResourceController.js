@@ -1,26 +1,33 @@
 // MODEL IMPORTATION
 //===================
 const Resource = require("../models/ResourceModel");
+const Lesson = require("../models/LessonModel");
+
+// ERROR HANDLING CONTROLLER
+const { handleError } = require("./ErrorHandling");
 
 const createResource = async (req, res) => {
   try {
     console.log(`Incoming resource body ${req.body}`);
-    let { resourceName, resourceUrl } = req.body;
+    let { lessonID, resourceName, resourceUrl } = req.body;
     let resourceData = { resourceName, resourceUrl };
     console.log(`Resource data object ${resourceData}`);
     let newResource = await Resource.create(resourceData);
     newResource.save();
-    res.sendStatus(201);
-  } catch (err) {
-    // DESTRUCTURING MONGODB ATLAS ERROR.
-    if (err.code == 11000) {
-      res.sendStatus(409);
-    } else {
-      console.log(JSON.stringify(err));
-      let { _message, name } = err;
-      let errorBody = { _message, name };
-      res.status(400).json(errorBody);
+    let { _id: resourceID } = newResource;
+    // Pushing the notes ID to the lesson.
+    let lessonData = await Lesson.findByIdAndUpdate(
+      lessonID,
+      { $set: { lessonNotes: resourceID } },
+      { new: true, useFindAndModify: false, runValidation: true }
+    );
+
+    if (lessonData.lessonNotes.equals(resourceID)) {
+      console.log("Notes Data operation successfull.");
+      res.sendStatus(201);
     }
+  } catch (err) {
+    handleError(err);
   }
 };
 
@@ -29,8 +36,8 @@ const findAllResources = async (req, res) => {
   try {
     let data = await Resource.find({}); //Find everything for me.
     res.json(data);
-  } catch (error) {
-    res.status(500).send(error);
+  } catch (err) {
+    handleError(err);
   }
 };
 const findResource = async (req, res) => {
@@ -39,8 +46,8 @@ const findResource = async (req, res) => {
   try {
     let data = await Resource.findById(resourceId);
     res.json(data);
-  } catch (error) {
-    res.status(500).send(error);
+  } catch (err) {
+    handleError(err);
   }
 };
 module.exports = {

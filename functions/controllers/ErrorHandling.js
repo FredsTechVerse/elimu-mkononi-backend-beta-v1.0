@@ -1,20 +1,23 @@
-const handleError = (error) => {
-  //   Handle specific Mongoose errors
+const handleError = (error, res) => {
+  let statusCode = 500;
+  let errorMessage = "Something went wrong";
+
   if (error.name === "MongoError" && error.code === 11000) {
-    const errorBody = { message: "This document already exists!" };
-    return res.status(409).json(errorBody);
+    statusCode = 409;
+    errorMessage = "This document already exists!";
   } else if (error.name === "ValidationError") {
-    const errorBody = { message: error.message };
-    return res.status(400).json(errorBody);
+    statusCode = 400;
+    errorMessage = error.message;
   } else if (error.name === "CastError") {
-    const errorBody = { message: "Invalid ID" };
-    return res.status(422).json(errorBody);
+    statusCode = 422;
+    errorMessage = "Invalid ID";
   }
+
   // Log other errors
-  console.log(error);
-  // Send a generic error message with a 500 status code
-  const errorBody = { message: "Something went wrong" };
-  return res.status(500).json(errorBody);
+  console.error(error);
+
+  // Send the error response
+  return res.status(statusCode).json({ message: errorMessage });
 };
 
 module.exports = { handleError };

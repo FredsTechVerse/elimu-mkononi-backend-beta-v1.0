@@ -3,7 +3,9 @@
 const Lesson = require("../models/LessonModel");
 const Chapter = require("../models/ChapterModel");
 
-// Perfect Illustration of One to many relationship.
+// ERROR HANDLING
+const { handleError } = require("./ErrorHandling");
+
 const createLesson = async (req, res) => {
   try {
     let { chapterID, lessonNumber, lessonName, lessonUrl } = req.body;
@@ -32,14 +34,7 @@ const createLesson = async (req, res) => {
       res.sendStatus(201);
     }
   } catch (err) {
-    if (err.code == 11000) {
-      console.console.log(JSON.stringify(err));
-      let errorBody = { message: "This lesson already exists!" };
-      res.status(400).json(errorBody);
-    } else {
-      console.log(err);
-      res.status(400).json(err);
-    }
+    handleError(err);
   }
 };
 const findLesson = async (req, res) => {
@@ -50,9 +45,8 @@ const findLesson = async (req, res) => {
     ]);
     console.log(data);
     res.json(data);
-  } catch (error) {
-    console.log(error);
-    res.status(500).send(error);
+  } catch (err) {
+    handleError(err);
   }
 };
 
@@ -64,9 +58,8 @@ const deleteLesson = async (req, res) => {
     );
     console.log(deletedLesson);
     res.json(deletedLesson);
-  } catch (error) {
-    console.log(error);
-    res.status(500).send(error);
+  } catch (err) {
+    handleError(err);
   }
 };
 

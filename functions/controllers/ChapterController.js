@@ -2,6 +2,10 @@
 //===================
 const Chapter = require("../models/ChapterModel");
 const Unit = require("../models/UnitModel");
+
+// ERROR HANDLING
+const { handleError } = require("./ErrorHandling");
+
 const createChapter = async (req, res) => {
   try {
     console.log(`New Request. ${JSON.stringify(req.body)}`);
@@ -31,8 +35,7 @@ const createChapter = async (req, res) => {
       res.status(400).json({ message: "Chapter not found" });
     }
   } catch (err) {
-    console.log(err);
-    res.status(500).json(err);
+    handleError(err);
   }
 };
 
@@ -40,8 +43,8 @@ const findAllChapters = async (req, res) => {
   try {
     let allChapters = await Chapter.find({});
     res.json(allChapters);
-  } catch (error) {
-    res.status(500).send(error);
+  } catch (err) {
+    handleError(err);
   }
 };
 
@@ -50,8 +53,8 @@ const populateChapterLessons = async (req, res) => {
     let data = await Chapter.find({}).populate("ChapterLessons");
     console.log(data);
     res.json(data);
-  } catch (error) {
-    res.status(500).send(error);
+  } catch (err) {
+    handleError(err);
   }
 };
 
@@ -62,8 +65,8 @@ const findChapter = async (req, res) => {
     console.log("Requested Chapter Data");
     console.log(data);
     res.json(data);
-  } catch (error) {
-    res.status(500).send(error);
+  } catch (err) {
+    handleError(err);
   }
 };
 

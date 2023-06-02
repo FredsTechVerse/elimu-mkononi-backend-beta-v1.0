@@ -62,6 +62,23 @@ const getSignedUrl = async (req, res) => {
   res.status(201).json({ signedUrl, Key });
 };
 
+const deleteFile = async (req, res) => {
+  const { Key } = req.body; // The key of the file you want to delete
+
+  const params = {
+    Bucket: bucketName, // The name of your S3 bucket
+    Key: Key, // The key of the file to delete
+  };
+
+  try {
+    await s3.deleteObject(params).promise();
+    res.status(200).json({ message: "File deleted successfully" });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: "Failed to delete file" });
+  }
+};
+
 // EXPORTING THE TWO FUNCTIONS CREATED.
 //======================================
-module.exports = { getSignedUrl, getFileStream };
+module.exports = { getSignedUrl, getFileStream, deleteFile };

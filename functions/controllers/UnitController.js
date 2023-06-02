@@ -3,6 +3,10 @@
 const Unit = require("../models/UnitModel");
 const Course = require("../models/CourseModel");
 const Tutor = require("../models/TutorModel");
+
+// ERROR HANDLING
+const { handleError } = require("./ErrorHandling");
+
 const getUnit = async (req, res) => {
   const { unitId } = req.params;
 
@@ -11,8 +15,8 @@ const getUnit = async (req, res) => {
     console.log("Requested unit data");
     console.log(data);
     res.json(data);
-  } catch (error) {
-    res.status(500).send(error);
+  } catch (err) {
+    handleError(err);
   }
 };
 const getUnitWithChapters = async (req, res) => {
@@ -23,8 +27,8 @@ const getUnitWithChapters = async (req, res) => {
     console.log("Requested unit data");
     console.log(data);
     res.json(data);
-  } catch (error) {
-    res.status(500).send(error);
+  } catch (err) {
+    handleError(err);
   }
 };
 
@@ -39,8 +43,8 @@ const getUnitWithLessons = async (req, res) => {
     });
     console.log("Requested unit data");
     res.json(data);
-  } catch (error) {
-    res.status(500).send(error);
+  } catch (err) {
+    handleError(err);
   }
 };
 
@@ -48,8 +52,8 @@ const getAllUnits = async (req, res) => {
   try {
     const unitsData = await Unit.find({});
     res.status(201).json(unitsData);
-  } catch (error) {
-    res.status(500).send(error);
+  } catch (err) {
+    handleError(err);
   }
 };
 // Perfect Illustration of One to many relationship.
@@ -94,16 +98,7 @@ const createUnit = async (req, res) => {
       res.sendStatus(201);
     }
   } catch (err) {
-    if (err.code == 11000) {
-      console.log(JSON.stringify(err));
-      let errorBody = { message: "This unit already exists!" };
-      res.status(400).json(errorBody);
-    } else {
-      console.log(err);
-      let { _message, name } = err;
-      let errorBody = { _message, name };
-      res.status(400).json(errorBody);
-    }
+    handleError(err);
   }
 };
 

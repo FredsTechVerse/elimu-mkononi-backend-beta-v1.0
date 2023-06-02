@@ -2,6 +2,9 @@
 const Notes = require("../models/NotesModel");
 const Lesson = require("../models/LessonModel");
 
+// ERROR HANDLING
+const { handleError } = require("./ErrorHandling");
+
 const createNotes = async (req, res) => {
   try {
     // Extracting the data from the request body.
@@ -24,14 +27,7 @@ const createNotes = async (req, res) => {
       res.sendStatus(201);
     }
   } catch (err) {
-    if (err.code == 11000) {
-      console.log(JSON.stringify(err));
-      let errorBody = { message: "This notes already exists!" };
-      res.status(400).json(errorBody);
-    } else {
-      console.log(err);
-      res.status(400).json(err);
-    }
+    handleError(err);
   }
 };
 
@@ -42,37 +38,10 @@ const findNote = async (req, res) => {
     console.log(data);
     res.json(data);
   } catch (err) {
-    res.status(500).send(err);
+    handleError(err);
   }
 };
 
-// KEY DISCOVERY
-//==============
-/**
- * Callbacks and try catch to not mix.It is either we use the try catch without the callback or use the callback without the try catch.
- */
-// VERSION_1(Using Callbacks)
-//============================
-// const updateNotes = async (req, res) => {
-//   console.log(req.body);
-//   // Extracting the data from the request body.
-//   let { lessonNotes, notesID } = req.body;
-//   //Updating the notes
-//   Notes.findByIdAndUpdate(
-//     notesID,
-//     { $set: { content: lessonNotes } },
-//     function (err, updatedNotes) {
-//       if (err) {
-//         console.log(err);
-//         return res.status(400).json(err);
-//       }
-//       console.log(updatedNotes);
-//       return res.status(202).json({ message: updatedNotes });
-//     }
-//   );
-// };
-// VERSION_2(Using try catch)
-//============================
 const updateNotes = async (req, res) => {
   try {
     // Extracting the data from the request body.
@@ -86,8 +55,7 @@ const updateNotes = async (req, res) => {
     console.log(updatedNotes);
     return res.status(202).json({ message: updatedNotes });
   } catch (err) {
-    console.log(err);
-    res.status(400).json(err);
+    handleError(err);
   }
 };
 

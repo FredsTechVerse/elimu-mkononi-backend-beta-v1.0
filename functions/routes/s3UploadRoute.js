@@ -7,15 +7,15 @@ const debugReq = (req, res, next) => {
 };
 
 // Importing the controllers needed.
-// const {
-//   getFileStream,
-//   getSignedUrl,
-// } = require("../controllers/s3DirectUploadController");
-
 const {
   getFileStream,
   getSignedUrl,
-} = require("../controllers/fileUploadController");
+} = require("../controllers/s3UploadController");
+
+// const {
+//   getFileStream,
+//   getSignedUrl,
+// } = require("../controllers/fileUploadController");
 
 // Defining the routes.
 // router.get("/:key", debugReq, async (req, res) => {

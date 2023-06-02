@@ -37,31 +37,14 @@ const getFileStream = async (fileKey) => {
 };
 
 const getSignedUrl = async (req, res) => {
-  console.log(`Signed Url body is as follows ${JSON.stringify(req.body)}`);
   const { fileType } = await req.body;
-  console.log(JSON.stringify(req.body));
-  console.log(JSON.stringify(req.body.fileType));
   // File name generation
   const rawBytes = await randomBytes(16);
   const fileName = rawBytes.toString("hex"); //Geneerates a random filename.
   const fileExtension = fileType && fileType.split("/")[1];
   const Key = `${fileName}.${fileExtension}`;
-
-  // console.log(`File name during signing URL ${Key} & fileType ${fileType}`);
-  // const contentType = (fileType) => {
-  //   return fileType;
-  // };
-  // const params = {
-  //   Bucket: bucketName, // The name of the bucket that you want to upload the file to
-  //   ContentType: contentType(fileType), // This is the file type that you are uploading
-  //   Key: Key, // Simply the name of the file at storage time
-  //   Expires: 400, // The number of seconds the URL is valid for. Default is 900 seconds (15 minutes)
-  // };
-
   const command = new GetObjectCommand({ Bucket: bucketName, Key: Key });
   const signedUrl = await getSignedUrl(client, command, { expiresIn: 400 }); // expires in seconds
-  // const signedUrl = await client.getSignedUrl("putObject", params);
-  console.log(`Signed URL Params ${signedUrl}`);
   res.status(201).json({ signedUrl, Key });
 };
 
