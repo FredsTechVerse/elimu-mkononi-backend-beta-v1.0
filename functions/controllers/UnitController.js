@@ -61,7 +61,7 @@ const createUnit = async (req, res) => {
   try {
     console.log(req.body);
     let {
-      courseId,
+      courseID,
       tutorId: tutorID,
       unitCode,
       unitName,
@@ -81,7 +81,7 @@ const createUnit = async (req, res) => {
 
     let courseData = await Course.findByIdAndUpdate(
       //Returns / saves the new document in play.
-      courseId,
+      courseID,
       { $push: { units: unitID } }, //Adding to an array of elements.
       { new: true, useFindAndModify: false, runValidation: true } //Addition params for update validation.
     );

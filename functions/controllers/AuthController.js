@@ -9,7 +9,8 @@ const Student = require("../models/StudentModel");
 const Tutor = require("../models/TutorModel");
 const Admin = require("../models/AdminModel");
 const RefreshToken = require("../models/RefreshTokensModel");
-const { handleError } = require("./ErrorHandling");
+const { handleError, handleJwtError } = require("./ErrorHandling");
+
 // AUTHORIZATION SECTION
 //=======================
 const generateAccessToken = (userData) => {
@@ -34,27 +35,21 @@ const authenticateToken = async (req, res, next) => {
     const payload = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
     req.user = payload;
     next();
-  } catch (error) {
-    if (error.name === "TokenExpiredError") {
-      return res.sendStatus(403);
-    } else if (error.name == "JsonWebTokenError") {
-      return res.sendStatus(403);
-    }
+  } catch (err) {
+    handleJwtError(err);
   }
 };
 
 const createTokenModel = async (req, res) => {
   try {
-    // let { adminId } = req.params;
-    const data = {
-      name: "tokens",
-      data: ["Initializer"],
+    const initialData = {
+      data: [],
     };
-    let tokenData = await RefreshToken.create(data);
-    res.status(200).json(tokenData);
-  } catch (error) {
-    console.log(error);
-    res.status(500).send(error);
+    let tokenData = await RefreshToken.create(initialData);
+    tokenData.save();
+    res.status(200);
+  } catch (err) {
+    handleError(err);
   }
 };
 const renewTokens = async (req, res) => {
@@ -70,9 +65,7 @@ const renewTokens = async (req, res) => {
   if (!refreshTokens.data.includes(refreshToken)) {
     return res.sendStatus(403);
   }
-  // We need to delete the previous refresh token for security reasons.
-  //   Trap 3 : Regenerates our short term access token (Its all about verifying payload and extracting info
-  // again to be used in the regeneration of the access token.)
+
   jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, payload) => {
     if (err) {
       return res.status(403).json({
@@ -92,7 +85,6 @@ const renewTokens = async (req, res) => {
 // REGISTRATION SECTION
 const registerStudent = async (req, res) => {
   try {
-    console.log(req.body);
     const hashedPassword = await bcrypt.hash(req.body.password, 10);
     let credentials = {
       firstName: req.body.firstName,
@@ -107,21 +99,11 @@ const registerStudent = async (req, res) => {
       .status(201)
       .json({ message: "Student has been registered successfully." });
   } catch (err) {
-    if (err.code == 11000) {
-      console.log(JSON.stringify(err));
-      let errorBody = { message: "This student already exists!" };
-      res.status(400).json(errorBody);
-    } else {
-      console.log(err);
-      let { _message, name } = err;
-      let errorBody = { _message, name };
-      res.status(400).json(errorBody);
-    }
+    handleError(err);
   }
 };
 const registerTutor = async (req, res) => {
   try {
-    console.log(req.body);
     const hashedPassword = await bcrypt.hash(req.body.password, 10);
     let credentials = {
       firstName: req.body.firstName,
@@ -139,7 +121,6 @@ const registerTutor = async (req, res) => {
 };
 const registerAdmin = async (req, res) => {
   try {
-    console.log(req.body);
     const hashedPassword = await bcrypt.hash(req.body.password, 10);
     let credentials = {
       firstName: req.body.firstName,
@@ -192,7 +173,6 @@ const logInUser = async (req, res) => {
       role: userData.role,
       _id: userData._id,
     };
-    console.log(`User: ${JSON.stringify(user)}`);
     const accessToken = generateAccessToken(user);
     const refreshToken = generateRefreshToken(user);
     let { _id: tokenID } = await RefreshToken.findOne({ name: "tokens" });
@@ -210,8 +190,7 @@ const logInUser = async (req, res) => {
       });
     }
   } catch (err) {
-    console.log(err);
-    res.sendStatus(500);
+    handleError(err);
   }
 };
 
@@ -234,8 +213,7 @@ const logOutUser = async (req, res) => {
     // Send success response
     res.sendStatus(204);
   } catch (err) {
-    console.error(`Logout Error : ${err}`);
-    res.status(500).json({ message: "Server error while logging out." });
+    handleError(err);
   }
 };
 
@@ -247,11 +225,9 @@ const findTutorById = async (req, res) => {
       path: "units",
       populate: "unitChapters",
     });
-    console.log("Requested Tutor Data");
     res.status(200).json(tutorData);
-  } catch (error) {
-    console.log(error);
-    res.status(500).send(error);
+  } catch (err) {
+    handleError(err);
   }
 };
 const findAllTutors = async (req, res) => {
@@ -259,7 +235,6 @@ const findAllTutors = async (req, res) => {
     const tutorData = await Tutor.find({});
     res.status(200).json(tutorData);
   } catch (err) {
-    console.log(err);
     res.status(400).json(err);
   }
 };
@@ -267,15 +242,12 @@ const deleteTutorById = async (req, res) => {
   try {
     await Tutor.findByIdAndDelete(req.body._id, function (err, docs) {
       if (!err) {
-        console.log(docs);
         res.status(200).json(docs);
       } else {
-        console.log(err);
         res.status(400).send(err);
       }
     });
   } catch (err) {
-    console.log(err);
     res.status(400).json(err);
   }
 };
@@ -286,7 +258,6 @@ const findAllAdmins = async (req, res) => {
     const adminData = await Admin.find({});
     res.status(200).json(adminData);
   } catch (err) {
-    console.log(err);
     res.status(400).json(err);
   }
 };
@@ -296,9 +267,8 @@ const findAdminById = async (req, res) => {
     let { adminId } = req.params;
     let adminData = await Admin.findById(adminId);
     res.status(200).json(adminData);
-  } catch (error) {
-    console.log(error);
-    res.status(500).send(error);
+  } catch (err) {
+    handleError(err);
   }
 };
 
@@ -306,16 +276,13 @@ const deleteAdminById = async (req, res) => {
   try {
     await Admin.findByIdAndDelete(req.body._id, function (err, docs) {
       if (!err) {
-        console.log(docs);
         res.status(200).json(docs);
       } else {
-        console.log(err);
         res.status(400).send(err);
       }
     });
   } catch (err) {
-    console.log(err);
-    res.status(400).json(err);
+    handleError(err);
   }
 };
 
@@ -325,9 +292,8 @@ const findStudentById = async (req, res) => {
     let { studentId } = req.params;
     let studentData = await Student.findById(studentId);
     res.status(200).json(studentData);
-  } catch (error) {
-    console.log(error);
-    res.status(500).send(error);
+  } catch (err) {
+    handleError(err);
   }
 };
 
@@ -336,8 +302,7 @@ const findAllStudents = async (req, res) => {
     const studentData = await Student.find({});
     res.status(200).json(studentData);
   } catch (err) {
-    console.log(err);
-    res.status(400).json(err);
+    handleError(err);
   }
 };
 
@@ -345,16 +310,13 @@ const deleteStudentById = async (req, res) => {
   try {
     await Student.findByIdAndDelete(req.body._id, function (err, docs) {
       if (!err) {
-        console.log(docs);
         res.status(200).json(docs);
       } else {
-        console.log(err);
         res.status(400).send(err);
       }
     });
   } catch (err) {
-    console.log(err);
-    res.status(400).json(err);
+    handleError(err);
   }
 };
 

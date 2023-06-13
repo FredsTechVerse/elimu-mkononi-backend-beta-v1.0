@@ -11,10 +11,6 @@ const region = process.env.AWS_BUCKET_REGION;
 const accessKeyId = process.env.AWS_ACCESS_KEY;
 const secretAccessKey = process.env.AWS_SECRET_ACCESS_KEY;
 
-console.log(
-  `S3 Credentials ${(bucketName, region, accessKeyId, secretAccessKey)}`
-);
-
 // Configuring credentials
 //========================
 const s3 = new S3({
@@ -56,7 +52,6 @@ const getSignedUrl = async (req, res) => {
     Key: Key, // Simply the name of the file at storage time
     Expires: 400, // The number of seconds the URL is valid for. Default is 900 seconds (15 minutes)
   };
-  console.log(`Assigned Params ${JSON.stringify(params)}`);
   const signedUrl = await s3.getSignedUrlPromise("putObject", params);
   console.log(`Signed URL Params ${signedUrl}`);
   res.status(201).json({ signedUrl, Key });

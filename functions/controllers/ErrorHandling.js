@@ -20,4 +20,14 @@ const handleError = (error, res) => {
   return res.status(statusCode).json({ message: errorMessage });
 };
 
-module.exports = { handleError };
+const handleJwtError = (err, res) => {
+  if (err.name === "TokenExpiredError") {
+    return res.status(401).json({ error: "Token expired" });
+  }
+  if (err.name === "JsonWebTokenError") {
+    return res.status(401).json({ error: "Invalid token" });
+  }
+  return res.status(500).json({ error: "Internal server error" });
+};
+
+module.exports = { handleError, handleJwtError };

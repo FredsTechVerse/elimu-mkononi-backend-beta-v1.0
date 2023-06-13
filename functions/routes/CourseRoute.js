@@ -21,7 +21,7 @@ router.post("/new-course", createCourse);
 router.get("/all-courses", findAllCourses);
 
 router.get(
-  "/:courseId",
+  "/:courseID",
   (req, res, next) => {
     console.log("Request received");
     console.log(req.params);

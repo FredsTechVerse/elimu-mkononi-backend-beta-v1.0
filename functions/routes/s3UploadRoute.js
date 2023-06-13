@@ -1,93 +1,56 @@
 const express = require("express");
 const router = express.Router();
 
-const debugReq = (req, res, next) => {
-  console.log("Get request for course data acknowledged.");
-  next();
-};
+const AWS = require("aws-sdk");
+const s3 = new AWS.S3();
 
-// Importing the controllers needed.
 const {
   getFileStream,
   getSignedUrl,
 } = require("../controllers/s3UploadController");
 
-// const {
-//   getFileStream,
-//   getSignedUrl,
-// } = require("../controllers/fileUploadController");
-
-// Defining the routes.
-// router.get("/:key", debugReq, async (req, res) => {
-//   try {
-//     const key = req.params.key;
-//     console.log(key);
-//     // Extremely crucial to await the data being sent to the client.
-//     const readStream = await getFileStream(key);
-//     readStream.pipe(res);
-//   } catch (err) {
-//     console.log(err);
-//     res.status(404).send(err);
-//   }
-// });
-
+const bucketName = process.env.AWS_BUCKET_NAME;
+// WITH FUNCTION FOR RETRIEVING FILE SIZE
 router.get("/:key", async (req, res) => {
   try {
     const key = req.params.key;
+
+    const params = {
+      Bucket: bucketName,
+      Key: key,
+    };
+    const headObjectResponse = await s3.headObject(params).promise();
+    const videoSize = headObjectResponse.ContentLength;
     const readStream = await getFileStream(key);
+    const range = req.headers.range;
 
-    res.setHeader("Content-Type", "video/mp4");
-    res.setHeader("Accept-Ranges", "bytes");
+    if (range) {
+      const parts = range.replace(/bytes=/, "").split("-");
+      const start = parseInt(parts[0], 10);
+      const end = parts[1] ? parseInt(parts[1], 10) : videoSize - 1;
+      const chunkSize = end - start + 1;
 
-    readStream.on("data", (chunk) => {
-      res.write(chunk);
-      console.log("Data is being sent in chunks!");
-    });
+      res.writeHead(206, {
+        "Content-Range": `bytes ${start}-${end}/${videoSize}`,
+        "Accept-Ranges": "bytes",
+        "Content-Length": chunkSize,
+        "Content-Type": "video/mp4",
+      });
 
-    readStream.on("end", () => {
-      res.end();
-      console.log("Data transfer complete!");
-    });
+      readStream.pipe(res);
+    } else {
+      res.writeHead(200, {
+        "Content-Length": videoSize,
+        "Content-Type": "video/mp4",
+      });
 
-    readStream.on("error", (err) => {
-      console.log(err);
-      res.status(500).send(err);
-    });
+      readStream.pipe(res);
+    }
   } catch (err) {
     console.log(err);
     res.status(404).send(err);
   }
 });
-
-// router.get("/:key", async (req, res) => {
-//   try {
-//     const key = req.params.key;
-//     const readStream = await getFileStream(key);
-
-//     const { size } = await getFileMetadata(key);
-//     const range = req.headers.range;
-
-//     if (range) {
-//       const [start, end] = range.replace("bytes=", "").split("-");
-//       const chunkSize = end ? parseInt(end) - parseInt(start) + 1 : size;
-//       const contentRange = `bytes ${start || 0}-${end || size - 1}/${size}`;
-
-//       res.status(206);
-//       res.setHeader("Content-Range", contentRange);
-//       res.setHeader("Accept-Ranges", "bytes");
-//       res.setHeader("Content-Length", chunkSize);
-//     } else {
-//       res.setHeader("Content-Length", size);
-//     }
-
-//     res.setHeader("Content-Type", "video/mp4");
-
-//     readStream.pipe(res);
-//   } catch (err) {
-//     console.log(err);
-//     res.status(404).send(err);
-//   }
-// });
 
 router.post("/", getSignedUrl);
 

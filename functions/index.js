@@ -4,18 +4,7 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 const app = express();
 require("dotenv").config();
-// // ROUTES IMPORTATION
-// //====================
-// const LessonRoute = require("./routes/LessonRoute");
-// const ChapterRoute = require("./routes/ChapterRoute");
-// const CourseRoute = require("./routes/CourseRoute");
-// const UnitRoute = require("./routes/UnitRoute");
-// const AuthRoute = require("./routes/AuthRoute");
-// const S3DirectUpload = require("./routes/s3DirectUploadRoute");
-// const NotesRoute = require("./routes/NotesRoute");
-// const ResourcesRoute = require("./routes/ResourcesRoute");
 
-// ROUTES IMPORTATION
 const routes = [
   { path: "/chapter", route: require("./routes/ChapterRoute") },
   { path: "/lesson", route: require("./routes/LessonRoute") },
@@ -98,9 +87,12 @@ routes.forEach((route) => {
   app.use(route.path, route.route);
 });
 
-// ROUTE DEFINATION
 app.get("/", (req, res) => {
   res.status(200).json({ message: "Hello from warmup server." });
 });
+
+// app.listen("3000", () => {
+//   console.log("Listening on port 3000");
+// });
 
 exports.app = functions.https.onRequest(app);

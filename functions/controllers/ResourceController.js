@@ -35,6 +35,7 @@ const findAllResources = async (req, res) => {
   // All the data will already be appended by the units.
   try {
     let data = await Resource.find({}); //Find everything for me.
+    console.log(data);
     res.json(data);
   } catch (err) {
     handleError(err);
