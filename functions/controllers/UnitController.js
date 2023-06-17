@@ -12,8 +12,6 @@ const getUnit = async (req, res) => {
 
   try {
     let data = await Unit.findById(unitId);
-    console.log("Requested unit data");
-    console.log(data);
     res.json(data);
   } catch (err) {
     handleError(err);
@@ -24,8 +22,6 @@ const getUnitWithChapters = async (req, res) => {
 
   try {
     let data = await Unit.findById(unitId).populate("unitChapters");
-    console.log("Requested unit data");
-    console.log(data);
     res.json(data);
   } catch (err) {
     handleError(err);
@@ -41,7 +37,6 @@ const getUnitWithLessons = async (req, res) => {
       // Populating the lessons array for every chapter.
       populate: { path: "chapterLessons" },
     });
-    console.log("Requested unit data");
     res.json(data);
   } catch (err) {
     handleError(err);
@@ -59,7 +54,6 @@ const getAllUnits = async (req, res) => {
 // Perfect Illustration of One to many relationship.
 const createUnit = async (req, res) => {
   try {
-    console.log(req.body);
     let {
       courseID,
       tutorId: tutorID,
@@ -73,9 +67,7 @@ const createUnit = async (req, res) => {
       unitDescription,
       tutor: [tutorID],
     };
-    console.log(unitData);
     let newUnit = await Unit.create(unitData);
-    console.log(newUnit);
     newUnit.save();
     let { _id: unitID } = newUnit; // Extracting ID from staved Lesson
 
@@ -85,7 +77,6 @@ const createUnit = async (req, res) => {
       { $push: { units: unitID } }, //Adding to an array of elements.
       { new: true, useFindAndModify: false, runValidation: true } //Addition params for update validation.
     );
-    console.log(courseData);
     let tutorData = await Tutor.findByIdAndUpdate(
       //Returns / saves the new document in play.
       tutorID,

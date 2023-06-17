@@ -8,7 +8,6 @@ const { handleError } = require("./ErrorHandling");
 
 const createChapter = async (req, res) => {
   try {
-    console.log(`New Request. ${JSON.stringify(req.body)}`);
     let { unitID, chapterNumber, chapterName, chapterDescription } = req.body;
     let chapterData = {
       chapterNumber,
@@ -25,7 +24,7 @@ const createChapter = async (req, res) => {
         { new: true, useFindAndModify: false, runValidation: true }
       );
       if (unitData._doc.unitChapters.includes(chapterID)) {
-        res.sendStatus(201);
+        res.status(201).json(newChapter);
       } else {
         res
           .status(500)
@@ -51,7 +50,6 @@ const findAllChapters = async (req, res) => {
 const populateChapterLessons = async (req, res) => {
   try {
     let data = await Chapter.find({}).populate("ChapterLessons");
-    console.log(data);
     res.json(data);
   } catch (err) {
     handleError(err);
@@ -62,8 +60,6 @@ const findChapter = async (req, res) => {
   const { chapterId } = req.params;
   try {
     let data = await Chapter.findById(chapterId).populate("chapterLessons");
-    console.log("Requested Chapter Data");
-    console.log(data);
     res.json(data);
   } catch (err) {
     handleError(err);

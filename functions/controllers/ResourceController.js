@@ -8,10 +8,8 @@ const { handleError } = require("./ErrorHandling");
 
 const createResource = async (req, res) => {
   try {
-    console.log(`Incoming resource body ${req.body}`);
     let { lessonID, resourceName, resourceUrl } = req.body;
     let resourceData = { resourceName, resourceUrl };
-    console.log(`Resource data object ${resourceData}`);
     let newResource = await Resource.create(resourceData);
     newResource.save();
     let { _id: resourceID } = newResource;
@@ -23,8 +21,7 @@ const createResource = async (req, res) => {
     );
 
     if (lessonData.lessonNotes.equals(resourceID)) {
-      console.log("Notes Data operation successfull.");
-      res.sendStatus(201);
+      res.status(201).send(newResource);
     }
   } catch (err) {
     handleError(err);
@@ -35,7 +32,6 @@ const findAllResources = async (req, res) => {
   // All the data will already be appended by the units.
   try {
     let data = await Resource.find({}); //Find everything for me.
-    console.log(data);
     res.json(data);
   } catch (err) {
     handleError(err);

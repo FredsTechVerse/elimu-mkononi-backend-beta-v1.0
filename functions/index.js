@@ -18,47 +18,10 @@ const routes = [
 
 // CONNECTION TO DATABASE,
 //========================
+mongoose.set("strictQuery", false);
 mongoose.connect(process.env.DATABASE_URL, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
-});
-
-// CONNECTION TEST
-//=================
-const db = mongoose.connection;
-// CONNECTION ERROR HANDLING
-db.on("open", function (ref) {
-  connected = true;
-  console.log("open connection to mongo server.");
-});
-
-db.on("connected", function (ref) {
-  connected = true;
-  console.log("connected to mongo server.");
-});
-
-db.on("disconnected", function (ref) {
-  connected = false;
-  console.log("disconnected from mongo server.");
-});
-
-db.on("close", function (ref) {
-  connected = false;
-  console.log("close connection to mongo server");
-});
-
-db.on("error", function (err) {
-  connected = false;
-  if (err.code == "ESERVFAIL") {
-    console.log("Network Error");
-  } else {
-    console.log("error connection to mongo server!");
-  }
-});
-
-db.on("reconnect", function (ref) {
-  connected = true;
-  console.log("reconnect to mongo server.");
 });
 
 //CORS CONFIGURATION
@@ -91,7 +54,7 @@ app.get("/", (req, res) => {
   res.status(200).json({ message: "Hello from warmup server." });
 });
 
-// app.listen("3000", () => {
+// app.listen("4000", () => {
 //   console.log("Listening on port 3000");
 // });
 

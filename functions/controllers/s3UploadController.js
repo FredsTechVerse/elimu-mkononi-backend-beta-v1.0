@@ -17,32 +17,24 @@ const s3 = new S3({
   region,
   accessKeyId,
   secretAccessKey,
-  // We shall specify version if needed.
 });
 
-// Fetches our file in a stream. Meaning we can start consuming our data as it arrives.
-const getFileStream = async (fileKey) => {
-  try {
-    const downloadParams = {
-      Key: fileKey,
-      Bucket: bucketName,
-    };
-    const data = await s3.getObject(downloadParams).createReadStream();
-    return data;
-  } catch (e) {
-    throw new Error(`Could not retrieve file from S3: ${e.message}`);
-  }
+const getFileStream = (key, { start, end } = {}) => {
+  const params = {
+    Bucket: bucketName,
+    Key: key,
+    Range: `bytes=${start || 0}-${end || ""}`,
+  };
+
+  return s3.getObject(params).createReadStream();
 };
 
-// Only interested with the file type.
 const getSignedUrl = async (req, res) => {
-  //The body simply contains the file type.
   const { fileType } = req.body;
   const rawBytes = await randomBytes(16);
   const fileName = rawBytes.toString("hex"); //Geneerates a random filename.
   const fileExtension = fileType && fileType.split("/")[1];
   const Key = `${fileName}.${fileExtension}`;
-  console.log(`File name during signing URL ${Key} & fileType ${fileType}`);
   const contentType = (fileType) => {
     return fileType;
   };
@@ -53,7 +45,6 @@ const getSignedUrl = async (req, res) => {
     Expires: 400, // The number of seconds the URL is valid for. Default is 900 seconds (15 minutes)
   };
   const signedUrl = await s3.getSignedUrlPromise("putObject", params);
-  console.log(`Signed URL Params ${signedUrl}`);
   res.status(201).json({ signedUrl, Key });
 };
 
@@ -69,8 +60,7 @@ const deleteFile = async (req, res) => {
     await s3.deleteObject(params).promise();
     res.status(200).json({ message: "File deleted successfully" });
   } catch (error) {
-    console.log(error);
-    res.status(500).json({ error: "Failed to delete file" });
+    res.status(500).json({ message: "Failed to delete file" });
   }
 };
 

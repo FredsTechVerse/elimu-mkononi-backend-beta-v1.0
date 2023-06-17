@@ -2,6 +2,44 @@
 
 This project is a guide to deploying an Express app using Firebase Functions.
 
+### CONNECTION TEST
+
+const db = mongoose.connection;
+
+db.on("open", function (ref) {
+connected = true;
+console.log("open connection to mongo server.");
+});
+
+db.on("connected", function (ref) {
+connected = true;
+console.log("connected to mongo server.");
+});
+
+db.on("disconnected", function (ref) {
+connected = false;
+console.log("disconnected from mongo server.");
+});
+
+db.on("close", function (ref) {
+connected = false;
+console.log("close connection to mongo server");
+});
+
+db.on("error", function (err) {
+connected = false;
+if (err.code == "ESERVFAIL") {
+console.log("Network Error");
+} else {
+console.log("error connection to mongo server!");
+}
+});
+
+db.on("reconnect", function (ref) {
+connected = true;
+console.log("reconnect to mongo server.");
+});
+
 ## REQUIREMENTS
 
 - Firebase account
