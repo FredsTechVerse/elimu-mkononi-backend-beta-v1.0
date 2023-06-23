@@ -2,6 +2,7 @@ const functions = require("firebase-functions");
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
+const { authenticateToken } = require("./controllers/AuthController");
 const app = express();
 require("dotenv").config();
 
@@ -45,6 +46,7 @@ app.use((req, res, next) => {
 });
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+app.use(authenticateToken);
 
 routes.forEach((route) => {
   app.use(route.path, route.route);

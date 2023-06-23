@@ -1,8 +1,7 @@
 ### GET REQUEST
-GET http://localhost:4000/notes/64498a04672fa96fb2250137
+POST http://localhost:5000/elearning-module-a887d/us-central1/app/auth/create-token
 
 ### POST REQUEST
-POST http://localhost:4000/lesson/newLesson
-Content-Type: application/json
+POST http://localhost:4000/auth/createTokenModel
 
 {"CName":"INTRODUCTION","LNo": 2143,"LName":"Lesson 400","LNotes":"Interesting Description","LVideo":"https://example3.com"} 

@@ -31,7 +31,7 @@ const createChapter = async (req, res) => {
           .send({ message: "Something went wrong while updating Unit model" });
       }
     } else {
-      res.status(400).json({ message: "Chapter not found" });
+      res.status(404).json({ message: "Unit not found" });
     }
   } catch (err) {
     handleError(err);

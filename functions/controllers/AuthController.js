@@ -20,17 +20,33 @@ const generateAccessToken = (userData) => {
 };
 const generateRefreshToken = (userData) => {
   return jwt.sign(userData, process.env.REFRESH_TOKEN_SECRET, {
-    expiresIn: "1y", //Should have a longer expiration time.
+    expiresIn: "2d", //Should have a longer expiration time.
   });
 };
 
 const authenticateToken = async (req, res, next) => {
   try {
     const authHeader = req.headers["authorization"];
+    console.log(`Auth Header ${JSON.stringify(authHeader)}`);
     const token = authHeader?.split(" ")[1];
-
-    if (!token) {
+    console.log(`Request path ${JSON.stringify(req.path)}`);
+    console.log(token);
+    if (
+      !token &&
+      req.path !== "/course/all-courses" &&
+      req.path !== "/auth/login" &&
+      req.path !== "/auth/register-student"
+    ) {
       return res.sendStatus(401);
+    }
+    // Exclude token verification for the /all-courses route
+    if (
+      req.path === "/course/all-courses" ||
+      "/auth/login" ||
+      "/auth/register-student"
+    ) {
+      req.user = null; // Set user to null or any other value if required for this route
+      return next();
     }
     const payload = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
     req.user = payload;
@@ -69,8 +85,7 @@ const renewTokens = async (req, res) => {
   jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, payload) => {
     if (err) {
       return res.status(403).json({
-        message:
-          "We have your refresh token but somehow we are encountering some issues.",
+        message: "The resource token has been tampered with!",
       });
     } else {
       // We destructure to sieve only the info that we require.
@@ -142,7 +157,6 @@ const registerAdmin = async (req, res) => {
 const logInUser = async (req, res) => {
   try {
     let userData = null;
-    let role = null;
 
     // First, check if user is a student
     userData = await Student.findOne({ firstName: req.body.firstName });
@@ -154,9 +168,10 @@ const logInUser = async (req, res) => {
     }
     if (!userData) {
       // If user is not found in any database, return 404
+      console.log("User has not been found");
       return res.sendStatus(404);
     }
-
+    console.log("Comparing passwords");
     // Check if password is correct
     const passwordMatches = await bcrypt.compare(
       req.body.password,
@@ -190,7 +205,7 @@ const logInUser = async (req, res) => {
       });
     }
   } catch (err) {
-    handleError(err);
+    handleError(err, res);
   }
 };
 

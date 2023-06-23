@@ -7,6 +7,7 @@ const { handleError } = require("./ErrorHandling");
 
 const createNotes = async (req, res) => {
   try {
+    console.log(`Creating notes : ${JSON.stringify(req.body)}`);
     // Extracting the data from the request body.
     let { lessonNotes, lessonID } = req.body;
     // Creating a new Notes object.

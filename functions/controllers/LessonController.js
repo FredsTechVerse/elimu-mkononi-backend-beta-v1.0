@@ -8,6 +8,7 @@ const { handleError } = require("./ErrorHandling");
 
 const createLesson = async (req, res) => {
   try {
+    console.log(`Lesson Data : ${JSON.stringify(req.body)}`);
     let { chapterID, lessonNumber, lessonName, lessonUrl } = req.body;
     let lessonData = {
       lessonNumber,
