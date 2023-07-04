@@ -5,3 +5,6 @@ POST http://localhost:5000/elearning-module-a887d/us-central1/app/auth/create-to
 POST http://localhost:4000/auth/createTokenModel
 
 {"CName":"INTRODUCTION","LNo": 2143,"LName":"Lesson 400","LNotes":"Interesting Description","LVideo":"https://example3.com"} 
+
+### AUTHORIZATION REQUEST 
+GET http://localhost:5000/elearning-module-a887d/us-central1/app/oAuth/authorizationUrl

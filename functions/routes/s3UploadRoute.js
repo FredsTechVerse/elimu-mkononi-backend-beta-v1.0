@@ -1,6 +1,5 @@
 const express = require("express");
 const router = express.Router();
-const fs = require("fs");
 
 const AWS = require("aws-sdk");
 const accessKeyId = process.env.AWS_ACCESS_KEY;

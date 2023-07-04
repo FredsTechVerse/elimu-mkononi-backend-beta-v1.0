@@ -15,12 +15,12 @@ const { handleError, handleJwtError } = require("./ErrorHandling");
 //=======================
 const generateAccessToken = (userData) => {
   return jwt.sign(userData, process.env.ACCESS_TOKEN_SECRET, {
-    expiresIn: "30m", //Usually shorter for sercurity reasons.
+    expiresIn: 30, //Usually shorter for sercurity reasons.
   });
 };
 const generateRefreshToken = (userData) => {
   return jwt.sign(userData, process.env.REFRESH_TOKEN_SECRET, {
-    expiresIn: "2d", //Should have a longer expiration time.
+    expiresIn: "1d", //Should have a longer expiration time.
   });
 };
 
@@ -30,14 +30,14 @@ const authenticateToken = async (req, res, next) => {
     console.log(`Auth Header ${JSON.stringify(authHeader)}`);
     const token = authHeader?.split(" ")[1];
     console.log(`Request path ${JSON.stringify(req.path)}`);
-    console.log(token);
+    console.log(`Token passed ${token}`);
     if (
       !token &&
       req.path !== "/course/all-courses" &&
       req.path !== "/auth/login" &&
       req.path !== "/auth/register-student"
     ) {
-      return res.sendStatus(401);
+      return res.status(401).json({ error: "Unauthorized user" });
     }
     // Exclude token verification for the /all-courses route
     if (
@@ -49,6 +49,7 @@ const authenticateToken = async (req, res, next) => {
       return next();
     }
     const payload = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+    console.log(`Verified token ${payload}`);
     req.user = payload;
     next();
   } catch (err) {

@@ -15,6 +15,7 @@ const routes = [
   { path: "/notes", route: require("./routes/NotesRoute") },
   { path: "/unit", route: require("./routes/UnitRoute") },
   { path: "/auth", route: require("./routes/AuthRoute") },
+  { path: "/oAuth", route: require("./routes/OAuthRoute") },
 ];
 
 // CONNECTION TO DATABASE,
@@ -46,7 +47,7 @@ app.use((req, res, next) => {
 });
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
-app.use(authenticateToken);
+// app.use(authenticateToken);
 
 routes.forEach((route) => {
   app.use(route.path, route.route);
