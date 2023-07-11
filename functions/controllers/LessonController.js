@@ -1,25 +1,24 @@
-// MODEL IMPORTATION
-//===================
 const Lesson = require("../models/LessonModel");
 const Chapter = require("../models/ChapterModel");
-
-// ERROR HANDLING
 const { handleError } = require("./ErrorHandling");
 
 const createLesson = async (req, res) => {
   try {
-    console.log(`Lesson Data : ${JSON.stringify(req.body)}`);
-    let { chapterID, lessonNumber, lessonName, lessonUrl } = req.body;
+    console.log(`Lesson Data received : ${JSON.stringify(req.body)}`);
+    let { chapterID, lessonNumber, lessonName, lessonUrl, thumbnails } =
+      req.body;
     let lessonData = {
       lessonNumber,
       lessonName,
       lessonUrl,
+      thumbnails,
     };
-    //Creating our new lesson
+    console.log(
+      `Thumbnails data to be sent to server ${JSON.stringify(thumbnails)}`
+    );
     let newLesson = await Lesson.create(lessonData);
     newLesson.save();
-    let { _id: lessonID } = newLesson; // Extracting ID from staved Lesson
-    // Pushing the lesson ID to the chapter.
+    let { _id: lessonID } = newLesson;
     let chapterData = await Chapter.findByIdAndUpdate(
       chapterID,
       { $push: { chapterLessons: lessonID } },
@@ -35,10 +34,10 @@ const createLesson = async (req, res) => {
 const findLesson = async (req, res) => {
   try {
     const { lessonId } = req.params;
-    let data = await Lesson.findById(lessonId).populate([
+    let lessonData = await Lesson.findById(lessonId).populate([
       "lessonNotes,lessonResources",
     ]);
-    res.json(data);
+    res.json(lessonData);
   } catch (err) {
     handleError(err);
   }
@@ -46,9 +45,9 @@ const findLesson = async (req, res) => {
 
 const deleteLesson = async (req, res) => {
   try {
-    const { lessonId } = req.params;
-    let deletedLesson = await User.findByIdAndDelete(lessonId);
-    res.json(deletedLesson);
+    const { lessonID } = req.params;
+    await Lesson.findByIdAndDelete(lessonID);
+    res.status(200).json({ message: "Lesson deleted successfully" });
   } catch (err) {
     handleError(err);
   }

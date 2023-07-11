@@ -93,10 +93,21 @@ const createUnit = async (req, res) => {
   }
 };
 
+const deleteUnit = async (req, res) => {
+  const { unitID } = req.params;
+  try {
+    await Unit.findByIdAndDelete(unitID);
+    res.status(200).json({ message: "Unit deleted successfully" });
+  } catch (err) {
+    handleError(err);
+  }
+};
+
 module.exports = {
   createUnit,
   getAllUnits,
   getUnit,
   getUnitWithChapters,
   getUnitWithLessons,
+  deleteUnit,
 };

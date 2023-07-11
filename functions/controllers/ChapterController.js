@@ -1,9 +1,5 @@
-// MODEL IMPORTATION
-//===================
 const Chapter = require("../models/ChapterModel");
 const Unit = require("../models/UnitModel");
-
-// ERROR HANDLING
 const { handleError } = require("./ErrorHandling");
 
 const createChapter = async (req, res) => {
@@ -49,8 +45,8 @@ const findAllChapters = async (req, res) => {
 
 const populateChapterLessons = async (req, res) => {
   try {
-    let data = await Chapter.find({}).populate("ChapterLessons");
-    res.json(data);
+    let chapterData = await Chapter.find({}).populate("ChapterLessons");
+    res.json(chapterData);
   } catch (err) {
     handleError(err);
   }
@@ -59,8 +55,20 @@ const populateChapterLessons = async (req, res) => {
 const findChapter = async (req, res) => {
   const { chapterId } = req.params;
   try {
-    let data = await Chapter.findById(chapterId).populate("chapterLessons");
-    res.json(data);
+    let chapterData = await Chapter.findById(chapterId).populate(
+      "chapterLessons"
+    );
+    res.json(chapterData);
+  } catch (err) {
+    handleError(err);
+  }
+};
+
+const deleteChapter = async (req, res) => {
+  try {
+    const { chapterID } = req.params;
+    await Chapter.findByIdAndDelete(chapterID);
+    res.status(200).json({ message: "Chapter deleted successfully" });
   } catch (err) {
     handleError(err);
   }
@@ -71,4 +79,5 @@ module.exports = {
   findChapter,
   findAllChapters,
   populateChapterLessons,
+  deleteChapter,
 };

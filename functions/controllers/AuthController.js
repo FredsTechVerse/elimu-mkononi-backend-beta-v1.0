@@ -15,12 +15,12 @@ const { handleError, handleJwtError } = require("./ErrorHandling");
 //=======================
 const generateAccessToken = (userData) => {
   return jwt.sign(userData, process.env.ACCESS_TOKEN_SECRET, {
-    expiresIn: 30, //Usually shorter for sercurity reasons.
+    expiresIn: 30,
   });
 };
 const generateRefreshToken = (userData) => {
   return jwt.sign(userData, process.env.REFRESH_TOKEN_SECRET, {
-    expiresIn: "1d", //Should have a longer expiration time.
+    expiresIn: "1d",
   });
 };
 
@@ -39,13 +39,12 @@ const authenticateToken = async (req, res, next) => {
     ) {
       return res.status(401).json({ error: "Unauthorized user" });
     }
-    // Exclude token verification for the /all-courses route
     if (
       req.path === "/course/all-courses" ||
       "/auth/login" ||
       "/auth/register-student"
     ) {
-      req.user = null; // Set user to null or any other value if required for this route
+      req.user = null;
       return next();
     }
     const payload = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
@@ -70,13 +69,11 @@ const createTokenModel = async (req, res) => {
   }
 };
 const renewTokens = async (req, res) => {
-  // Trap 1 : Checks if the refresh token is present
   const refreshToken = req.body?.refreshToken;
 
   if (!refreshToken) {
     return res.sendStatus(401);
   }
-  // Trap 2 : Compares the refresh tokens
 
   let refreshTokens = await RefreshToken.findOne({ name: "tokens" });
   if (!refreshTokens.data.includes(refreshToken)) {
@@ -89,7 +86,6 @@ const renewTokens = async (req, res) => {
         message: "The resource token has been tampered with!",
       });
     } else {
-      // We destructure to sieve only the info that we require.
       const { firstName, surname, role } = payload;
       const userData = { firstName, surname, role };
       const accessToken = generateAccessToken(userData);
@@ -168,12 +164,10 @@ const logInUser = async (req, res) => {
       userData = await Admin.findOne({ firstName: req.body.firstName });
     }
     if (!userData) {
-      // If user is not found in any database, return 404
       console.log("User has not been found");
       return res.sendStatus(404);
     }
     console.log("Comparing passwords");
-    // Check if password is correct
     const passwordMatches = await bcrypt.compare(
       req.body.password,
       userData.password
@@ -181,8 +175,6 @@ const logInUser = async (req, res) => {
     if (!passwordMatches) {
       return res.sendStatus(401);
     }
-
-    // If everything is OK, generate and send access and refresh tokens
     const user = {
       firstName: userData.firstName,
       surname: userData.surname,
@@ -212,7 +204,6 @@ const logInUser = async (req, res) => {
 
 const logOutUser = async (req, res) => {
   try {
-    // Check if refreshTokens document exists
     let refreshTokens = await RefreshToken.findOne({ name: "tokens" });
     if (!refreshTokens) {
       return res.status(404).json({ message: "Refresh tokens not found." });
@@ -222,11 +213,7 @@ const logOutUser = async (req, res) => {
     refreshTokens.data = refreshTokens.data.filter(
       (token) => token !== req.body.token
     );
-
-    // Save refreshTokens document
     await refreshTokens.save();
-
-    // Send success response
     res.sendStatus(204);
   } catch (err) {
     handleError(err);
@@ -268,7 +255,6 @@ const deleteTutorById = async (req, res) => {
   }
 };
 
-// ADMIN SECTION
 const findAllAdmins = async (req, res) => {
   try {
     const adminData = await Admin.find({});
@@ -302,7 +288,6 @@ const deleteAdminById = async (req, res) => {
   }
 };
 
-// STUDENT SECTION
 const findStudentById = async (req, res) => {
   try {
     let { studentId } = req.params;

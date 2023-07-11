@@ -18,6 +18,7 @@ const routes = [
   { path: "/oAuth", route: require("./routes/OAuthRoute") },
 ];
 
+console.log(`Connection url ${process.env.DATABASE_URL}`);
 // CONNECTION TO DATABASE,
 //========================
 mongoose.set("strictQuery", false);
@@ -58,7 +59,7 @@ app.get("/", (req, res) => {
 });
 
 // app.listen("4000", () => {
-//   console.log("Listening on port 3000");
+//   console.log("Listening on port 4000");
 // });
 
 exports.app = functions.https.onRequest(app);
