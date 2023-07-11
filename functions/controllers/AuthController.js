@@ -255,7 +255,6 @@ const deleteTutorById = async (req, res) => {
   }
 };
 
-// ADMIN SECTION
 const findAllAdmins = async (req, res) => {
   try {
     const adminData = await Admin.find({});
@@ -289,7 +288,6 @@ const deleteAdminById = async (req, res) => {
   }
 };
 
-// STUDENT SECTION
 const findStudentById = async (req, res) => {
   try {
     let { studentId } = req.params;
