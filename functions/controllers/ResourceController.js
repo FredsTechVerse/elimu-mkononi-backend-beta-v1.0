@@ -1,9 +1,5 @@
-// MODEL IMPORTATION
-//===================
 const Resource = require("../models/ResourceModel");
 const Lesson = require("../models/LessonModel");
-
-// ERROR HANDLING CONTROLLER
 const { handleError } = require("./ErrorHandling");
 
 const createResource = async (req, res) => {
@@ -13,7 +9,6 @@ const createResource = async (req, res) => {
     let newResource = await Resource.create(resourceData);
     newResource.save();
     let { _id: resourceID } = newResource;
-    // Pushing the notes ID to the lesson.
     let lessonData = await Lesson.findByIdAndUpdate(
       lessonID,
       { $set: { lessonNotes: resourceID } },
@@ -29,20 +24,28 @@ const createResource = async (req, res) => {
 };
 
 const findAllResources = async (req, res) => {
-  // All the data will already be appended by the units.
   try {
-    let data = await Resource.find({}); //Find everything for me.
+    let data = await Resource.find({});
     res.json(data);
   } catch (err) {
     handleError(err);
   }
 };
 const findResource = async (req, res) => {
-  // All the data will already be appended by the units.
   const { resourceId } = req.params;
   try {
-    let data = await Resource.findById(resourceId);
-    res.json(data);
+    let resourceData = await Resource.findById(resourceId);
+    res.json(resourceData);
+  } catch (err) {
+    handleError(err);
+  }
+};
+
+const deleteResource = async (req, res) => {
+  try {
+    const { resourceID } = req.params;
+    await Resource.findByIdAndDelete(resourceID);
+    res.status(200).json({ message: "Resource deleted successfully" });
   } catch (err) {
     handleError(err);
   }
@@ -51,4 +54,5 @@ module.exports = {
   findAllResources,
   findResource,
   createResource,
+  deleteResource,
 };

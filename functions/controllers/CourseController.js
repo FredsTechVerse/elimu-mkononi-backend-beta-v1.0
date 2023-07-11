@@ -1,7 +1,4 @@
-// MODEL IMPORTATION
-//===================
 const Course = require("../models/CourseModel");
-// ERROR HANDLING
 const { handleError } = require("./ErrorHandling");
 
 const createCourse = async (req, res) => {
@@ -17,26 +14,36 @@ const createCourse = async (req, res) => {
 };
 
 const findAllCourses = async (req, res) => {
-  // All the data will already be appended by the units.
   try {
-    let data = await Course.find({}); //Find everything for me.
-    res.json(data);
+    let courseData = await Course.find({});
+    res.json(courseData);
   } catch (err) {
     handleError(err);
   }
 };
 const findCourse = async (req, res) => {
-  // All the data will already be appended by the units.
   const { courseID } = req.params;
   try {
-    let data = await Course.findById(courseID).populate("units"); //Find everything for me.
-    res.json(data);
+    let courseData = await Course.findById(courseID).populate("units"); //Find everything for me.
+    res.json(courseData);
   } catch (err) {
     handleError(err);
   }
 };
+
+const deleteCourse = async (req, res) => {
+  try {
+    const { courseID } = req.params;
+    await Course.findByIdAndDelete(courseID);
+    res.status(200).json({ message: "Course deleted successfully" });
+  } catch (err) {
+    handleError(err);
+  }
+};
+
 module.exports = {
   findAllCourses,
   findCourse,
   createCourse,
+  deleteCourse,
 };

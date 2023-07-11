@@ -5,6 +5,7 @@ const randomBytes = promisify(crypto.randomBytes);
 const fs = require("fs");
 // S3 CONFIGS
 const { S3Client, GetObjectCommand } = require("@aws-sdk/client-s3");
+
 // S3 CREDENTIALS
 const bucketName = process.env.AWS_BUCKET_NAME;
 const region = process.env.AWS_BUCKET_REGION;
@@ -21,7 +22,6 @@ const client = new S3Client({
   },
 });
 
-// Fetches our file in a stream. Meaning we can start consuming our data as it arrives.
 const getFileStream = async (fileKey) => {
   try {
     const downloadParams = {
@@ -40,7 +40,7 @@ const getSignedUrl = async (req, res) => {
   const { fileType } = await req.body;
   // File name generation
   const rawBytes = await randomBytes(16);
-  const fileName = rawBytes.toString("hex"); //Geneerates a random filename.
+  const fileName = rawBytes.toString("hex");
   const fileExtension = fileType && fileType.split("/")[1];
   const Key = `${fileName}.${fileExtension}`;
   const command = new GetObjectCommand({ Bucket: bucketName, Key: Key });
@@ -48,6 +48,4 @@ const getSignedUrl = async (req, res) => {
   res.status(201).json({ signedUrl, Key });
 };
 
-// EXPORTING THE TWO FUNCTIONS CREATED.
-//======================================
 module.exports = { getSignedUrl, getFileStream };

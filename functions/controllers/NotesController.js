@@ -1,20 +1,13 @@
-// MODEL IMPORTATION
 const Notes = require("../models/NotesModel");
 const Lesson = require("../models/LessonModel");
-
-// ERROR HANDLING
 const { handleError } = require("./ErrorHandling");
 
 const createNotes = async (req, res) => {
   try {
-    console.log(`Creating notes : ${JSON.stringify(req.body)}`);
-    // Extracting the data from the request body.
     let { lessonNotes, lessonID } = req.body;
-    // Creating a new Notes object.
     let newNotes = await Notes.create({ content: lessonNotes });
     newNotes.save();
     let { _id: notesID } = newNotes;
-    // Pushing the notes ID to the lesson.
     let lessonData = await Lesson.findByIdAndUpdate(
       lessonID,
       { $set: { lessonNotes: notesID } },
@@ -32,8 +25,8 @@ const createNotes = async (req, res) => {
 const findNote = async (req, res) => {
   const { notesID } = req.params;
   try {
-    let data = await Notes.findById(notesID);
-    res.json(data);
+    let NoteData = await Notes.findById(notesID);
+    res.json(NoteData);
   } catch (err) {
     handleError(err);
   }
@@ -41,10 +34,7 @@ const findNote = async (req, res) => {
 
 const updateNotes = async (req, res) => {
   try {
-    // Extracting the data from the request body.
     let { lessonNotes, notesID } = req.body;
-
-    //Updating the notes
     let updatedNotes = await Notes.findByIdAndUpdate(notesID, {
       $set: { content: lessonNotes },
     });
@@ -54,4 +44,14 @@ const updateNotes = async (req, res) => {
   }
 };
 
-module.exports = { createNotes, updateNotes, findNote };
+const deleteNotes = async (req, res) => {
+  try {
+    const { noteID } = req.params;
+    await Notes.findByIdAndDelete(noteID);
+    res.status(200).json({ message: "Note deleted successfully" });
+  } catch (err) {
+    handleError(err);
+  }
+};
+
+module.exports = { createNotes, updateNotes, findNote, deleteNotes };

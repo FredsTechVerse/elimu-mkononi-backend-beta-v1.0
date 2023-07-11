@@ -7,4 +7,9 @@ POST http://localhost:4000/auth/createTokenModel
 {"CName":"INTRODUCTION","LNo": 2143,"LName":"Lesson 400","LNotes":"Interesting Description","LVideo":"https://example3.com"} 
 
 ### AUTHORIZATION REQUEST 
-GET http://localhost:5000/elearning-module-a887d/us-central1/app/oAuth/authorizationUrl
+GET http://localhost:5000/elearning-module-a887d/us-central1/app/oAuth/authorizationUri
+### FETCH ACCESS TOKEN
+# GET http://localhost:5000/elearning-module-a887d/us-central1/app/oAuth/getToken?code=4/0AZEOvhVHvn7_-tKFyfs1td7rGXLIZYsFMxvFYVIqAZ7ptKPB-BtnClD7XMGbxNVNTqlTEg
+GET http://localhost:4000/oAuth/getToken?code=4/0AZEOvhVHvn7_-tKFyfs1td7rGXLIZYsFMxvFYVIqAZ7ptKPB-BtnClD7XMGbxNVNTqlTEg
+### NEW FETCH
+GET http://localhost:5000/elearning-module-a887d/us-central1/app/oAuth/getToken?code=4%2F0AZEOvhUb-4BqNManKZZy__qXJHynCkI8JEyVPfkTTfUBLsQBRSutrZ024arW5ciw9fvXaA&scope=https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fyoutube.upload
