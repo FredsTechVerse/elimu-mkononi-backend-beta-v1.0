@@ -15,7 +15,7 @@ const { handleError, handleJwtError } = require("./ErrorHandling");
 //=======================
 const generateAccessToken = (userData) => {
   return jwt.sign(userData, process.env.ACCESS_TOKEN_SECRET, {
-    expiresIn: 30,
+    expiresIn: "30s",
   });
 };
 const generateRefreshToken = (userData) => {
@@ -26,29 +26,29 @@ const generateRefreshToken = (userData) => {
 
 const authenticateToken = async (req, res, next) => {
   try {
+    console.log("Authenticating user");
     const authHeader = req.headers["authorization"];
-    console.log(`Auth Header ${JSON.stringify(authHeader)}`);
     const token = authHeader?.split(" ")[1];
-    console.log(`Request path ${JSON.stringify(req.path)}`);
-    console.log(`Token passed ${token}`);
+    console.log(`Authentication Token ${JSON.stringify(token)}`);
     if (
       !token &&
       req.path !== "/course/all-courses" &&
       req.path !== "/auth/login" &&
       req.path !== "/auth/register-student"
     ) {
-      return res.status(401).json({ error: "Unauthorized user" });
-    }
-    if (
+      return res.status(401).json({ message: "Unauthorized user" });
+    } else if (
       req.path === "/course/all-courses" ||
       "/auth/login" ||
       "/auth/register-student"
     ) {
+      console.log(req.path);
+      console.log("Authentication has been bypassed");
       req.user = null;
       return next();
     }
     const payload = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
-    console.log(`Verified token ${payload}`);
+    console.log("User authenticated successfully!");
     req.user = payload;
     next();
   } catch (err) {
@@ -69,10 +69,11 @@ const createTokenModel = async (req, res) => {
   }
 };
 const renewTokens = async (req, res) => {
+  console.log("Renewing access token");
   const refreshToken = req.body?.refreshToken;
 
   if (!refreshToken) {
-    return res.sendStatus(401);
+    return res.status(401).json({ message: "Token not found in request body" });
   }
 
   let refreshTokens = await RefreshToken.findOne({ name: "tokens" });
@@ -83,13 +84,14 @@ const renewTokens = async (req, res) => {
   jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, payload) => {
     if (err) {
       return res.status(403).json({
-        message: "The resource token has been tampered with!",
+        message: "The refresh token has been tampered with!",
       });
     } else {
       const { firstName, surname, role } = payload;
       const userData = { firstName, surname, role };
       const accessToken = generateAccessToken(userData);
-      res.json({ accessToken, refreshToken });
+
+      res.json({ newAccessToken: accessToken });
     }
   });
 };
@@ -154,8 +156,6 @@ const registerAdmin = async (req, res) => {
 const logInUser = async (req, res) => {
   try {
     let userData = null;
-
-    // First, check if user is a student
     userData = await Student.findOne({ firstName: req.body.firstName });
     if (!userData) {
       userData = await Tutor.findOne({ firstName: req.body.firstName });
@@ -164,16 +164,14 @@ const logInUser = async (req, res) => {
       userData = await Admin.findOne({ firstName: req.body.firstName });
     }
     if (!userData) {
-      console.log("User has not been found");
       return res.sendStatus(404);
     }
-    console.log("Comparing passwords");
     const passwordMatches = await bcrypt.compare(
       req.body.password,
       userData.password
     );
     if (!passwordMatches) {
-      return res.sendStatus(401);
+      return res.status(401).json({ message: "The passwords do not match" });
     }
     const user = {
       firstName: userData.firstName,
@@ -193,7 +191,6 @@ const logInUser = async (req, res) => {
       res.status(200).json({
         accessToken,
         refreshToken,
-        user: { firstName: user.firstName, surname: user.surname },
         roles: [user.role],
       });
     }

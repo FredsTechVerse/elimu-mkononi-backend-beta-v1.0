@@ -10,17 +10,17 @@ const LessonSchema = new Schema(
       default: {
         url: { type: String, required: true },
         width: { type: Number, required: true },
-        type: { type: Number, required: true },
+        height: { type: Number, required: true },
       },
       medium: {
         url: { type: String, required: true },
         width: { type: Number, required: true },
-        type: { type: Number, required: true },
+        height: { type: Number, required: true },
       },
       high: {
         url: { type: String, required: true },
         width: { type: Number, required: true },
-        type: { type: Number, required: true },
+        height: { type: Number, required: true },
       },
     },
     lessonNotes: {

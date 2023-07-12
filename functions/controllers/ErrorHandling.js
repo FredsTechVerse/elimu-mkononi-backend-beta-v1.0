@@ -1,33 +1,34 @@
-const handleError = (error, res) => {
+const handleError = (err, res) => {
   let statusCode = 500;
   let errorMessage = "Something went wrong";
 
-  if (error.name === "MongoError" && error.code === 11000) {
+  if (err.name === "MongoError" && err.code === 11000) {
     statusCode = 409;
     errorMessage = "This document already exists!";
-  } else if (error.name === "ValidationError") {
+  } else if (err.name === "ValidationError") {
     statusCode = 400;
-    errorMessage = error.message;
-  } else if (error.name === "CastError") {
+    errorMessage = err.message;
+  } else if (err.name === "CastError") {
     statusCode = 422;
     errorMessage = "Invalid ID";
   }
-
-  // Log other errors
-  console.error(error);
+  console.log(err);
 
   // Send the error response
   return res.status(statusCode).json({ message: errorMessage });
 };
 
 const handleJwtError = (err, res) => {
+  console.log(`The jwt error that has occured ${err}`);
   if (err.name === "TokenExpiredError") {
-    return res.status(401).json({ error: "Token expired" });
+    return res.status(401).json({ message: "Token expired" });
   }
   if (err.name === "JsonWebTokenError") {
-    return res.status(401).json({ error: "Invalid token" });
+    return res.status(401).json({ message: "Invalid token" });
   }
-  return res.status(500).json({ error: "Internal server error" });
+  return res
+    .status(500)
+    .json({ message: "Something went wrong during authentication" });
 };
 
 module.exports = { handleError, handleJwtError };
