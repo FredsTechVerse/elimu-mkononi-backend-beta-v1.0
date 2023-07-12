@@ -30,7 +30,7 @@ const createChapter = async (req, res) => {
       res.status(404).json({ message: "Unit not found" });
     }
   } catch (err) {
-    handleError(err);
+    handleError(err, res);
   }
 };
 
@@ -39,7 +39,7 @@ const findAllChapters = async (req, res) => {
     let allChapters = await Chapter.find({});
     res.json(allChapters);
   } catch (err) {
-    handleError(err);
+    handleError(err, res);
   }
 };
 
@@ -48,7 +48,7 @@ const populateChapterLessons = async (req, res) => {
     let chapterData = await Chapter.find({}).populate("ChapterLessons");
     res.json(chapterData);
   } catch (err) {
-    handleError(err);
+    handleError(err, res);
   }
 };
 
@@ -60,7 +60,7 @@ const findChapter = async (req, res) => {
     );
     res.json(chapterData);
   } catch (err) {
-    handleError(err);
+    handleError(err, res);
   }
 };
 
@@ -70,7 +70,7 @@ const deleteChapter = async (req, res) => {
     await Chapter.findByIdAndDelete(chapterID);
     res.status(200).json({ message: "Chapter deleted successfully" });
   } catch (err) {
-    handleError(err);
+    handleError(err, res);
   }
 };
 

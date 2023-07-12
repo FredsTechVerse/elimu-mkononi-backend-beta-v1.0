@@ -19,7 +19,7 @@ const createResource = async (req, res) => {
       res.status(201).send(newResource);
     }
   } catch (err) {
-    handleError(err);
+    handleError(err, res);
   }
 };
 
@@ -28,7 +28,7 @@ const findAllResources = async (req, res) => {
     let data = await Resource.find({});
     res.json(data);
   } catch (err) {
-    handleError(err);
+    handleError(err, res);
   }
 };
 const findResource = async (req, res) => {
@@ -37,7 +37,7 @@ const findResource = async (req, res) => {
     let resourceData = await Resource.findById(resourceId);
     res.json(resourceData);
   } catch (err) {
-    handleError(err);
+    handleError(err, res);
   }
 };
 
@@ -47,7 +47,7 @@ const deleteResource = async (req, res) => {
     await Resource.findByIdAndDelete(resourceID);
     res.status(200).json({ message: "Resource deleted successfully" });
   } catch (err) {
-    handleError(err);
+    handleError(err, res);
   }
 };
 module.exports = {

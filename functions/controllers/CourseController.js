@@ -9,7 +9,7 @@ const createCourse = async (req, res) => {
     newCourse.save();
     res.status(201).json(newCourse);
   } catch (err) {
-    handleError(err);
+    handleError(err, res);
   }
 };
 
@@ -18,7 +18,7 @@ const findAllCourses = async (req, res) => {
     let courseData = await Course.find({});
     res.json(courseData);
   } catch (err) {
-    handleError(err);
+    handleError(err, res);
   }
 };
 const findCourse = async (req, res) => {
@@ -27,7 +27,7 @@ const findCourse = async (req, res) => {
     let courseData = await Course.findById(courseID).populate("units"); //Find everything for me.
     res.json(courseData);
   } catch (err) {
-    handleError(err);
+    handleError(err, res);
   }
 };
 
@@ -37,7 +37,7 @@ const deleteCourse = async (req, res) => {
     await Course.findByIdAndDelete(courseID);
     res.status(200).json({ message: "Course deleted successfully" });
   } catch (err) {
-    handleError(err);
+    handleError(err, res);
   }
 };
 

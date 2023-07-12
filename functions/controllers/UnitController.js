@@ -14,7 +14,7 @@ const getUnit = async (req, res) => {
     let data = await Unit.findById(unitId);
     res.json(data);
   } catch (err) {
-    handleError(err);
+    handleError(err,res);
   }
 };
 const getUnitWithChapters = async (req, res) => {
@@ -24,7 +24,7 @@ const getUnitWithChapters = async (req, res) => {
     let data = await Unit.findById(unitId).populate("unitChapters");
     res.json(data);
   } catch (err) {
-    handleError(err);
+    handleError(err,res);
   }
 };
 
@@ -39,7 +39,7 @@ const getUnitWithLessons = async (req, res) => {
     });
     res.json(data);
   } catch (err) {
-    handleError(err);
+    handleError(err,res);
   }
 };
 
@@ -48,7 +48,7 @@ const getAllUnits = async (req, res) => {
     const unitsData = await Unit.find({});
     res.status(201).json(unitsData);
   } catch (err) {
-    handleError(err);
+    handleError(err,res);
   }
 };
 // Perfect Illustration of One to many relationship.
@@ -89,7 +89,7 @@ const createUnit = async (req, res) => {
       res.sendStatus(201);
     }
   } catch (err) {
-    handleError(err);
+    handleError(err,res);
   }
 };
 
@@ -99,7 +99,7 @@ const deleteUnit = async (req, res) => {
     await Unit.findByIdAndDelete(unitID);
     res.status(200).json({ message: "Unit deleted successfully" });
   } catch (err) {
-    handleError(err);
+    handleError(err,res);
   }
 };
 

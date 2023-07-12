@@ -19,7 +19,7 @@ const handleError = (err, res) => {
 };
 
 const handleJwtError = (err, res) => {
-  console.log(`The jwt error that has occured ${err}`);
+  console.log(`The jwt error that has occured ${JSON.stringify(err)}`);
   if (err.name === "TokenExpiredError") {
     return res.status(401).json({ message: "Token expired" });
   }

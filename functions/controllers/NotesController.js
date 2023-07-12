@@ -18,7 +18,7 @@ const createNotes = async (req, res) => {
       res.status(201).send(newNotes);
     }
   } catch (err) {
-    handleError(err);
+    handleError(err, res);
   }
 };
 
@@ -28,7 +28,7 @@ const findNote = async (req, res) => {
     let NoteData = await Notes.findById(notesID);
     res.json(NoteData);
   } catch (err) {
-    handleError(err);
+    handleError(err, res);
   }
 };
 
@@ -40,7 +40,7 @@ const updateNotes = async (req, res) => {
     });
     return res.status(202).json({ message: updatedNotes });
   } catch (err) {
-    handleError(err);
+    handleError(err, res);
   }
 };
 
@@ -50,7 +50,7 @@ const deleteNotes = async (req, res) => {
     await Notes.findByIdAndDelete(noteID);
     res.status(200).json({ message: "Note deleted successfully" });
   } catch (err) {
-    handleError(err);
+    handleError(err, res);
   }
 };
 

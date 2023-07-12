@@ -28,7 +28,7 @@ const createLesson = async (req, res) => {
       res.status(201).send(newLesson);
     }
   } catch (err) {
-    handleError(err);
+    handleError(err, res);
   }
 };
 const findLesson = async (req, res) => {
@@ -39,7 +39,7 @@ const findLesson = async (req, res) => {
     ]);
     res.json(lessonData);
   } catch (err) {
-    handleError(err);
+    handleError(err, res);
   }
 };
 
@@ -49,7 +49,7 @@ const deleteLesson = async (req, res) => {
     await Lesson.findByIdAndDelete(lessonID);
     res.status(200).json({ message: "Lesson deleted successfully" });
   } catch (err) {
-    handleError(err);
+    handleError(err, res);
   }
 };
 

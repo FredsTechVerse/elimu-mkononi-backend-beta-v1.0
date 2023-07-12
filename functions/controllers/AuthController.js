@@ -30,29 +30,33 @@ const authenticateToken = async (req, res, next) => {
     const authHeader = req.headers["authorization"];
     const token = authHeader?.split(" ")[1];
     console.log(`Authentication Token ${JSON.stringify(token)}`);
+    console.log(`Path specified ${JSON.stringify(req.path)}`);
     if (
       !token &&
       req.path !== "/course/all-courses" &&
       req.path !== "/auth/login" &&
+      req.path !== "/auth/refresh-token" &&
       req.path !== "/auth/register-student"
     ) {
       return res.status(401).json({ message: "Unauthorized user" });
     } else if (
       req.path === "/course/all-courses" ||
-      "/auth/login" ||
-      "/auth/register-student"
+      req.path === "/auth/login" ||
+      req.path === "/auth/register-student" ||
+      req.path === "/auth/refresh-token"
     ) {
       console.log(req.path);
       console.log("Authentication has been bypassed");
       req.user = null;
       return next();
+    } else {
+      const payload = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+      console.log("User authenticated successfully!");
+      req.user = payload;
+      return next();
     }
-    const payload = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
-    console.log("User authenticated successfully!");
-    req.user = payload;
-    next();
   } catch (err) {
-    handleJwtError(err);
+    handleJwtError(err, res);
   }
 };
 
@@ -65,11 +69,11 @@ const createTokenModel = async (req, res) => {
     tokenData.save();
     res.status(200);
   } catch (err) {
-    handleError(err);
+    handleError(err, res);
   }
 };
 const renewTokens = async (req, res) => {
-  console.log("Renewing access token");
+  console.log(`Renewing access token ${JSON.stringify(req.body.refreshToken)}`);
   const refreshToken = req.body?.refreshToken;
 
   if (!refreshToken) {
@@ -83,6 +87,7 @@ const renewTokens = async (req, res) => {
 
   jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, payload) => {
     if (err) {
+      console.log("The refresh token has been tampered with!");
       return res.status(403).json({
         message: "The refresh token has been tampered with!",
       });
@@ -90,6 +95,7 @@ const renewTokens = async (req, res) => {
       const { firstName, surname, role } = payload;
       const userData = { firstName, surname, role };
       const accessToken = generateAccessToken(userData);
+      console.log(`Renewal successfull ${JSON.stringify(accessToken)}`);
 
       res.json({ newAccessToken: accessToken });
     }
@@ -113,7 +119,7 @@ const registerStudent = async (req, res) => {
       .status(201)
       .json({ message: "Student has been registered successfully." });
   } catch (err) {
-    handleError(err);
+    handleError(err, res);
   }
 };
 const registerTutor = async (req, res) => {
@@ -147,7 +153,7 @@ const registerAdmin = async (req, res) => {
     tutor.save();
     res.sendStatus(201);
   } catch (err) {
-    handleError(err);
+    handleError(err, res);
   }
 };
 
@@ -213,7 +219,7 @@ const logOutUser = async (req, res) => {
     await refreshTokens.save();
     res.sendStatus(204);
   } catch (err) {
-    handleError(err);
+    handleError(err, res);
   }
 };
 
@@ -227,7 +233,7 @@ const findTutorById = async (req, res) => {
     });
     res.status(200).json(tutorData);
   } catch (err) {
-    handleError(err);
+    handleError(err, res);
   }
 };
 const findAllTutors = async (req, res) => {
@@ -267,7 +273,7 @@ const findAdminById = async (req, res) => {
     let adminData = await Admin.findById(adminId);
     res.status(200).json(adminData);
   } catch (err) {
-    handleError(err);
+    handleError(err, res);
   }
 };
 
@@ -281,7 +287,7 @@ const deleteAdminById = async (req, res) => {
       }
     });
   } catch (err) {
-    handleError(err);
+    handleError(err, res);
   }
 };
 
@@ -291,7 +297,7 @@ const findStudentById = async (req, res) => {
     let studentData = await Student.findById(studentId);
     res.status(200).json(studentData);
   } catch (err) {
-    handleError(err);
+    handleError(err, res);
   }
 };
 
@@ -300,7 +306,7 @@ const findAllStudents = async (req, res) => {
     const studentData = await Student.find({});
     res.status(200).json(studentData);
   } catch (err) {
-    handleError(err);
+    handleError(err, res);
   }
 };
 
@@ -314,7 +320,7 @@ const deleteStudentById = async (req, res) => {
       }
     });
   } catch (err) {
-    handleError(err);
+    handleError(err, res);
   }
 };
 
