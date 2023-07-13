@@ -15,7 +15,7 @@ const { handleError, handleJwtError } = require("./ErrorHandling");
 //=======================
 const generateAccessToken = (userData) => {
   return jwt.sign(userData, process.env.ACCESS_TOKEN_SECRET, {
-    expiresIn: "15s",
+    expiresIn: "5m",
   });
 };
 const generateRefreshToken = (userData) => {
