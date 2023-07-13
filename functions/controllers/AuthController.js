@@ -15,7 +15,7 @@ const { handleError, handleJwtError } = require("./ErrorHandling");
 //=======================
 const generateAccessToken = (userData) => {
   return jwt.sign(userData, process.env.ACCESS_TOKEN_SECRET, {
-    expiresIn: "30s",
+    expiresIn: "15s",
   });
 };
 const generateRefreshToken = (userData) => {
@@ -26,11 +26,8 @@ const generateRefreshToken = (userData) => {
 
 const authenticateToken = async (req, res, next) => {
   try {
-    console.log("Authenticating user");
     const authHeader = req.headers["authorization"];
     const token = authHeader?.split(" ")[1];
-    console.log(`Authentication Token ${JSON.stringify(token)}`);
-    console.log(`Path specified ${JSON.stringify(req.path)}`);
     if (
       !token &&
       req.path !== "/course/all-courses" &&
@@ -45,13 +42,12 @@ const authenticateToken = async (req, res, next) => {
       req.path === "/auth/register-student" ||
       req.path === "/auth/refresh-token"
     ) {
-      console.log(req.path);
-      console.log("Authentication has been bypassed");
+      console.log(`Authentication has been bypassed by path ${req.path}`);
       req.user = null;
       return next();
     } else {
       const payload = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
-      console.log("User authenticated successfully!");
+      console.log("User has been authenticated successfully!");
       req.user = payload;
       return next();
     }
