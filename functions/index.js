@@ -4,7 +4,9 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 const { authenticateToken } = require("./controllers/AuthController");
 const app = express();
-require("dotenv").config();
+if (process.env.NODE_ENV !== "production") {
+  require("dotenv").config();
+}
 
 const routes = [
   { path: "/chapter", route: require("./routes/ChapterRoute") },
@@ -57,8 +59,8 @@ app.get("/", (req, res) => {
   res.status(200).json({ message: "Hello from warmup server." });
 });
 
-// app.listen("4000", () => {
-//   console.log("Listening on port 4000");
-// });
+app.listen("4000", () => {
+  console.log("Listening on port 4000");
+});
 
-exports.app = functions.https.onRequest(app);
+// exports.app = functions.https.onRequest(app);

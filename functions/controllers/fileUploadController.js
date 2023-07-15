@@ -1,4 +1,3 @@
-require("dotenv").config();
 const crypto = require("crypto");
 const { promisify } = require("util");
 const randomBytes = promisify(crypto.randomBytes);

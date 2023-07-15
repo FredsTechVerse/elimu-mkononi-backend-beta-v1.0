@@ -3,6 +3,7 @@ const { handleError } = require("./ErrorHandling");
 
 const createCourse = async (req, res) => {
   try {
+    console.log(req.body);
     let { courseTitle, courseImage } = req.body;
     let courseData = { courseTitle, courseImage };
     let newCourse = await Course.create(courseData);

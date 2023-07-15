@@ -1,4 +1,3 @@
-require("dotenv").config();
 const crypto = require("crypto");
 const S3 = require("aws-sdk/clients/s3");
 const { promisify } = require("util");
@@ -35,16 +34,17 @@ const getSignedUrl = async (req, res) => {
   const fileName = rawBytes.toString("hex"); //Geneerates a random filename.
   const fileExtension = fileType && fileType.split("/")[1];
   const Key = `${fileName}.${fileExtension}`;
-  const contentType = (fileType) => {
-    return fileType;
-  };
+  // const contentType = (fileType) => {
+  //   return fileType;
+  // };
   const params = {
-    Bucket: bucketName, // The name of the bucket that you want to upload the file to
-    ContentType: contentType(fileType), // This is the file type that you are uploading
-    Key: Key, // Simply the name of the file at storage time
-    Expires: 400, // The number of seconds the URL is valid for. Default is 900 seconds (15 minutes)
+    Bucket: bucketName,
+    ContentType: fileType,
+    Key: Key,
+    Expires: 300,
   };
   const signedUrl = await s3.getSignedUrlPromise("putObject", params);
+  // const signedUrl = `https://${bucketName}.s3.${region}.amazonaws.com/${Key}`;
   res.status(201).json({ signedUrl, Key });
 };
 

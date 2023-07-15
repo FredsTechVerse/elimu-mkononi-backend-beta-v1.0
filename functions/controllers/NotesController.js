@@ -4,6 +4,9 @@ const { handleError } = require("./ErrorHandling");
 
 const createNotes = async (req, res) => {
   try {
+    console.log(
+      `Creating notes from the notes body : ${JSON.stringify(req.body)}`
+    );
     let { lessonNotes, lessonID } = req.body;
     let newNotes = await Notes.create({ content: lessonNotes });
     newNotes.save();
@@ -15,7 +18,7 @@ const createNotes = async (req, res) => {
     );
 
     if (lessonData.lessonNotes.equals(notesID)) {
-      res.status(201).send(newNotes);
+      res.status(201).json(newNotes);
     }
   } catch (err) {
     handleError(err, res);
@@ -23,9 +26,15 @@ const createNotes = async (req, res) => {
 };
 
 const findNote = async (req, res) => {
-  const { notesID } = req.params;
   try {
+    const { notesID } = req.params;
+
     let NoteData = await Notes.findById(notesID);
+    console.log(
+      `Here are the notes I have found ${JSON.stringify(
+        notesData
+      )} for the noteID ; ${notesID}`
+    );
     res.json(NoteData);
   } catch (err) {
     handleError(err, res);
@@ -35,10 +44,11 @@ const findNote = async (req, res) => {
 const updateNotes = async (req, res) => {
   try {
     let { lessonNotes, notesID } = req.body;
+    console.log(`We wanna update our notes to ${JSON.stringify(lessonNotes)}`);
     let updatedNotes = await Notes.findByIdAndUpdate(notesID, {
       $set: { content: lessonNotes },
     });
-    return res.status(202).json({ message: updatedNotes });
+    return res.status(202).json(updatedNotes);
   } catch (err) {
     handleError(err, res);
   }

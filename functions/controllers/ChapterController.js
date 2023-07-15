@@ -24,7 +24,7 @@ const createChapter = async (req, res) => {
       } else {
         res
           .status(500)
-          .send({ message: "Something went wrong while updating Unit model" });
+          .json({ message: "Something went wrong while updating Unit model" });
       }
     } else {
       res.status(404).json({ message: "Unit not found" });

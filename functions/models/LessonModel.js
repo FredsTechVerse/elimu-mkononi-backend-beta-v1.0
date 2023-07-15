@@ -6,23 +6,7 @@ const LessonSchema = new Schema(
     lessonNumber: { type: String, required: true },
     lessonName: { type: String, required: true, uppercase: true },
     lessonUrl: { type: String, required: true },
-    thumbnails: {
-      default: {
-        url: { type: String, required: true },
-        width: { type: Number, required: true },
-        height: { type: Number, required: true },
-      },
-      medium: {
-        url: { type: String, required: true },
-        width: { type: Number, required: true },
-        height: { type: Number, required: true },
-      },
-      high: {
-        url: { type: String, required: true },
-        width: { type: Number, required: true },
-        height: { type: Number, required: true },
-      },
-    },
+    videoKind: { type: String, required: true },
     lessonNotes: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Note",
@@ -35,8 +19,5 @@ const LessonSchema = new Schema(
     timestamps: true,
   }
 );
-
-// Creating a model.
 const LessonModel = mongoose.model("Lesson", LessonSchema);
-// Exporting the Model
 module.exports = LessonModel;

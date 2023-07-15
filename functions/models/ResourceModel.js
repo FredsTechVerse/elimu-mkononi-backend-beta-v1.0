@@ -17,5 +17,4 @@ const ResourceSchema = new Schema(
 // Creating a model.
 const ResourceModel = mongoose.model("Resource", ResourceSchema);
 
-// Exporting the Model
 module.exports = ResourceModel;

@@ -5,17 +5,14 @@ const { handleError } = require("./ErrorHandling");
 const createLesson = async (req, res) => {
   try {
     console.log(`Lesson Data received : ${JSON.stringify(req.body)}`);
-    let { chapterID, lessonNumber, lessonName, lessonUrl, thumbnails } =
+    let { chapterID, lessonNumber, lessonName, lessonUrl, videoKind } =
       req.body;
     let lessonData = {
       lessonNumber,
       lessonName,
       lessonUrl,
-      thumbnails,
+      videoKind,
     };
-    console.log(
-      `Thumbnails data to be sent to server ${JSON.stringify(thumbnails)}`
-    );
     let newLesson = await Lesson.create(lessonData);
     newLesson.save();
     let { _id: lessonID } = newLesson;
@@ -25,7 +22,7 @@ const createLesson = async (req, res) => {
       { new: true, useFindAndModify: false, runValidation: true }
     );
     if (chapterData._doc.chapterLessons.includes(lessonID)) {
-      res.status(201).send(newLesson);
+      res.status(201).json(newLesson);
     }
   } catch (err) {
     handleError(err, res);

@@ -16,7 +16,7 @@ const createResource = async (req, res) => {
     );
 
     if (lessonData.lessonNotes.equals(resourceID)) {
-      res.status(201).send(newResource);
+      res.status(201).json(newResource);
     }
   } catch (err) {
     handleError(err, res);

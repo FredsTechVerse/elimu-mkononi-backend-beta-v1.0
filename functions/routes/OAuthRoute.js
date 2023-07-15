@@ -2,7 +2,6 @@ const express = require("express");
 const axios = require("axios");
 const router = express.Router();
 const { google } = require("googleapis");
-require("dotenv").config();
 
 const clientId = process.env.CLIENT_ID;
 const clientSecret = process.env.CLIENT_SECRET;
@@ -22,7 +21,7 @@ router.get("/authorizationUri", (req, res) => {
     scope: scope,
   });
   console.log("Authorization URI:", authUri);
-  res.status(200).send(authUri);
+  res.status(200).json(authUri);
 });
 
 router.get("/getToken", (req, res) => {
@@ -48,11 +47,11 @@ router.get("/getToken", (req, res) => {
           accessToken
         )} Expires In :${JSON.stringify(expiresIn)}`
       );
-      res.send(accessToken);
+      res.json(accessToken);
     })
     .catch((error) => {
       console.error("Error exchanging code for access token:", error);
-      res.status(500).send("Failed to obtain access token");
+      res.status(500).json("Failed to obtain access token");
     });
 });
 
@@ -81,11 +80,11 @@ router.post("/getToken", (req, res) => {
           accessToken
         )} Expires In :${JSON.stringify(expiresIn)}`
       );
-      res.send(accessToken);
+      res.json(accessToken);
     })
     .catch((error) => {
       console.error("Error exchanging code for access token:", error);
-      res.status(500).send("Failed to obtain access token");
+      res.status(500).json("Failed to obtain access token");
     });
 });
 

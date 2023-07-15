@@ -1,6 +1,3 @@
-if (process.env.NODE_ENV !== "production") {
-  require("dotenv").config();
-}
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 
@@ -13,9 +10,18 @@ const { handleError, handleJwtError } = require("./ErrorHandling");
 
 // AUTHORIZATION SECTION
 //=======================
+const verifyAccess = (req, res) => {
+  try {
+    console.log("Access verified successfully!");
+    res.status(200).json({ message: "Permission Granted" });
+  } catch (err) {
+    handleError(err, res);
+  }
+};
+
 const generateAccessToken = (userData) => {
   return jwt.sign(userData, process.env.ACCESS_TOKEN_SECRET, {
-    expiresIn: "5m",
+    expiresIn: "15m",
   });
 };
 const generateRefreshToken = (userData) => {
@@ -33,16 +39,18 @@ const authenticateToken = async (req, res, next) => {
       req.path !== "/course/all-courses" &&
       req.path !== "/auth/login" &&
       req.path !== "/auth/refresh-token" &&
-      req.path !== "/auth/register-student"
+      req.path !== "/auth/register-student" &&
+      req.path !== "/s3Direct/*"
     ) {
       return res.status(401).json({ message: "Unauthorized user" });
     } else if (
       req.path === "/course/all-courses" ||
       req.path === "/auth/login" ||
       req.path === "/auth/register-student" ||
-      req.path === "/auth/refresh-token"
+      req.path === "/auth/refresh-token" ||
+      req.path === "/s3Direct/*"
     ) {
-      console.log(`Authentication has been bypassed by path ${req.path}`);
+      console.log(`Authentication has been bypassed by path : ${req.path}`);
       req.user = null;
       return next();
     } else {
@@ -109,8 +117,8 @@ const registerStudent = async (req, res) => {
       contact: req.body.contact,
       password: hashedPassword,
     };
-    const student = await Student.create(credentials);
-    student.save();
+    const newStudent = await Student.create(credentials);
+    newStudent.save();
     res
       .status(201)
       .json({ message: "Student has been registered successfully." });
@@ -128,8 +136,8 @@ const registerTutor = async (req, res) => {
       contact: req.body.contact,
       password: hashedPassword,
     };
-    const tutor = await Tutor.create(credentials);
-    tutor.save();
+    const newTutor = await Tutor.create(credentials);
+    newTutor.save();
     res.sendStatus(201);
   } catch (error) {
     handleError(error);
@@ -145,8 +153,8 @@ const registerAdmin = async (req, res) => {
       contact: req.body.contact,
       password: hashedPassword,
     };
-    const tutor = await Admin.create(credentials);
-    tutor.save();
+    const newAdmin = await Admin.create(credentials);
+    newAdmin.save();
     res.sendStatus(201);
   } catch (err) {
     handleError(err, res);
@@ -222,6 +230,7 @@ const logOutUser = async (req, res) => {
 // TUTOR SECTION
 const findTutorById = async (req, res) => {
   try {
+    console.log(JSON.stringify(req.user));
     let { _id: tutorId } = req.user;
     let tutorData = await Tutor.findById(tutorId).populate({
       path: "units",
@@ -340,4 +349,5 @@ module.exports = {
   deleteAdminById,
   logInUser,
   logOutUser,
+  verifyAccess,
 };

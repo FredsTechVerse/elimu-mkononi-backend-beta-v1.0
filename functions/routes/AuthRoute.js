@@ -1,4 +1,3 @@
-const axios = require("axios");
 const express = require("express");
 const router = express.Router();
 
@@ -7,7 +6,6 @@ const router = express.Router();
 const {
   createTokenModel,
   renewTokens,
-  authenticateToken,
   findStudentById,
   findAllStudents,
   registerStudent,
@@ -22,7 +20,15 @@ const {
   deleteAdminById,
   logInUser,
   logOutUser,
+  verifyAccess,
 } = require("../controllers/AuthController");
+
+// AUTHORIZATION ROUTES
+router.get("/verify-access", verifyAccess);
+router.post("/create-token", createTokenModel);
+router.post("/login", logInUser);
+router.post("/refresh-token", renewTokens);
+router.delete("/logout", logOutUser);
 
 // STUDENT ROUTES
 router.get("/all-students", findAllStudents);
@@ -32,7 +38,7 @@ router.delete("/student", deleteStudentById);
 
 // TUTOR ROUTES
 router.get("/all-tutors", findAllTutors);
-router.get("/tutor", authenticateToken, findTutorById);
+router.get("/tutor", findTutorById);
 router.post("/register-tutor", registerTutor);
 router.delete("/tutor", deleteTutorById);
 
@@ -41,11 +47,5 @@ router.get("/all-admins", findAllAdmins);
 router.get("/admin/:adminId", findAdminById);
 router.post("/register-admin", registerAdmin);
 router.delete("/admin", deleteAdminById);
-
-// AUTHORIZATION ROUTES
-router.post("/create-token", createTokenModel);
-router.post("/login", logInUser);
-router.post("/refresh-token", renewTokens);
-router.delete("/logout", logOutUser);
 
 module.exports = router;

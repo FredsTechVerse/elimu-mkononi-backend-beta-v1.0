@@ -65,7 +65,7 @@ router.get("/:key", async (req, res) => {
     // ============================
     readStream.on("error", (error) => {
       console.error("Stream error:", error);
-      res.status(500).send("An error occurred while streaming the video.");
+      res.status(500).json("An error occurred while streaming the video.");
     });
 
     readStream.on("end", () => {
@@ -81,7 +81,7 @@ router.get("/:key", async (req, res) => {
     readStream.pipe(res);
   } catch (err) {
     console.log(err);
-    res.status(404).send(err);
+    res.status(404).json(err);
   }
 });
 
