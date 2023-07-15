@@ -29,13 +29,13 @@ const findNote = async (req, res) => {
   try {
     const { notesID } = req.params;
 
-    let NoteData = await Notes.findById(notesID);
+    let noteData = await Notes.findById(notesID);
     console.log(
       `Here are the notes I have found ${JSON.stringify(
-        notesData
+        noteData
       )} for the noteID ; ${notesID}`
     );
-    res.json(NoteData);
+    res.json(noteData);
   } catch (err) {
     handleError(err, res);
   }

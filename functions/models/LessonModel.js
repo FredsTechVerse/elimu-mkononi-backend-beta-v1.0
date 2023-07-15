@@ -6,7 +6,7 @@ const LessonSchema = new Schema(
     lessonNumber: { type: String, required: true },
     lessonName: { type: String, required: true, uppercase: true },
     lessonUrl: { type: String, required: true },
-    videoKind: { type: String, required: true },
+    videoKind: { type: String, required: true, default: "youtube#video" },
     lessonNotes: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Note",
