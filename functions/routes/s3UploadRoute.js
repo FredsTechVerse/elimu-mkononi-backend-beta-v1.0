@@ -1,12 +1,14 @@
 const express = require("express");
 const router = express.Router();
 
-const { getSignedUrl } = require("../controllers/s3UploadController");
+// const { getSignedUrl } = require("../controllers/s3UploadController");
 const {
   getSignedFileUrl,
-} = require("../controllers/fileUploadControllers.jsx");
+  getFile,
+} = require("../controllers/fileUploadController");
 
 // router.post("/", getSignedUrl);
+router.get("/:fileKey", getFile);
 router.post("/", getSignedFileUrl);
 
 module.exports = router;

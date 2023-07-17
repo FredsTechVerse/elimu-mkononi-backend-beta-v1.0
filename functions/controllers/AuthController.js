@@ -40,7 +40,7 @@ const authenticateToken = async (req, res, next) => {
       req.path !== "/auth/login" &&
       req.path !== "/auth/refresh-token" &&
       req.path !== "/auth/register-student" &&
-      req.path !== "/s3Direct/*"
+      !req.path.startsWith("/s3Direct/")
     ) {
       return res.status(401).json({ message: "Unauthorized user" });
     } else if (
@@ -48,7 +48,7 @@ const authenticateToken = async (req, res, next) => {
       req.path === "/auth/login" ||
       req.path === "/auth/register-student" ||
       req.path === "/auth/refresh-token" ||
-      req.path === "/s3Direct/*"
+      req.path.startsWith("/s3Direct/")
     ) {
       console.log(`Authentication has been bypassed by path : ${req.path}`);
       req.user = null;
