@@ -18,25 +18,12 @@ const s3 = new S3({
   secretAccessKey,
 });
 
-const getFileStream = (key, { start, end } = {}) => {
-  const params = {
-    Bucket: bucketName,
-    Key: key,
-    Range: `bytes=${start || 0}-${end || ""}`,
-  };
-
-  return s3.getObject(params).createReadStream();
-};
-
 const getSignedUrl = async (req, res) => {
   const { fileType } = req.body;
   const rawBytes = await randomBytes(16);
   const fileName = rawBytes.toString("hex"); //Geneerates a random filename.
   const fileExtension = fileType && fileType.split("/")[1];
   const Key = `${fileName}.${fileExtension}`;
-  // const contentType = (fileType) => {
-  //   return fileType;
-  // };
   const params = {
     Bucket: bucketName,
     ContentType: fileType,
@@ -49,11 +36,11 @@ const getSignedUrl = async (req, res) => {
 };
 
 const deleteFile = async (req, res) => {
-  const { Key } = req.body; // The key of the file you want to delete
+  const { Key } = req.body; // The name of the file you want to delete
 
   const params = {
-    Bucket: bucketName, // The name of your S3 bucket
-    Key: Key, // The key of the file to delete
+    Bucket: bucketName,
+    Key: Key,
   };
 
   try {
