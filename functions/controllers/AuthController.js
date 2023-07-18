@@ -21,7 +21,7 @@ const verifyAccess = (req, res) => {
 
 const generateAccessToken = (userData) => {
   return jwt.sign(userData, process.env.ACCESS_TOKEN_SECRET, {
-    expiresIn: "15m",
+    expiresIn: "15s",
   });
 };
 const generateRefreshToken = (userData) => {
@@ -77,7 +77,6 @@ const createTokenModel = async (req, res) => {
   }
 };
 const renewTokens = async (req, res) => {
-  console.log(`Renewing access token ${JSON.stringify(req.body.refreshToken)}`);
   const refreshToken = req.body?.refreshToken;
 
   if (!refreshToken) {
@@ -96,8 +95,8 @@ const renewTokens = async (req, res) => {
         message: "The refresh token has been tampered with!",
       });
     } else {
-      const { firstName, surname, role } = payload;
-      const userData = { firstName, surname, role };
+      const { firstName, surname, role, userID } = payload;
+      const userData = { firstName, surname, role, userID };
       const accessToken = generateAccessToken(userData);
       console.log(`Renewal successfull ${JSON.stringify(accessToken)}`);
 
@@ -184,11 +183,12 @@ const logInUser = async (req, res) => {
       return res.status(401).json({ message: "The passwords do not match" });
     }
     const user = {
+      userID: userData._id,
       firstName: userData.firstName,
       surname: userData.surname,
       role: userData.role,
-      _id: userData._id,
     };
+    console.log(`User credentials while logging in ${JSON.stringify(user)}`);
     const accessToken = generateAccessToken(user);
     const refreshToken = generateRefreshToken(user);
     let { _id: tokenID } = await RefreshToken.findOne({ name: "tokens" });
@@ -230,12 +230,16 @@ const logOutUser = async (req, res) => {
 // TUTOR SECTION
 const findTutorById = async (req, res) => {
   try {
-    console.log(JSON.stringify(req.user));
-    let { _id: tutorId } = req.user;
-    let tutorData = await Tutor.findById(tutorId).populate({
+    console.log(
+      `User Data derived from access token ${JSON.stringify(req.user)}`
+    );
+    let { userID } = req.user;
+    console.log(`Tutor id derived from access token ${userID}`);
+    let tutorData = await Tutor.findById(userID).populate({
       path: "units",
       populate: "unitChapters",
     });
+    console.log(`The tutor data found ${JSON.stringify(tutorData)}`);
     res.status(200).json(tutorData);
   } catch (err) {
     handleError(err, res);
@@ -274,8 +278,8 @@ const findAllAdmins = async (req, res) => {
 
 const findAdminById = async (req, res) => {
   try {
-    let { adminId } = req.params;
-    let adminData = await Admin.findById(adminId);
+    let { userID } = req.user;
+    let adminData = await Admin.findById(userID);
     res.status(200).json(adminData);
   } catch (err) {
     handleError(err, res);

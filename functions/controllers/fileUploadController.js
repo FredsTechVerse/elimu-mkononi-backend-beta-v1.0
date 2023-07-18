@@ -48,7 +48,8 @@ const getFile = async (req, res) => {
     const response = await client.send(command);
     res.send(response);
   } catch (error) {
-    console.log(error);
+    // console.log(error);
+    console.log(`S3 Resource retrieval access denied error!`);
     res.status(500).json({ message: "Could not retrieve file from S3" });
   }
 };
