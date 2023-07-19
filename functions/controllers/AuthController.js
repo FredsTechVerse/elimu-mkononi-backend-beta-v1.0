@@ -34,23 +34,35 @@ const authenticateToken = async (req, res, next) => {
   try {
     const authHeader = req.headers["authorization"];
     const token = authHeader?.split(" ")[1];
+    console.log(
+      `The request path ${JSON.stringify(
+        req.path
+      )} Token received ${JSON.stringify(token)}`
+    );
     if (
       !token &&
       req.path !== "/course/all-courses" &&
       req.path !== "/auth/login" &&
       req.path !== "/auth/refresh-token" &&
       req.path !== "/auth/register-student" &&
+      req.path !== "/auth/logout" &&
       !req.path.startsWith("/s3Direct/")
     ) {
-      return res.status(401).json({ message: "Unauthorized user" });
+      console.log(
+        `The request path with 401 error ${JSON.stringify(
+          req.path
+        )} Token received ${JSON.stringify(token)}`
+      );
+      return res.status(401).json({ message: "Unauthorized user meehn!" });
     } else if (
       req.path === "/course/all-courses" ||
       req.path === "/auth/login" ||
+      req.path === "/auth/logout" ||
       req.path === "/auth/register-student" ||
       req.path === "/auth/refresh-token" ||
       req.path.startsWith("/s3Direct/")
     ) {
-      console.log(`Authentication has been bypassed by path : ${req.path}`);
+      console.log(`Authentication bypassed path : ${req.path}`);
       req.user = null;
       return next();
     } else {
@@ -105,7 +117,72 @@ const renewTokens = async (req, res) => {
   });
 };
 
-// REGISTRATION SECTION
+const logInUser = async (req, res) => {
+  try {
+    let userData = null;
+    userData = await Student.findOne({ firstName: req.body.firstName });
+    if (!userData) {
+      userData = await Tutor.findOne({ firstName: req.body.firstName });
+    }
+    if (!userData) {
+      userData = await Admin.findOne({ firstName: req.body.firstName });
+    }
+    if (!userData) {
+      return res.sendStatus(404);
+    }
+    const passwordMatches = await bcrypt.compare(
+      req.body.password,
+      userData.password
+    );
+    if (!passwordMatches) {
+      return res.status(401).json({ message: "The passwords do not match" });
+    }
+    const user = {
+      userID: userData._id,
+      firstName: userData.firstName,
+      surname: userData.surname,
+      role: userData.role,
+    };
+    console.log(`User credentials while logging in ${JSON.stringify(user)}`);
+    const accessToken = generateAccessToken(user);
+    const refreshToken = generateRefreshToken(user);
+    let { _id: tokenID } = await RefreshToken.findOne({ name: "tokens" });
+    let refreshTokenData = await RefreshToken.findByIdAndUpdate(
+      tokenID,
+      { $push: { data: refreshToken } },
+      { new: true, useFindAndModify: false, runValidation: true }
+    );
+    if (refreshTokenData._doc.data.includes(refreshToken)) {
+      res.status(200).json({
+        accessToken,
+        refreshToken,
+        roles: [user.role],
+      });
+    }
+  } catch (err) {
+    handleError(err, res);
+  }
+};
+
+const logOutUser = async (req, res) => {
+  console.log(`Logging out our user ${JSON.stringify(req.body)}`);
+  try {
+    if (!req.body) {
+      return res.status(404).json({ message: "Refresh tokens not found." });
+    }
+    let refreshTokens = await RefreshToken.findOne({ name: "tokens" });
+    // Removes particular token
+    refreshTokens.data = refreshTokens.data.filter(
+      (token) => token !== req.body.refreshToken
+    );
+    console.log("Refresh token deleted successfully!");
+    await refreshTokens.save();
+    res.sendStatus(204);
+  } catch (err) {
+    handleError(err, res);
+  }
+};
+
 const registerStudent = async (req, res) => {
   try {
     const hashedPassword = await bcrypt.hash(req.body.password, 10);
@@ -160,81 +237,13 @@ const registerAdmin = async (req, res) => {
   }
 };
 
-// LOGIN SECTION
-//===============
-const logInUser = async (req, res) => {
-  try {
-    let userData = null;
-    userData = await Student.findOne({ firstName: req.body.firstName });
-    if (!userData) {
-      userData = await Tutor.findOne({ firstName: req.body.firstName });
-    }
-    if (!userData) {
-      userData = await Admin.findOne({ firstName: req.body.firstName });
-    }
-    if (!userData) {
-      return res.sendStatus(404);
-    }
-    const passwordMatches = await bcrypt.compare(
-      req.body.password,
-      userData.password
-    );
-    if (!passwordMatches) {
-      return res.status(401).json({ message: "The passwords do not match" });
-    }
-    const user = {
-      userID: userData._id,
-      firstName: userData.firstName,
-      surname: userData.surname,
-      role: userData.role,
-    };
-    console.log(`User credentials while logging in ${JSON.stringify(user)}`);
-    const accessToken = generateAccessToken(user);
-    const refreshToken = generateRefreshToken(user);
-    let { _id: tokenID } = await RefreshToken.findOne({ name: "tokens" });
-    let refreshTokenData = await RefreshToken.findByIdAndUpdate(
-      tokenID,
-      { $push: { data: refreshToken } },
-      { new: true, useFindAndModify: false, runValidation: true }
-    );
-    if (refreshTokenData._doc.data.includes(refreshToken)) {
-      res.status(200).json({
-        accessToken,
-        refreshToken,
-        roles: [user.role],
-      });
-    }
-  } catch (err) {
-    handleError(err, res);
-  }
-};
-
-const logOutUser = async (req, res) => {
-  try {
-    let refreshTokens = await RefreshToken.findOne({ name: "tokens" });
-    if (!refreshTokens) {
-      return res.status(404).json({ message: "Refresh tokens not found." });
-    }
-
-    // Remove token from refreshTokens data
-    refreshTokens.data = refreshTokens.data.filter(
-      (token) => token !== req.body.token
-    );
-    await refreshTokens.save();
-    res.sendStatus(204);
-  } catch (err) {
-    handleError(err, res);
-  }
-};
-
-// TUTOR SECTION
+// QUERY SECTION
 const findTutorById = async (req, res) => {
   try {
     console.log(
-      `User Data derived from access token ${JSON.stringify(req.user)}`
+      `Tutor Data derived from access token ${JSON.stringify(req.user)}`
     );
     let { userID } = req.user;
-    console.log(`Tutor id derived from access token ${userID}`);
     let tutorData = await Tutor.findById(userID).populate({
       path: "units",
       populate: "unitChapters",
@@ -245,61 +254,19 @@ const findTutorById = async (req, res) => {
     handleError(err, res);
   }
 };
-const findAllTutors = async (req, res) => {
-  try {
-    const tutorData = await Tutor.find({});
-    res.status(200).json(tutorData);
-  } catch (err) {
-    res.status(400).json(err);
-  }
-};
-const deleteTutorById = async (req, res) => {
-  try {
-    await Tutor.findByIdAndDelete(req.body._id, function (err, docs) {
-      if (!err) {
-        res.status(200).json(docs);
-      } else {
-        res.status(400).send(err);
-      }
-    });
-  } catch (err) {
-    res.status(400).json(err);
-  }
-};
-
-const findAllAdmins = async (req, res) => {
-  try {
-    const adminData = await Admin.find({});
-    res.status(200).json(adminData);
-  } catch (err) {
-    res.status(400).json(err);
-  }
-};
-
 const findAdminById = async (req, res) => {
   try {
+    console.log(
+      `Admin Data derived from access token ${JSON.stringify(req.user)}`
+    );
     let { userID } = req.user;
     let adminData = await Admin.findById(userID);
+    console.log(`The admin data found ${JSON.stringify(adminData)}`);
     res.status(200).json(adminData);
   } catch (err) {
     handleError(err, res);
   }
 };
-
-const deleteAdminById = async (req, res) => {
-  try {
-    await Admin.findByIdAndDelete(req.body._id, function (err, docs) {
-      if (!err) {
-        res.status(200).json(docs);
-      } else {
-        res.status(400).send(err);
-      }
-    });
-  } catch (err) {
-    handleError(err, res);
-  }
-};
-
 const findStudentById = async (req, res) => {
   try {
     let { studentId } = req.params;
@@ -318,16 +285,54 @@ const findAllStudents = async (req, res) => {
     handleError(err, res);
   }
 };
-
-const deleteStudentById = async (req, res) => {
+const findAllTutors = async (req, res) => {
   try {
-    await Student.findByIdAndDelete(req.body._id, function (err, docs) {
+    const tutorData = await Tutor.find({});
+    res.status(200).json(tutorData);
+  } catch (err) {
+    handleError(err, res);
+  }
+};
+
+const findAllAdmins = async (req, res) => {
+  try {
+    const adminData = await Admin.find({});
+    res.status(200).json(adminData);
+  } catch (err) {
+    handleError(err, res);
+  }
+};
+
+const deleteTutorById = async (req, res) => {
+  try {
+    await Tutor.findByIdAndDelete(req.body._id, function (err, docs) {
       if (!err) {
         res.status(200).json(docs);
       } else {
         res.status(400).send(err);
       }
     });
+  } catch (err) {
+    handleError(err, res);
+  }
+};
+const deleteAdminById = async (req, res) => {
+  try {
+    await Admin.findByIdAndDelete(req.body._id, function (err, docs) {
+      if (!err) {
+        res.status(200).json(docs);
+      } else {
+        res.status(400).send(err);
+      }
+    });
+  } catch (err) {
+    handleError(err, res);
+  }
+};
+
+const deleteStudentById = async (req, res) => {
+  try {
+    await Student.findByIdAndDelete(req?.body?._id);
   } catch (err) {
     handleError(err, res);
   }

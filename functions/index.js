@@ -32,7 +32,7 @@ mongoose.connect(process.env.DATABASE_URL, {
 //===================
 const corsOptions = {
   origin: "*",
-  methods: ["GET", "POST", "PUT"],
+  methods: ["GET", "POST", "PUT", "DELETE"],
   allowedHeaders: "*",
 };
 

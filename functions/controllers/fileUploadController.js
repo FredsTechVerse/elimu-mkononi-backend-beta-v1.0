@@ -19,6 +19,7 @@ const getSignedFileUrl = async (req, res) => {
   try {
     // STEP 1 : PROCESSING FILE INFORMATION
     const { fileType } = req.body;
+    console.log(`File Type passed ${fileType}`);
     const rawBytes = await randomBytes(16);
     const fileName = rawBytes.toString("hex"); //Geneerates a random filename.
     const fileExtension = fileType && fileType.split("/")[1];
@@ -39,6 +40,7 @@ const getSignedFileUrl = async (req, res) => {
 };
 const getFile = async (req, res) => {
   const { fileKey } = req.params;
+  console.log(`File key ${fileKey}`);
   try {
     const downloadParams = {
       Bucket: process.env.AWS_BUCKET_NAME,
@@ -46,9 +48,16 @@ const getFile = async (req, res) => {
     };
     const command = new GetObjectCommand(downloadParams);
     const response = await client.send(command);
-    res.send(response);
+    const str = await response.Body.transformToString();
+    // Get the image content as a buffer
+    // const imageBuffer = await response.Body.transformToByteArray();
+
+    // Determine the content type based on the file extension or other methods
+    const contentType = "image/jpeg"; // Replace with the appropriate content type for your image
+    res.set("Content-Type", contentType);
+    res.send(str);
   } catch (error) {
-    // console.log(error);
+    console.log(error);
     console.log(`S3 Resource retrieval access denied error!`);
     res.status(500).json({ message: "Could not retrieve file from S3" });
   }
