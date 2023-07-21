@@ -44,7 +44,7 @@ router.delete("/tutor", deleteTutorById);
 
 // ADMIN ROUTES
 router.get("/all-admins", findAllAdmins);
-router.get("/admin/:adminId", findAdminById);
+router.get("/admin", findAdminById);
 router.post("/register-admin", registerAdmin);
 router.delete("/admin", deleteAdminById);
 

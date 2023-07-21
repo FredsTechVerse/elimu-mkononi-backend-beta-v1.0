@@ -3,6 +3,7 @@ const {
   S3Client,
   GetObjectCommand,
   DeleteObjectCommand,
+  PutObjectCommand,
 } = require("@aws-sdk/client-s3");
 const { randomBytes } = require("crypto");
 const config = {
@@ -25,7 +26,7 @@ const getSignedFileUrl = async (req, res) => {
     const fileExtension = fileType && fileType.split("/")[1];
     const Key = `${fileName}.${fileExtension}`;
     //   STEP 2 : CREATING  THE COMMAND TO OUR BUCKET HOLDING THE NECESSARY KEY
-    const command = new GetObjectCommand({
+    const command = new PutObjectCommand({
       Bucket: process.env.AWS_BUCKET_NAME,
       Key: Key,
     });
@@ -49,13 +50,10 @@ const getFile = async (req, res) => {
     const command = new GetObjectCommand(downloadParams);
     const response = await client.send(command);
     const str = await response.Body.transformToString();
-    // Get the image content as a buffer
-    // const imageBuffer = await response.Body.transformToByteArray();
-
-    // Determine the content type based on the file extension or other methods
-    const contentType = "image/jpeg"; // Replace with the appropriate content type for your image
-    res.set("Content-Type", contentType);
-    res.send(str);
+    console.log(response.ContentType);
+    const base64String = str.toString("base64");
+    res.set("Content-Type", response.ContentType);
+    res.send(base64String);
   } catch (error) {
     console.log(error);
     console.log(`S3 Resource retrieval access denied error!`);

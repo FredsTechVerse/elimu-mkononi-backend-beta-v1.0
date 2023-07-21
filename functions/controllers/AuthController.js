@@ -21,7 +21,7 @@ const verifyAccess = (req, res) => {
 
 const generateAccessToken = (userData) => {
   return jwt.sign(userData, process.env.ACCESS_TOKEN_SECRET, {
-    expiresIn: "15s",
+    expiresIn: "15m",
   });
 };
 const generateRefreshToken = (userData) => {
@@ -177,7 +177,7 @@ const logOutUser = async (req, res) => {
     );
     console.log("Refresh token deleted successfully!");
     await refreshTokens.save();
-    res.sendStatus(204);
+    res.sendStatus(200);
   } catch (err) {
     handleError(err, res);
   }
@@ -248,7 +248,7 @@ const findTutorById = async (req, res) => {
       path: "units",
       populate: "unitChapters",
     });
-    console.log(`The tutor data found ${JSON.stringify(tutorData)}`);
+    console.log(`The admin data found ${JSON.stringify(tutorData)}`);
     res.status(200).json(tutorData);
   } catch (err) {
     handleError(err, res);
