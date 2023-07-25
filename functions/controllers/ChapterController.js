@@ -10,6 +10,7 @@ const createChapter = async (req, res) => {
       chapterName,
       chapterDescription,
     };
+
     let newChapter = await Chapter.create(chapterData);
     newChapter.save();
     let { _id: chapterID } = newChapter;

@@ -11,9 +11,6 @@ const LessonSchema = new Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "Note",
     },
-    lessonResources: [
-      { type: mongoose.Schema.Types.ObjectId, ref: "Resource" },
-    ],
   },
   {
     timestamps: true,

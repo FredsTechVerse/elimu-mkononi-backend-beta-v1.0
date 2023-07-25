@@ -20,7 +20,6 @@ const getSignedFileUrl = async (req, res) => {
   try {
     // STEP 1 : PROCESSING FILE INFORMATION
     const { fileType } = req.body;
-    console.log(`File Type passed ${fileType}`);
     const rawBytes = await randomBytes(16);
     const fileName = rawBytes.toString("hex"); //Geneerates a random filename.
     const fileExtension = fileType && fileType.split("/")[1];
@@ -32,16 +31,13 @@ const getSignedFileUrl = async (req, res) => {
     });
 
     const signedUrl = await getSignedUrl(client, command, { expiresIn: 300 });
-    console.log(signedUrl);
     res.status(201).json({ signedUrl, Key });
   } catch (err) {
-    console.error(err);
     res.status(500).json({ message: "Failed to generate signed url" });
   }
 };
 const getFile = async (req, res) => {
   const { fileKey } = req.params;
-  console.log(`File key ${fileKey}`);
   try {
     const downloadParams = {
       Bucket: process.env.AWS_BUCKET_NAME,
@@ -50,14 +46,10 @@ const getFile = async (req, res) => {
     const command = new GetObjectCommand(downloadParams);
     const response = await client.send(command);
     const str = await response.Body.transformToString();
-    console.log(response.ContentType);
-    const base64String = str.toString("base64");
-    res.set("Content-Type", response.ContentType);
-    res.send(base64String);
+
+    res.send(str);
   } catch (error) {
-    console.log(error);
-    console.log(`S3 Resource retrieval access denied error!`);
-    res.status(500).json({ message: "Could not retrieve file from S3" });
+    res.status(401).json({ message: "Could not retrieve file from S3" });
   }
 };
 const deleteFile = async (req, res) => {
@@ -69,11 +61,7 @@ const deleteFile = async (req, res) => {
   try {
     const response = await client.send(command);
     res.status(201).json({ message: response });
-  } catch (err) {
-    console.error(
-      `Error that occured while deleting file ${JSON.stringify(err)}`
-    );
-  }
+  } catch (err) {}
 };
 
 module.exports = { getSignedFileUrl, getFile, deleteFile };

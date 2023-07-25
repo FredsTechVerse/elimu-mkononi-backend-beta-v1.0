@@ -4,9 +4,6 @@ const { handleError } = require("./ErrorHandling");
 
 const createNotes = async (req, res) => {
   try {
-    console.log(
-      `Creating notes from the notes body : ${JSON.stringify(req.body)}`
-    );
     let { lessonNotes, lessonID } = req.body;
     let newNotes = await Notes.create({ content: lessonNotes });
     newNotes.save();
@@ -30,11 +27,7 @@ const findNote = async (req, res) => {
     const { notesID } = req.params;
 
     let noteData = await Notes.findById(notesID);
-    console.log(
-      `Here are the notes I have found ${JSON.stringify(
-        noteData
-      )} for the noteID ; ${notesID}`
-    );
+
     res.json(noteData);
   } catch (err) {
     handleError(err, res);
@@ -44,7 +37,6 @@ const findNote = async (req, res) => {
 const updateNotes = async (req, res) => {
   try {
     let { lessonNotes, notesID } = req.body;
-    console.log(`We wanna update our notes to ${JSON.stringify(lessonNotes)}`);
     let updatedNotes = await Notes.findByIdAndUpdate(notesID, {
       $set: { content: lessonNotes },
     });

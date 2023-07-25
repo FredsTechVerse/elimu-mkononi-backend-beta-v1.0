@@ -11,6 +11,7 @@ const {
   registerStudent,
   deleteStudentById,
   findTutorById,
+  findAllUsers,
   findAllTutors,
   registerTutor,
   deleteTutorById,
@@ -29,6 +30,7 @@ router.post("/create-token", createTokenModel);
 router.post("/login", logInUser);
 router.post("/refresh-token", renewTokens);
 router.delete("/logout", logOutUser);
+router.get("/all-users", findAllUsers);
 
 // STUDENT ROUTES
 router.get("/all-students", findAllStudents);

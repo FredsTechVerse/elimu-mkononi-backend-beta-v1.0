@@ -1,4 +1,4 @@
-# ELIMU MKONONI BACKEND
+# ELIMU HUB BACKEND
 
 - Where we make revision easy and fun!
 

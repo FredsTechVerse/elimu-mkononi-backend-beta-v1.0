@@ -4,14 +4,12 @@ const { handleError } = require("./ErrorHandling");
 
 const createLesson = async (req, res) => {
   try {
-    console.log(`Lesson Data received : ${JSON.stringify(req.body)}`);
-    let { chapterID, lessonNumber, lessonName, lessonUrl, videoKind } =
-      req.body;
+    let { chapterID, lessonNumber, lessonName, lessonUrl } = req.body;
+
     let lessonData = {
       lessonNumber,
       lessonName,
       lessonUrl,
-      videoKind,
     };
     let newLesson = await Lesson.create(lessonData);
     newLesson.save();

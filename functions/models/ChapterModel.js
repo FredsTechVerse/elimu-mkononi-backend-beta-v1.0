@@ -8,6 +8,9 @@ const ChapterSchema = new Schema(
     chapterName: { type: String, required: true, uppercase: true },
     chapterDescription: { type: String, required: true },
     chapterLessons: [{ type: mongoose.Schema.Types.ObjectId, ref: "Lesson" }],
+    chapterResources: [
+      { type: mongoose.Schema.Types.ObjectId, ref: "Resource" },
+    ],
   },
   {
     timestamps: true,

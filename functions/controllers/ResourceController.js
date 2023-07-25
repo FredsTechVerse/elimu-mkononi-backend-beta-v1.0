@@ -1,21 +1,21 @@
 const Resource = require("../models/ResourceModel");
-const Lesson = require("../models/LessonModel");
+const Chapter = require("../models/ChapterModel");
 const { handleError } = require("./ErrorHandling");
 
 const createResource = async (req, res) => {
   try {
-    let { lessonID, resourceName, resourceUrl } = req.body;
-    let resourceData = { resourceName, resourceUrl };
+    let { chapterID, resourceName, resourceUrl } = req.body;
+    let resourceData = { resourceName, resourceUrl, chapterID };
     let newResource = await Resource.create(resourceData);
     newResource.save();
     let { _id: resourceID } = newResource;
-    let lessonData = await Lesson.findByIdAndUpdate(
-      lessonID,
-      { $set: { lessonNotes: resourceID } },
+    let chapterData = await Chapter.findByIdAndUpdate(
+      chapterID,
+      { $push: { chapterResources: resourceID } },
       { new: true, useFindAndModify: false, runValidation: true }
     );
 
-    if (lessonData.lessonNotes.equals(resourceID)) {
+    if (chapterData?.lessonNotes?.equals(resourceID)) {
       res.status(201).json(newResource);
     }
   } catch (err) {

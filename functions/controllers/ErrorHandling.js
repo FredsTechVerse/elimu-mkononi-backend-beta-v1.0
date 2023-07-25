@@ -12,7 +12,6 @@ const handleError = (err, res) => {
     statusCode = 422;
     errorMessage = "Invalid ID";
   }
-  console.log(err);
 
   // Send the error response
   return res.status(statusCode).json({ message: errorMessage });
