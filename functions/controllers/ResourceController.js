@@ -5,7 +5,7 @@ const { handleError } = require("./ErrorHandling");
 const createResource = async (req, res) => {
   try {
     let { chapterID, resourceName, resourceUrl } = req.body;
-    let resourceData = { resourceName, resourceUrl, chapterID };
+    let resourceData = { resourceName, resourceUrl };
     let newResource = await Resource.create(resourceData);
     newResource.save();
     let { _id: resourceID } = newResource;
@@ -15,7 +15,7 @@ const createResource = async (req, res) => {
       { new: true, useFindAndModify: false, runValidation: true }
     );
 
-    if (chapterData?.lessonNotes?.equals(resourceID)) {
+    if (chapterData?._doc?.chapterResources?.includes(resourceID)) {
       res.status(201).json(newResource);
     }
   } catch (err) {

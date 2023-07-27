@@ -18,11 +18,11 @@ const oAuth2Client = new google.auth.OAuth2(
 oAuth2Client.on("tokens", (tokens) => {
   if (tokens.refresh_token) {
     // store the refresh_token in my database!
-    console.log(
-      `Refresh Token generated ${JSON.stringify(tokens.refresh_token)}`
-    );
+    // console.log(
+    //   `Refresh Token generated ${JSON.stringify(tokens.refresh_token)}`
+    // );
   }
-  console.log(`Access Token generated ${JSON.stringify(tokens.access_token)}`);
+  // console.log(`Access Token generated ${JSON.stringify(tokens.access_token)}`);
 });
 
 router.get("/authorizationUri", (req, res) => {
@@ -31,7 +31,6 @@ router.get("/authorizationUri", (req, res) => {
     scope: scope,
     include_granted_scopes: true,
   });
-  console.log("Authorization URI generated:", authUri);
   res.status(200).json(authUri);
 });
 

@@ -19,7 +19,7 @@ const createLesson = async (req, res) => {
       { $push: { chapterLessons: lessonID } },
       { new: true, useFindAndModify: false, runValidation: true }
     );
-    if (chapterData._doc.chapterLessons.includes(lessonID)) {
+    if (chapterData?._doc?.chapterLessons?.includes(lessonID)) {
       res.status(201).json(newLesson);
     }
   } catch (err) {
@@ -29,9 +29,7 @@ const createLesson = async (req, res) => {
 const findLesson = async (req, res) => {
   try {
     const { lessonId } = req.params;
-    let lessonData = await Lesson.findById(lessonId).populate([
-      "lessonNotes,lessonResources",
-    ]);
+    let lessonData = await Lesson.findById(lessonId).populate("lessonNotes");
     res.json(lessonData);
   } catch (err) {
     handleError(err, res);

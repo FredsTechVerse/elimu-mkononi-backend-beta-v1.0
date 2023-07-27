@@ -20,7 +20,7 @@ const verifyAccess = (req, res) => {
 
 const generateAccessToken = (userData) => {
   return jwt.sign(userData, process.env.ACCESS_TOKEN_SECRET, {
-    expiresIn: "15m",
+    expiresIn: "30m",
   });
 };
 const generateRefreshToken = (userData) => {
@@ -97,7 +97,6 @@ const renewTokens = async (req, res) => {
       const { firstName, surname, role, userID } = payload;
       const userData = { firstName, surname, role, userID };
       const accessToken = generateAccessToken(userData);
-
       res.json({ newAccessToken: accessToken });
     }
   });
