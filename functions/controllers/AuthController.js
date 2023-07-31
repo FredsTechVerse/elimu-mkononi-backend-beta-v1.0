@@ -20,12 +20,12 @@ const verifyAccess = (req, res) => {
 
 const generateAccessToken = (userData) => {
   return jwt.sign(userData, process.env.ACCESS_TOKEN_SECRET, {
-    expiresIn: "30m",
+    expiresIn: "15s",
   });
 };
 const generateRefreshToken = (userData) => {
   return jwt.sign(userData, process.env.REFRESH_TOKEN_SECRET, {
-    expiresIn: "1d",
+    expiresIn: "45s",
   });
 };
 
@@ -43,7 +43,7 @@ const authenticateToken = async (req, res, next) => {
       req.path !== "/auth/logout" &&
       !req.path.startsWith("/s3Direct/")
     ) {
-      return res.status(401).json({ message: "Unauthorized user meehn!" });
+      return res.status(401).json({ message: "Stranger!" });
     } else if (
       req.path === "/course/all-courses" ||
       req.path === "/auth/login" ||
@@ -90,9 +90,7 @@ const renewTokens = async (req, res) => {
 
   jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, payload) => {
     if (err) {
-      return res.status(403).json({
-        message: "The refresh token has been tampered with!",
-      });
+      handleJwtError(err, res);
     } else {
       const { firstName, surname, role, userID } = payload;
       const userData = { firstName, surname, role, userID };
