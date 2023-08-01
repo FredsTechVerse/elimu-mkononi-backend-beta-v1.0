@@ -6,13 +6,17 @@ const Student = require("../models/StudentModel");
 const Tutor = require("../models/TutorModel");
 const Admin = require("../models/AdminModel");
 const RefreshToken = require("../models/RefreshTokensModel");
-const { handleError, handleJwtError } = require("./ErrorHandling");
+const {
+  handleError,
+  handleJwtError,
+  handleRenewTokenError,
+} = require("./ErrorHandling");
 
 // AUTHORIZATION SECTION
 //=======================
 const verifyAccess = (req, res) => {
   try {
-    res.status(200).json({ message: "Permission Granted" });
+    res.status(200).json({ message: "Permission Granted!" });
   } catch (err) {
     handleError(err, res);
   }
@@ -20,12 +24,12 @@ const verifyAccess = (req, res) => {
 
 const generateAccessToken = (userData) => {
   return jwt.sign(userData, process.env.ACCESS_TOKEN_SECRET, {
-    expiresIn: "15s",
+    expiresIn: "15m",
   });
 };
 const generateRefreshToken = (userData) => {
   return jwt.sign(userData, process.env.REFRESH_TOKEN_SECRET, {
-    expiresIn: "45s",
+    expiresIn: "24h",
   });
 };
 
@@ -43,7 +47,7 @@ const authenticateToken = async (req, res, next) => {
       req.path !== "/auth/logout" &&
       !req.path.startsWith("/s3Direct/")
     ) {
-      return res.status(401).json({ message: "Stranger!" });
+      return res.sendStatus(403);
     } else if (
       req.path === "/course/all-courses" ||
       req.path === "/auth/login" ||
@@ -71,7 +75,7 @@ const createTokenModel = async (req, res) => {
     };
     let tokenData = await RefreshToken.create(initialData);
     tokenData.save();
-    res.status(200);
+    res.sendStatus(200);
   } catch (err) {
     handleError(err, res);
   }
@@ -80,7 +84,7 @@ const renewTokens = async (req, res) => {
   const refreshToken = req.body?.refreshToken;
 
   if (!refreshToken) {
-    return res.status(401).json({ message: "Token not found in request body" });
+    return res.sendStatus(403);
   }
 
   let refreshTokens = await RefreshToken.findOne({ name: "tokens" });
@@ -90,7 +94,7 @@ const renewTokens = async (req, res) => {
 
   jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, payload) => {
     if (err) {
-      handleJwtError(err, res);
+      handleRenewTokenError(err, res);
     } else {
       const { firstName, surname, role, userID } = payload;
       const userData = { firstName, surname, role, userID };

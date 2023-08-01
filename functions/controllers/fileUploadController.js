@@ -49,7 +49,7 @@ const getFile = async (req, res) => {
 
     res.send(str);
   } catch (error) {
-    res.status(401).json({ message: "Could not retrieve file from S3" });
+    res.status(400).json({ message: "Could not retrieve file from S3" });
   }
 };
 const deleteFile = async (req, res) => {

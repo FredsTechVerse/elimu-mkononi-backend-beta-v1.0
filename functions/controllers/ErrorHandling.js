@@ -13,8 +13,20 @@ const handleError = (err, res) => {
     errorMessage = "Invalid ID";
   }
 
-  // Send the error response
   return res.status(statusCode).json({ message: errorMessage });
+};
+
+const handleRenewTokenError = (err, res) => {
+  if (err.name === "TokenExpiredError") {
+    console.log("Renew Token has expired");
+    return res.sendStatus(403);
+  }
+  if (err.name === "JsonWebTokenError") {
+    return res.status(401).json({ message: "Invalid token" });
+  }
+  return res
+    .status(500)
+    .json({ message: "Something went wrong during authentication" });
 };
 
 const handleJwtError = (err, res) => {
@@ -29,4 +41,4 @@ const handleJwtError = (err, res) => {
     .json({ message: "Something went wrong during authentication" });
 };
 
-module.exports = { handleError, handleJwtError };
+module.exports = { handleError, handleJwtError, handleRenewTokenError };
