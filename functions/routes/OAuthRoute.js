@@ -35,14 +35,17 @@ router.get("/authorizationUri", (req, res) => {
 });
 
 router.post("/getToken", async (req, res) => {
-  const { code } = req.body;
-
   try {
-    const { tokens } = await oAuth2Client.getToken(code);
-    oAuth2Client.setCredentials(tokens);
-    res.status(200).json(tokens);
+    const { code } = req.body;
+    if (code) {
+      const { tokens } = await oAuth2Client.getToken(code);
+      oAuth2Client.setCredentials(tokens);
+      res.status(200).json(tokens);
+    } else {
+      res.status(404).json({ message: "Code not found" });
+    }
   } catch (error) {
-    res.status(500).json("Failed to obtain access token");
+    res.status(500).json(error);
   }
 });
 
