@@ -2,9 +2,18 @@
 
 This project is a guide to deploying an Express app using Firebase Functions.
 
+## OPTIMIZATIONS
+
+- Refactor auth controllers futher by passing the role ... Do this optimization , make sure they work properly... Then see how we can even improve perfomance using react hook forms.
+
+## BACKEND TIPS
+
+- By handling errors for each request, it really helps avoid crushing the server without reasonable cause.
+
 ### CONNECTION TEST
 
-const db = mongoose.connection;
+- This was a life saver .... Helps know exactly what the issue is.
+  const db = mongoose.connection;
 
 db.on("open", function (ref) {
 connected = true;
@@ -39,7 +48,7 @@ connected = true;
 - Firebase CLI installed
 - Node.js and npm installed
 
-## PARTIES INVOLVED
+## TECHNOLOGIES INVOLVED
 
 - MongoDB database
 - .env variables
@@ -79,5 +88,5 @@ After successful deployment , only authenticated users can access the server , t
 
 ## CONCLUSION
 
-Using Firebase Functions makes hosting your backend easy and seamless. The steps outlined above will guide you in deploying your Express app using Firebase.
-Ensure you have stable internet; it might be the cause of some funny errors between simulation and deployment.
+- Using Firebase Functions makes hosting your backend cheap and seamless. The steps outlined above will guide you in deploying your Express app using Firebase.
+- Ensure you have stable internet; it might be the cause of some funny errors between simulation and deployment.

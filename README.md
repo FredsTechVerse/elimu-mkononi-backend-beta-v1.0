@@ -5,6 +5,7 @@
 ## TO DO
 
 - Get rid of the access denied error when fetching course image by setting the bucket rules correctly!
+- Retrieve .env variables from deployed app versions.
 
 ### A DEEPER DIVE INTO S3 BUCKET TOPICS
 
