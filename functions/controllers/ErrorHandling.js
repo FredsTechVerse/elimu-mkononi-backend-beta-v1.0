@@ -18,7 +18,6 @@ const handleError = (err, res) => {
 
 const handleRenewTokenError = (err, res) => {
   if (err.name === "TokenExpiredError") {
-    console.log("Renew Token has expired");
     return res.sendStatus(403);
   }
   if (err.name === "JsonWebTokenError") {
