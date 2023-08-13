@@ -11,7 +11,7 @@ const getUnit = async (req, res) => {
   const { unitID } = req.params;
 
   try {
-    let data = await Unit.findById(unitID);
+    const data = await Unit.findById(unitID);
     res.json(data);
   } catch (err) {
     handleError(err, res);
@@ -21,7 +21,7 @@ const getUnitWithChapters = async (req, res) => {
   const { unitID } = req.params;
 
   try {
-    let data = await Unit.findById(unitID).populate("unitChapters");
+    const data = await Unit.findById(unitID).populate("unitChapters");
     res.json(data);
   } catch (err) {
     handleError(err, res);
@@ -32,7 +32,7 @@ const getUnitWithLessons = async (req, res) => {
   const { unitID } = req.params;
 
   try {
-    let data = await Unit.findById(unitID).populate({
+    const data = await Unit.findById(unitID).populate({
       path: "unitChapters",
       populate: { path: "chapterLessons" },
     });
@@ -53,31 +53,31 @@ const getAllUnits = async (req, res) => {
 // Perfect Illustration of One to many relationship.
 const createUnit = async (req, res) => {
   try {
-    let {
+    const {
       courseID,
       tutorId: tutorID,
       unitCode,
       unitName,
       unitDescription,
     } = req.body;
-    let unitData = {
+    const unitData = {
       unitCode,
       unitName,
       unitDescription,
       tutor: [tutorID],
     };
 
-    let newUnit = await Unit.create(unitData);
+    const newUnit = await Unit.create(unitData);
     newUnit.save();
-    let { _id: unitID } = newUnit; // Extracting ID from staved Lesson
+    const { _id: unitID } = newUnit; // Extracting ID from staved Lesson
 
-    let courseData = await Course.findByIdAndUpdate(
+    const courseData = await Course.findByIdAndUpdate(
       //Returns / saves the new document in play.
       courseID,
       { $push: { units: unitID } }, //Adding to an array of elements.
       { new: true, useFindAndModify: false, runValidation: true } //Addition params for update validation.
     );
-    let tutorData = await Tutor.findByIdAndUpdate(
+    const tutorData = await Tutor.findByIdAndUpdate(
       //Returns / saves the new document in play.
       tutorID,
       { $push: { units: unitID } }, //Adding to an array of elements.
@@ -96,8 +96,8 @@ const createUnit = async (req, res) => {
 const updateUnit = async (req, res) => {
   try {
     const { unitID } = req.params;
-    let { tutorID, unitCode, unitName, unitDescription } = req.body;
-    let unitData = {
+    const { tutorID, unitCode, unitName, unitDescription } = req.body;
+    const unitData = {
       unitCode,
       unitName,
       unitDescription,

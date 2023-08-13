@@ -1,9 +1,10 @@
 const Tutor = require("../models/TutorModel");
+const { handleError } = require("./ErrorHandling");
 
 const registerTutor = async (req, res) => {
   try {
     const hashedPassword = await bcrypt.hash(req.body.password, 10);
-    let credentials = {
+    const credentials = {
       firstName: req.body.firstName,
       surname: req.body.surname,
       email: req.body.email,
@@ -29,8 +30,8 @@ const findAllTutors = async (req, res) => {
 
 const findTutorById = async (req, res) => {
   try {
-    let { tutorID } = req.params;
-    let tutorData = await Tutor.findById(tutorID).populate({
+    const { tutorID } = req.params;
+    const tutorData = await Tutor.findById(tutorID).populate({
       path: "units",
       populate: "unitChapters",
     });

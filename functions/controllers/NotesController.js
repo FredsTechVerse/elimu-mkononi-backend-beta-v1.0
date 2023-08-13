@@ -4,11 +4,11 @@ const { handleError } = require("./ErrorHandling");
 
 const createNotes = async (req, res) => {
   try {
-    let { lessonNotes, lessonID } = req.body;
-    let newNotes = await Notes.create({ content: lessonNotes });
+    const { lessonNotes, lessonID } = req.body;
+    const newNotes = await Notes.create({ content: lessonNotes });
     newNotes.save();
-    let { _id: notesID } = newNotes;
-    let lessonData = await Lesson.findByIdAndUpdate(
+    const { _id: notesID } = newNotes;
+    const lessonData = await Lesson.findByIdAndUpdate(
       lessonID,
       { $set: { lessonNotes: notesID } },
       { new: true, useFindAndModify: false, runValidation: true }
@@ -26,7 +26,7 @@ const findNote = async (req, res) => {
   try {
     const { notesID } = req.params;
 
-    let noteData = await Notes.findById(notesID);
+    const noteData = await Notes.findById(notesID);
 
     res.json(noteData);
   } catch (err) {

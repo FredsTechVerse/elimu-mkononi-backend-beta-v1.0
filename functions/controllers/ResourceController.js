@@ -4,12 +4,12 @@ const { handleError } = require("./ErrorHandling");
 
 const createResource = async (req, res) => {
   try {
-    let { chapterID, resourceName, resourceUrl } = req.body;
-    let resourceData = { resourceName, resourceUrl };
-    let newResource = await Resource.create(resourceData);
+    const { chapterID, resourceName, resourceUrl } = req.body;
+    const resourceData = { resourceName, resourceUrl };
+    const newResource = await Resource.create(resourceData);
     newResource.save();
-    let { _id: resourceID } = newResource;
-    let chapterData = await Chapter.findByIdAndUpdate(
+    const { _id: resourceID } = newResource;
+    const chapterData = await Chapter.findByIdAndUpdate(
       chapterID,
       { $push: { chapterResources: resourceID } },
       { new: true, useFindAndModify: false, runValidation: true }
@@ -25,7 +25,7 @@ const createResource = async (req, res) => {
 
 const findAllResources = async (req, res) => {
   try {
-    let data = await Resource.find({});
+    const data = await Resource.find({});
     res.json(data);
   } catch (err) {
     handleError(err, res);
@@ -34,7 +34,7 @@ const findAllResources = async (req, res) => {
 const findResource = async (req, res) => {
   const { resourceID } = req.params;
   try {
-    let resourceData = await Resource.findById(resourceID);
+    const resourceData = await Resource.findById(resourceID);
     res.json(resourceData);
   } catch (err) {
     handleError(err, res);
@@ -44,8 +44,8 @@ const findResource = async (req, res) => {
 const updateResource = async (req, res) => {
   try {
     const { resourceID } = req.params;
-    let { resourceName, resourceUrl } = req.body;
-    let resourceData = { resourceName, resourceUrl };
+    const { resourceName, resourceUrl } = req.body;
+    const resourceData = { resourceName, resourceUrl };
     await Resource.findByIdAndUpdate(resourceID, resourceData);
     res.status(202).json({ message: "Resource updated successfully" });
   } catch (err) {

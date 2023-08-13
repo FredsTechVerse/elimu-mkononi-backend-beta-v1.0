@@ -39,8 +39,8 @@ const logInUser = async (req, res) => {
     };
     const accessToken = generateAccessToken(user);
     const refreshToken = generateRefreshToken(user);
-    let { _id: tokenID } = await RefreshToken.findOne({ name: "tokens" });
-    let refreshTokenData = await RefreshToken.findByIdAndUpdate(
+    const { _id: tokenID } = await RefreshToken.findOne({ name: "tokens" });
+    const refreshTokenData = await RefreshToken.findByIdAndUpdate(
       tokenID,
       { $push: { data: refreshToken } },
       { new: true, useFindAndModify: false, runValidation: true }
@@ -57,32 +57,17 @@ const logInUser = async (req, res) => {
   }
 };
 
-// const logOutUser = async (req, res) => {
-//   try {
-//     if (!req.body) {
-//       return res.status(404).json({ message: "Refresh tokens not found." });
-//     }
-//     let refreshTokens = await RefreshToken.findOne({ name: "tokens" });
-//     // Removes particular token
-//     refreshTokens.data = refreshTokens.data.filter(
-//       (token) => token !== req.body.refreshToken
-//     );
-//     await refreshTokens.save();
-//     res.sendStatus(200);
-//   } catch (err) {
-//     handleError(err, res);
-//   }
-// };
-
 const logOutUser = async (req, res) => {
   try {
     if (!req.body.refreshToken) {
       return res.status(404).json({ message: "Refresh tokens not found." });
     }
 
+    console.log({ refreshToken: req.body.refreshToken });
+
     await RefreshToken.findOneAndUpdate(
       { name: "tokens" },
-      { data: { $pull: req.body.refreshToken } }
+      { $pull: { data: req.body.refreshToken } }
     );
     res.sendStatus(200);
   } catch (err) {
@@ -97,7 +82,7 @@ const findAllUsers = async (req, res) => {
       const tutorData = await Tutor.find({});
       const adminData = await Admin.find({});
 
-      let totalUsers = {
+      const totalUsers = {
         totalStudents: studentData?.length,
         totalTutors: tutorData?.length,
         totalAdmins: adminData?.length,

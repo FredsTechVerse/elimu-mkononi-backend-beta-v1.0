@@ -4,17 +4,17 @@ const { handleError } = require("./ErrorHandling");
 
 const createLesson = async (req, res) => {
   try {
-    let { chapterID, lessonNumber, lessonName, lessonUrl } = req.body;
+    const { chapterID, lessonNumber, lessonName, lessonUrl } = req.body;
 
-    let lessonData = {
+    const lessonData = {
       lessonNumber,
       lessonName,
       lessonUrl,
     };
-    let newLesson = await Lesson.create(lessonData);
+    const newLesson = await Lesson.create(lessonData);
     newLesson.save();
-    let { _id: lessonID } = newLesson;
-    let chapterData = await Chapter.findByIdAndUpdate(
+    const { _id: lessonID } = newLesson;
+    const chapterData = await Chapter.findByIdAndUpdate(
       chapterID,
       { $push: { chapterLessons: lessonID } },
       { new: true, useFindAndModify: false, runValidation: true }
@@ -29,7 +29,7 @@ const createLesson = async (req, res) => {
 const findLesson = async (req, res) => {
   try {
     const { lessonID } = req.params;
-    let lessonData = await Lesson.findById(lessonID).populate("lessonNotes");
+    const lessonData = await Lesson.findById(lessonID).populate("lessonNotes");
     res.json(lessonData);
   } catch (err) {
     handleError(err, res);
@@ -39,9 +39,9 @@ const findLesson = async (req, res) => {
 const updateLesson = async (req, res) => {
   try {
     const { lessonID } = req.params;
-    let { lessonNumber, lessonName, lessonUrl } = req.body;
+    const { lessonNumber, lessonName, lessonUrl } = req.body;
 
-    let lessonData = {
+    const lessonData = {
       lessonNumber,
       lessonName,
       lessonUrl,

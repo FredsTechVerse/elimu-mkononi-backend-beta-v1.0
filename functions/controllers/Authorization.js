@@ -66,7 +66,7 @@ const createTokenModel = async (req, res) => {
     const initialData = {
       data: [],
     };
-    let tokenData = await RefreshToken.create(initialData);
+    consttokenData = await RefreshToken.create(initialData);
     tokenData.save();
     res.sendStatus(200);
   } catch (err) {
@@ -80,7 +80,7 @@ const renewTokens = async (req, res) => {
     return res.sendStatus(403);
   }
 
-  let refreshTokens = await RefreshToken.findOne({ name: "tokens" });
+  const refreshTokens = await RefreshToken.findOne({ name: "tokens" });
   if (!refreshTokens.data.includes(refreshToken)) {
     return res.sendStatus(403);
   }

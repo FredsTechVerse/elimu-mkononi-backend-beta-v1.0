@@ -8,8 +8,6 @@ This project is a guide to deploying an Express app using Firebase Functions.
 
 ## TO DO
 
-- Get rid of the access denied error when fetching course image by setting the bucket rules correctly!
-- Retrieve .env variables from deployed app versions.
 - User should not be able to update password until proper protocol for authentication , decryption and encryption after update is followed
 - Swap most of the let with const in the db especially where we append the data once
 
@@ -21,6 +19,7 @@ A way for us to interact with our data stored in a bucket , the database.
 - This operators are used as key value pairs where the key is the operator and the value is the value to be used in the operation. eg `Inventory.find({"quantity": { $gt: 5000}})`
 - Not to forget that the operator is preceded by a dollar sign.
 - They will go a long away in aiding in precision query. Eg the pull operator manipulates the database directly while removing token.
+- Be careful with the order of the operator and key!
 
 #### A DEEPER DIVE INTO THE S3 BUCKET
 

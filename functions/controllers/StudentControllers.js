@@ -1,9 +1,9 @@
 const Student = require("../models/StudentModel");
-
+const { handleError } = require("./ErrorHandling");
 const registerStudent = async (req, res) => {
   try {
     const hashedPassword = await bcrypt.hash(req.body.password, 10);
-    let credentials = {
+    const credentials = {
       firstName: req.body.firstName,
       surname: req.body.surname,
       email: req.body.email,
@@ -61,6 +61,7 @@ const deleteStudentById = async (req, res) => {
   try {
     const { studentID } = req.params;
     await Student.findByIdAndDelete(studentID);
+
     res.status(200).json({
       message: "Student deleted successfully",
     });

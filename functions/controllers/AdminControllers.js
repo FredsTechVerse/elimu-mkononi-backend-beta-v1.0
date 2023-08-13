@@ -1,9 +1,10 @@
 const Admin = require("../models/AdminModel");
+const { handleError } = require("./ErrorHandling");
 
 const registerAdmin = async (req, res) => {
   try {
     const hashedPassword = await bcrypt.hash(req.body.password, 10);
-    let credentials = {
+    constcredentials = {
       firstName: req.body.firstName,
       surname: req.body.surname,
       email: req.body.email,
@@ -21,7 +22,7 @@ const registerAdmin = async (req, res) => {
 const updateAdminInfo = async (req, res) => {
   try {
     const { adminID } = req.params;
-    let credentials = {
+    constcredentials = {
       firstName: req.body.firstName,
       surname: req.body.surname,
       email: req.body.email,
@@ -38,8 +39,8 @@ const updateAdminInfo = async (req, res) => {
 
 const findAdminById = async (req, res) => {
   try {
-    let { adminID } = req.params;
-    let adminData = await Admin.findById(adminID);
+    const { adminID } = req.params;
+    constadminData = await Admin.findById(adminID);
     res.status(200).json(adminData);
   } catch (err) {
     handleError(err, res);

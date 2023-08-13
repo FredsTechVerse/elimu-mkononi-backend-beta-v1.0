@@ -3,9 +3,9 @@ const { handleError } = require("./ErrorHandling");
 
 const createCourse = async (req, res) => {
   try {
-    let { courseTitle, courseImage } = req.body;
-    let courseData = { courseTitle, courseImage };
-    let newCourse = await Course.create(courseData);
+    const { courseTitle, courseImage } = req.body;
+    const courseData = { courseTitle, courseImage };
+    const newCourse = await Course.create(courseData);
     newCourse.save();
     res.status(201).json(newCourse);
   } catch (err) {
@@ -15,7 +15,7 @@ const createCourse = async (req, res) => {
 
 const findAllCourses = async (req, res) => {
   try {
-    let courseData = await Course.find({}).populate({
+    const courseData = await Course.find({}).populate({
       path: "units",
       populate: {
         path: "unitChapters",
@@ -29,7 +29,7 @@ const findAllCourses = async (req, res) => {
 const findCourse = async (req, res) => {
   const { courseID } = req.params;
   try {
-    let courseData = await Course.findById(courseID).populate("units");
+    const courseData = await Course.findById(courseID).populate("units");
     res.json(courseData);
   } catch (err) {
     handleError(err, res);
@@ -39,8 +39,8 @@ const findCourse = async (req, res) => {
 const updateCourse = async (req, res) => {
   try {
     const { courseID } = req.params;
-    let { courseTitle, courseImage } = req.body;
-    let courseData = { courseTitle, courseImage };
+    const { courseTitle, courseImage } = req.body;
+    const courseData = { courseTitle, courseImage };
     await Course.findByIdAndUpdate(courseID, courseData);
     res.status(202).json({ message: "Course updated successfully" });
   } catch (err) {

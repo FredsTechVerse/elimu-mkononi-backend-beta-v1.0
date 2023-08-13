@@ -4,18 +4,18 @@ const { handleError } = require("./ErrorHandling");
 
 const createChapter = async (req, res) => {
   try {
-    let { unitID, chapterNumber, chapterName, chapterDescription } = req.body;
-    let chapterData = {
+    const { unitID, chapterNumber, chapterName, chapterDescription } = req.body;
+    const chapterData = {
       chapterNumber,
       chapterName,
       chapterDescription,
     };
 
-    let newChapter = await Chapter.create(chapterData);
+    const newChapter = await Chapter.create(chapterData);
     newChapter.save();
-    let { _id: chapterID } = newChapter;
+    const { _id: chapterID } = newChapter;
     if (unitID !== null && unitID !== undefined) {
-      let unitData = await Unit.findByIdAndUpdate(
+      const unitData = await Unit.findByIdAndUpdate(
         unitID,
         { $push: { unitChapters: chapterID } },
         { new: true, useFindAndModify: false, runValidation: true }
@@ -37,7 +37,7 @@ const createChapter = async (req, res) => {
 
 const findAllChapters = async (req, res) => {
   try {
-    let allChapters = await Chapter.find({});
+    const allChapters = await Chapter.find({});
     res.json(allChapters);
   } catch (err) {
     handleError(err, res);
@@ -46,7 +46,7 @@ const findAllChapters = async (req, res) => {
 
 const populateChapterLessons = async (req, res) => {
   try {
-    let chapterData = await Chapter.find({}).populate("ChapterLessons");
+    const chapterData = await Chapter.find({}).populate("ChapterLessons");
     res.json(chapterData);
   } catch (err) {
     handleError(err, res);
@@ -56,7 +56,7 @@ const populateChapterLessons = async (req, res) => {
 const findChapter = async (req, res) => {
   const { chapterID } = req.params;
   try {
-    let chapterData = await Chapter.findById(chapterID).populate(
+    const chapterData = await Chapter.findById(chapterID).populate(
       "chapterLessons"
     );
     res.json(chapterData);
@@ -67,8 +67,8 @@ const findChapter = async (req, res) => {
 const updateChapter = async (req, res) => {
   try {
     const { chapterID } = req.params;
-    let { chapterNumber, chapterName, chapterDescription } = req.body;
-    let chapterData = {
+    const { chapterNumber, chapterName, chapterDescription } = req.body;
+    const chapterData = {
       chapterNumber,
       chapterName,
       chapterDescription,
