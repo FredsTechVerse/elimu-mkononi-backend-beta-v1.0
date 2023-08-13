@@ -2,7 +2,7 @@ const functions = require("firebase-functions");
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
-const { authenticateToken } = require("./controllers/AuthController");
+const { authenticateToken } = require("./controllers/Authorization");
 const app = express();
 if (process.env.NODE_ENV !== "production") {
   require("dotenv").config();

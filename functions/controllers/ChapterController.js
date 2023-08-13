@@ -54,9 +54,9 @@ const populateChapterLessons = async (req, res) => {
 };
 
 const findChapter = async (req, res) => {
-  const { chapterId } = req.params;
+  const { chapterID } = req.params;
   try {
-    let chapterData = await Chapter.findById(chapterId).populate(
+    let chapterData = await Chapter.findById(chapterID).populate(
       "chapterLessons"
     );
     res.json(chapterData);
@@ -67,8 +67,14 @@ const findChapter = async (req, res) => {
 const updateChapter = async (req, res) => {
   try {
     const { chapterID } = req.params;
-    await Chapter.findByIdAndUpdate(chapterID, req.body);
-    res.status(200).json({ message: "Chapter deleted successfully" });
+    let { chapterNumber, chapterName, chapterDescription } = req.body;
+    let chapterData = {
+      chapterNumber,
+      chapterName,
+      chapterDescription,
+    };
+    await Chapter.findByIdAndUpdate(chapterID, chapterData);
+    res.status(202).send({ message: "Chapter updated successfully!" });
   } catch (err) {
     handleError(err, res);
   }
@@ -89,5 +95,6 @@ module.exports = {
   findChapter,
   findAllChapters,
   populateChapterLessons,
+  updateChapter,
   deleteChapter,
 };

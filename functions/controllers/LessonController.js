@@ -28,9 +28,26 @@ const createLesson = async (req, res) => {
 };
 const findLesson = async (req, res) => {
   try {
-    const { lessonId } = req.params;
-    let lessonData = await Lesson.findById(lessonId).populate("lessonNotes");
+    const { lessonID } = req.params;
+    let lessonData = await Lesson.findById(lessonID).populate("lessonNotes");
     res.json(lessonData);
+  } catch (err) {
+    handleError(err, res);
+  }
+};
+
+const updateLesson = async (req, res) => {
+  try {
+    const { lessonID } = req.params;
+    let { lessonNumber, lessonName, lessonUrl } = req.body;
+
+    let lessonData = {
+      lessonNumber,
+      lessonName,
+      lessonUrl,
+    };
+    await Lesson.findByIdAndUpdate(lessonID, lessonData);
+    res.status(202).json({ message: "Lesson updated successfully" });
   } catch (err) {
     handleError(err, res);
   }
@@ -39,6 +56,7 @@ const findLesson = async (req, res) => {
 const deleteLesson = async (req, res) => {
   try {
     const { lessonID } = req.params;
+
     await Lesson.findByIdAndDelete(lessonID);
     res.status(200).json({ message: "Lesson deleted successfully" });
   } catch (err) {
@@ -46,4 +64,4 @@ const deleteLesson = async (req, res) => {
   }
 };
 
-module.exports = { findLesson, createLesson, deleteLesson };
+module.exports = { findLesson, createLesson, updateLesson, deleteLesson };

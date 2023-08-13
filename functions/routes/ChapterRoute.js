@@ -6,19 +6,15 @@ const {
   findAllChapters,
   findChapter,
   populateChapterLessons,
+  updateChapter,
+  deleteChapter,
 } = require("../controllers/ChapterController");
-// CRUD OPERATIONS
-//=================
-// CREATING A DOCUMENT.
-router.post("/new-chapter", createChapter);
 
-// READING THE DOCUMENT
-//======================
+router.post("/", createChapter);
 router.get("/all-chapters", findAllChapters);
-
-router.get("/:chapterId", findChapter);
-
+router.get("/:chapterID", findChapter);
 router.get("/all-chapters-lessons", populateChapterLessons);
+router.put("/:chapterID", updateChapter);
+router.delete("/:chapterID", deleteChapter);
 
-// EXPORTING A MODEL.
 module.exports = router;

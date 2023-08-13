@@ -36,11 +36,11 @@ const findNote = async (req, res) => {
 
 const updateNotes = async (req, res) => {
   try {
-    let { lessonNotes, notesID } = req.body;
-    let updatedNotes = await Notes.findByIdAndUpdate(notesID, {
-      $set: { content: lessonNotes },
-    });
-    return res.status(202).json(updatedNotes);
+    const { notesID } = req.params;
+    const { lessonNotes } = req.body;
+    const lessonData = { content: lessonNotes };
+    await Notes.findByIdAndUpdate(notesID, lessonData);
+    return res.status(202).json({ message: "Notes updated successfully" });
   } catch (err) {
     handleError(err, res);
   }
@@ -56,4 +56,4 @@ const deleteNotes = async (req, res) => {
   }
 };
 
-module.exports = { createNotes, updateNotes, findNote, deleteNotes };
+module.exports = { createNotes, findNote, updateNotes, deleteNotes };

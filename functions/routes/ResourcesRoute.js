@@ -1,14 +1,18 @@
 const express = require("express");
 const router = express.Router();
-// CONTROLLERS
+
 const {
   findAllResources,
   findResource,
   createResource,
+  updateResource,
+  deleteResource,
 } = require("../controllers/ResourceController");
-//  ROUTES
+
 router.post("/new-resource", createResource);
 router.get("/all-resources", findAllResources);
-router.get("/:resourceId", findResource);
-// MODULE EXPORTATION
+router.get("/:resourceID", findResource);
+router.put("/:resourceID", updateResource);
+router.delete("/:resourceID", deleteResource);
+
 module.exports = router;

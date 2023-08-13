@@ -4,20 +4,16 @@ if (process.env.NODE_ENV !== "production") {
   require("dotenv/config");
 }
 
-// CONTROLLERS IMPORTATIONS.
-//===========================
 const {
   createNotes,
   updateNotes,
+  deleteNotes,
   findNote,
 } = require("../controllers/NotesController");
 
-// ROUTES CONFIGURATION
-//=====================
+router.post("/", createNotes);
 router.get("/:notesID", findNote);
-router.post("/newNotes", createNotes);
+router.put("/:notesID", updateNotes);
+router.delete("/:notesID", deleteNotes);
 
-router.put("/updateNotes", updateNotes);
-
-// EXPORTING A MODEL.
 module.exports = router;

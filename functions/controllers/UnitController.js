@@ -8,20 +8,20 @@ const Tutor = require("../models/TutorModel");
 const { handleError } = require("./ErrorHandling");
 
 const getUnit = async (req, res) => {
-  const { unitId } = req.params;
+  const { unitID } = req.params;
 
   try {
-    let data = await Unit.findById(unitId);
+    let data = await Unit.findById(unitID);
     res.json(data);
   } catch (err) {
     handleError(err, res);
   }
 };
 const getUnitWithChapters = async (req, res) => {
-  const { unitId } = req.params;
+  const { unitID } = req.params;
 
   try {
-    let data = await Unit.findById(unitId).populate("unitChapters");
+    let data = await Unit.findById(unitID).populate("unitChapters");
     res.json(data);
   } catch (err) {
     handleError(err, res);
@@ -29,10 +29,10 @@ const getUnitWithChapters = async (req, res) => {
 };
 
 const getUnitWithLessons = async (req, res) => {
-  const { unitId } = req.params;
+  const { unitID } = req.params;
 
   try {
-    let data = await Unit.findById(unitId).populate({
+    let data = await Unit.findById(unitID).populate({
       path: "unitChapters",
       populate: { path: "chapterLessons" },
     });
@@ -93,6 +93,23 @@ const createUnit = async (req, res) => {
   }
 };
 
+const updateUnit = async (req, res) => {
+  try {
+    const { unitID } = req.params;
+    let { tutorID, unitCode, unitName, unitDescription } = req.body;
+    let unitData = {
+      unitCode,
+      unitName,
+      unitDescription,
+      tutor: [tutorID],
+    };
+    await Unit.findByIdAndUpdate(unitID, unitData);
+    res.status(202).json({ message: "Unit updated successfully" });
+  } catch (err) {
+    handleError(err, res);
+  }
+};
+
 const deleteUnit = async (req, res) => {
   const { unitID } = req.params;
   try {
@@ -109,5 +126,6 @@ module.exports = {
   getUnit,
   getUnitWithChapters,
   getUnitWithLessons,
+  updateUnit,
   deleteUnit,
 };

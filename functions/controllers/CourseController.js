@@ -36,6 +36,18 @@ const findCourse = async (req, res) => {
   }
 };
 
+const updateCourse = async (req, res) => {
+  try {
+    const { courseID } = req.params;
+    let { courseTitle, courseImage } = req.body;
+    let courseData = { courseTitle, courseImage };
+    await Course.findByIdAndUpdate(courseID, courseData);
+    res.status(202).json({ message: "Course updated successfully" });
+  } catch (err) {
+    handleError(err, res);
+  }
+};
+
 const deleteCourse = async (req, res) => {
   try {
     const { courseID } = req.params;
@@ -50,5 +62,6 @@ module.exports = {
   findAllCourses,
   findCourse,
   createCourse,
+  updateCourse,
   deleteCourse,
 };

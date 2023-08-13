@@ -32,10 +32,22 @@ const findAllResources = async (req, res) => {
   }
 };
 const findResource = async (req, res) => {
-  const { resourceId } = req.params;
+  const { resourceID } = req.params;
   try {
-    let resourceData = await Resource.findById(resourceId);
+    let resourceData = await Resource.findById(resourceID);
     res.json(resourceData);
+  } catch (err) {
+    handleError(err, res);
+  }
+};
+
+const updateResource = async (req, res) => {
+  try {
+    const { resourceID } = req.params;
+    let { resourceName, resourceUrl } = req.body;
+    let resourceData = { resourceName, resourceUrl };
+    await Resource.findByIdAndUpdate(resourceID, resourceData);
+    res.status(202).json({ message: "Resource updated successfully" });
   } catch (err) {
     handleError(err, res);
   }
@@ -54,5 +66,6 @@ module.exports = {
   findAllResources,
   findResource,
   createResource,
+  updateResource,
   deleteResource,
 };

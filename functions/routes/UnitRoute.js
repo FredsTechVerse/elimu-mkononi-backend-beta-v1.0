@@ -5,20 +5,15 @@ const router = express.Router();
 const {
   createUnit,
   getAllUnits,
-  getUnit,
-  getUnitWithChapters,
   getUnitWithLessons,
+  updateUnit,
+  deleteUnit,
 } = require("../controllers/UnitController");
 
-// CRUD OPERATIONS
-//=================
-// CREATING A DOCUMENT.
-// When creating a lesson, we would like to save the lesson id to its respective chapter.
-router.post("/new-unit", createUnit);
-
-router.get("/:unitId", getUnitWithLessons);
-
+router.post("/", createUnit);
+router.get("/:unitID", getUnitWithLessons);
 router.get("/all-units", getAllUnits);
+router.put("/:unitID", updateUnit);
+router.delete("/:unitID", deleteUnit);
 
-// EXPORTING A MODEL.
 module.exports = router;

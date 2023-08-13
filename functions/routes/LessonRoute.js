@@ -3,11 +3,16 @@ const router = express.Router();
 
 // CONTROLLERS IMPORTATIONS.
 //===========================
-const { createLesson, findLesson } = require("../controllers/LessonController");
+const {
+  createLesson,
+  findLesson,
+  updateLesson,
+  deleteLesson,
+} = require("../controllers/LessonController");
 
-router.post("/new-lesson", createLesson);
+router.post("/", createLesson);
+router.get("/:lessonID", findLesson);
+router.put("/:lessonID", updateLesson);
+router.delete("/:lessonID", deleteLesson);
 
-router.get("/:lessonId", findLesson);
-
-// EXPORTING A MODEL.
 module.exports = router;
