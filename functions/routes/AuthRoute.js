@@ -36,18 +36,18 @@ router.get("/all-users", findAllUsers);
 router.get("/all-students", findAllStudents);
 router.get("/student/:studentId", findStudentById);
 router.post("/register-student", registerStudent);
-router.delete("/student", deleteStudentById);
+router.delete("/student/:studentID", deleteStudentById);
 
 // TUTOR ROUTES
 router.get("/all-tutors", findAllTutors);
 router.get("/tutor", findTutorById);
 router.post("/register-tutor", registerTutor);
-router.delete("/tutor", deleteTutorById);
+router.delete("/tutor/:tutorID", deleteTutorById);
 
 // ADMIN ROUTES
 router.get("/all-admins", findAllAdmins);
 router.get("/admin", findAdminById);
 router.post("/register-admin", registerAdmin);
-router.delete("/admin", deleteAdminById);
+router.delete("/admin/:adminID", deleteAdminById);
 
 module.exports = router;

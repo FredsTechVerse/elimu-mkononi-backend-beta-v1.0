@@ -64,6 +64,15 @@ const findChapter = async (req, res) => {
     handleError(err, res);
   }
 };
+const updateChapter = async (req, res) => {
+  try {
+    const { chapterID } = req.params;
+    await Chapter.findByIdAndUpdate(chapterID, req.body);
+    res.status(200).json({ message: "Chapter deleted successfully" });
+  } catch (err) {
+    handleError(err, res);
+  }
+};
 
 const deleteChapter = async (req, res) => {
   try {

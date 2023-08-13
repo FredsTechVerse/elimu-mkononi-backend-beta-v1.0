@@ -247,6 +247,7 @@ const findStudentById = async (req, res) => {
   try {
     let { studentId } = req.params;
     let studentData = await Student.findById(studentId);
+    console.log({ studentData });
     res.status(200).json(studentData);
   } catch (err) {
     handleError(err, res);
@@ -329,7 +330,9 @@ const deleteAdminById = async (req, res) => {
 
 const deleteStudentById = async (req, res) => {
   try {
-    await Student.findByIdAndDelete(req?.body?._id);
+    const { studentID } = req.params;
+    await Student.findByIdAndDelete(studentID);
+    res.sendStatus(200);
   } catch (err) {
     handleError(err, res);
   }
