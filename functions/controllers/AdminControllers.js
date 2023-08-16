@@ -1,4 +1,6 @@
 const Admin = require("../models/AdminModel");
+const bcrypt = require("bcrypt");
+
 const { handleError } = require("./ErrorHandling");
 
 const registerAdmin = async (req, res) => {
@@ -36,11 +38,20 @@ const updateAdminInfo = async (req, res) => {
     handleError(err, res);
   }
 };
+const findAuthorizedAdmin = async (req, res) => {
+  try {
+    const { userID: adminID } = req.user;
+    const adminData = await Admin.findById(adminID);
+    res.status(200).json(adminData);
+  } catch (err) {
+    handleError(err, res);
+  }
+};
 
 const findAdminById = async (req, res) => {
   try {
     const { adminID } = req.params;
-    constadminData = await Admin.findById(adminID);
+    const adminData = await Admin.findById(adminID);
     res.status(200).json(adminData);
   } catch (err) {
     handleError(err, res);
@@ -70,6 +81,7 @@ const deleteAdminById = async (req, res) => {
 
 module.exports = {
   registerAdmin,
+  findAuthorizedAdmin,
   findAdminById,
   findAllAdmins,
   updateAdminInfo,

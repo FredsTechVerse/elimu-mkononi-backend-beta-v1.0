@@ -63,8 +63,6 @@ const logOutUser = async (req, res) => {
       return res.status(404).json({ message: "Refresh tokens not found." });
     }
 
-    console.log({ refreshToken: req.body.refreshToken });
-
     await RefreshToken.findOneAndUpdate(
       { name: "tokens" },
       { $pull: { data: req.body.refreshToken } }

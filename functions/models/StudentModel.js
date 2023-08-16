@@ -9,7 +9,7 @@ const StudentSchema = new Schema(
     surname: { type: String, required: true, uppercase: true },
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
-    contact: { type: String, required: true },
+    contact: { type: String, required: true, unique: true },
     status: { type: String, required: true, default: "free" }, //Account status is free until payment is approved.
     role: {
       type: String,

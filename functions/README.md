@@ -6,10 +6,16 @@ This project is a guide to deploying an Express app using Firebase Functions.
 
 - Where we make revision easy and fun!
 
+## BACKEND CONTROLLER DEBUGGING
+
+console.log(`Req Body ${JSON.stringify(req.body)}`);
+console.log(`Unit Body ${JSON.stringify(unitData)}`);
+
 ## TO DO
 
 - User should not be able to update password until proper protocol for authentication , decryption and encryption after update is followed
-- Swap most of the let with const in the db especially where we append the data once
+- Write a list of the CRUD functionalities to go testing the go ticking while making the necessary adjustments.
+- I will group similar functionailites later and sort out by the path to the controller. But this has to happen after all the routes are working.
 
 #### MONGOOSE OPERATORS
 

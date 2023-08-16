@@ -1,4 +1,6 @@
 const Student = require("../models/StudentModel");
+const bcrypt = require("bcrypt");
+
 const { handleError } = require("./ErrorHandling");
 const registerStudent = async (req, res) => {
   try {
@@ -23,6 +25,16 @@ const registerStudent = async (req, res) => {
 const findAllStudents = async (req, res) => {
   try {
     const studentData = await Student.find({});
+    res.status(200).json(studentData);
+  } catch (err) {
+    handleError(err, res);
+  }
+};
+
+const findAuthorizedStudent = async (req, res) => {
+  try {
+    const { userID: studentID } = req.user;
+    const studentData = await Student.findById(studentID);
     res.status(200).json(studentData);
   } catch (err) {
     handleError(err, res);
@@ -72,6 +84,7 @@ const deleteStudentById = async (req, res) => {
 
 module.exports = {
   registerStudent,
+  findAuthorizedStudent,
   findAllStudents,
   findStudentById,
   updateStudentInfo,

@@ -2,7 +2,7 @@ const handleError = (err, res) => {
   let statusCode = 500;
   let errorMessage = "Something went wrong";
 
-  if (err.name === "MongoError" && err.code === 11000) {
+  if (err.code === 11000) {
     statusCode = 409;
     errorMessage = "This document already exists!";
   } else if (err.name === "ValidationError") {
@@ -12,7 +12,7 @@ const handleError = (err, res) => {
     statusCode = 422;
     errorMessage = "Invalid ID";
   }
-
+  console.log(`Error handling controller ${JSON.stringify(err)}`);
   return res.status(statusCode).json({ message: errorMessage });
 };
 

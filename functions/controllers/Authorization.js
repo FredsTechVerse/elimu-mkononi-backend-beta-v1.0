@@ -36,7 +36,7 @@ const authenticateToken = async (req, res, next) => {
       req.path !== "/course/all-courses" &&
       req.path !== "/auth/login" &&
       req.path !== "/auth/refresh-token" &&
-      req.path !== "/auth/register-student" &&
+      req.path !== "/auth/student" &&
       req.path !== "/auth/logout" &&
       !req.path.startsWith("/s3Direct/")
     ) {
@@ -45,7 +45,7 @@ const authenticateToken = async (req, res, next) => {
       req.path === "/course/all-courses" ||
       req.path === "/auth/login" ||
       req.path === "/auth/logout" ||
-      req.path === "/auth/register-student" ||
+      req.path === "/auth/student" ||
       req.path === "/auth/refresh-token" ||
       req.path.startsWith("/s3Direct/")
     ) {

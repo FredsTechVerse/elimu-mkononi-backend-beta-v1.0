@@ -17,6 +17,7 @@ const {
 
 const {
   registerAdmin,
+  findAuthorizedAdmin,
   findAdminById,
   findAllAdmins,
   updateAdminInfo,
@@ -25,6 +26,7 @@ const {
 
 const {
   registerTutor,
+  findAuthorizedTutor,
   findAllTutors,
   findTutorById,
   updateTutorInfo,
@@ -33,6 +35,7 @@ const {
 
 const {
   registerStudent,
+  findAuthorizedStudent,
   findAllStudents,
   findStudentById,
   updateStudentInfo,
@@ -48,23 +51,26 @@ router.get("/all-users", findAllUsers);
 router.delete("/logout", logOutUser);
 
 // STUDENT ROUTES
-router.post("/register-student", registerStudent);
+router.post("/student", registerStudent);
+router.get("/student", findAuthorizedStudent);
 router.get("/all-students", findAllStudents);
 router.get("/student/:studentID", findStudentById);
 router.put("/student/:studentID", updateStudentInfo);
 router.delete("/student/:studentID", deleteStudentById);
 
 // TUTOR ROUTES
-router.post("/register-tutor", registerTutor);
+router.post("/tutor", registerTutor);
 router.get("/all-tutors", findAllTutors);
+router.get("/tutor", findAuthorizedTutor);
 router.get("/tutor/:tutorID", findTutorById);
 router.put("/tutor/:tutorID", updateTutorInfo);
 router.delete("/tutor/:tutorID", deleteTutorById);
 
 // ADMIN ROUTES
-router.post("/register-admin", registerAdmin);
+router.post("/admin", registerAdmin);
+router.get("/admin", findAuthorizedAdmin);
 router.get("/all-admins", findAllAdmins);
-router.get("/admin/:adminID", findAdminById);
+router.get("/admin/adminID", findAdminById);
 router.put("/admin/:adminID", updateAdminInfo);
 router.delete("/admin/:adminID", deleteAdminById);
 

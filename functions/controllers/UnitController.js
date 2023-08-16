@@ -53,19 +53,16 @@ const getAllUnits = async (req, res) => {
 // Perfect Illustration of One to many relationship.
 const createUnit = async (req, res) => {
   try {
-    const {
-      courseID,
-      tutorId: tutorID,
-      unitCode,
-      unitName,
-      unitDescription,
-    } = req.body;
+    const { courseID, tutorID, unitCode, unitName, unitDescription } = req.body;
     const unitData = {
       unitCode,
       unitName,
       unitDescription,
       tutor: [tutorID],
     };
+
+    console.log(`Req Body ${JSON.stringify(req.body)}`);
+    console.log(`Unit Body ${JSON.stringify(unitData)}`);
 
     const newUnit = await Unit.create(unitData);
     newUnit.save();
