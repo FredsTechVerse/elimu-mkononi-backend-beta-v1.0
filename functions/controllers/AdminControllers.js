@@ -6,7 +6,7 @@ const { handleError } = require("./ErrorHandling");
 const registerAdmin = async (req, res) => {
   try {
     const hashedPassword = await bcrypt.hash(req.body.password, 10);
-    constcredentials = {
+    const credentials = {
       firstName: req.body.firstName,
       surname: req.body.surname,
       email: req.body.email,
@@ -24,7 +24,7 @@ const registerAdmin = async (req, res) => {
 const updateAdminInfo = async (req, res) => {
   try {
     const { adminID } = req.params;
-    constcredentials = {
+    const credentials = {
       firstName: req.body.firstName,
       surname: req.body.surname,
       email: req.body.email,
@@ -32,7 +32,7 @@ const updateAdminInfo = async (req, res) => {
     };
     await Admin.findByIdAndUpdate(adminID, credentials);
     res
-      .send(202)
+      .status(202)
       .json({ message: "Admin information has been successfully updated" });
   } catch (err) {
     handleError(err, res);
@@ -41,7 +41,7 @@ const updateAdminInfo = async (req, res) => {
 const findAuthorizedAdmin = async (req, res) => {
   try {
     const { userID: adminID } = req.user;
-    const adminData = await Admin.findById(adminID);
+    const adminData = await Admin.findById(adminID).select("-password");
     res.status(200).json(adminData);
   } catch (err) {
     handleError(err, res);
@@ -51,7 +51,7 @@ const findAuthorizedAdmin = async (req, res) => {
 const findAdminById = async (req, res) => {
   try {
     const { adminID } = req.params;
-    const adminData = await Admin.findById(adminID);
+    const adminData = await Admin.findById(adminID).select("-password");
     res.status(200).json(adminData);
   } catch (err) {
     handleError(err, res);
@@ -60,7 +60,7 @@ const findAdminById = async (req, res) => {
 
 const findAllAdmins = async (req, res) => {
   try {
-    const adminData = await Admin.find({});
+    const adminData = await Admin.find({}).select("-password");
     res.status(200).json(adminData);
   } catch (err) {
     handleError(err, res);

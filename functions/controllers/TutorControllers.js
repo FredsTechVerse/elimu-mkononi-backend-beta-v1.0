@@ -4,9 +4,6 @@ const { handleError } = require("./ErrorHandling");
 
 const registerTutor = async (req, res) => {
   try {
-    console.log({
-      TutorData: req.body,
-    });
     const hashedPassword = await bcrypt.hash(req.body.password, 10);
     const credentials = {
       firstName: req.body.firstName,
@@ -17,7 +14,6 @@ const registerTutor = async (req, res) => {
     };
     const newTutor = await Tutor.create(credentials);
     newTutor.save();
-    console.log("Tutor Data created");
     res.sendStatus(201);
   } catch (err) {
     handleError(err, res);
@@ -26,7 +22,7 @@ const registerTutor = async (req, res) => {
 
 const findAllTutors = async (req, res) => {
   try {
-    const tutorData = await Tutor.find({});
+    const tutorData = await Tutor.find({}).select("-password");
     res.status(200).json(tutorData);
   } catch (err) {
     handleError(err, res);
@@ -36,11 +32,12 @@ const findAllTutors = async (req, res) => {
 const findAuthorizedTutor = async (req, res) => {
   try {
     const { userID: tutorID } = req.user;
-    console.log({ tutorID: tutorID });
-    const tutorData = await Tutor.findById(tutorID).populate({
-      path: "units",
-      populate: "unitChapters",
-    });
+    const tutorData = await Tutor.findById(tutorID)
+      .select("-password")
+      .populate({
+        path: "units",
+        populate: "unitChapters",
+      });
     res.status(200).json(tutorData);
   } catch (err) {
     handleError(err, res);
@@ -50,11 +47,12 @@ const findAuthorizedTutor = async (req, res) => {
 const findTutorById = async (req, res) => {
   try {
     const { tutorID } = req.params;
-    console.log({ tutorID: tutorID });
-    const tutorData = await Tutor.findById(tutorID).populate({
-      path: "units",
-      populate: "unitChapters",
-    });
+    const tutorData = await Tutor.findById(tutorID)
+      .select("-password")
+      .populate({
+        path: "units",
+        populate: "unitChapters",
+      });
     res.status(200).json(tutorData);
   } catch (err) {
     handleError(err, res);
@@ -72,7 +70,7 @@ const updateTutorInfo = async (req, res) => {
     };
     await Tutor.findByIdAndUpdate(tutorID, credentials);
     res
-      .send(202)
+      .status(202)
       .json({ message: "Tutor information has been successfully updated" });
   } catch (err) {
     handleError(err, res);

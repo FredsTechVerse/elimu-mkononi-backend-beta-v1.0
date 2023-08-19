@@ -24,7 +24,7 @@ const registerStudent = async (req, res) => {
 
 const findAllStudents = async (req, res) => {
   try {
-    const studentData = await Student.find({});
+    const studentData = await Student.find({}).select("-password");
     res.status(200).json(studentData);
   } catch (err) {
     handleError(err, res);
@@ -34,7 +34,7 @@ const findAllStudents = async (req, res) => {
 const findAuthorizedStudent = async (req, res) => {
   try {
     const { userID: studentID } = req.user;
-    const studentData = await Student.findById(studentID);
+    const studentData = await Student.findById(studentID).select("-password");
     res.status(200).json(studentData);
   } catch (err) {
     handleError(err, res);
@@ -44,7 +44,7 @@ const findAuthorizedStudent = async (req, res) => {
 const findStudentById = async (req, res) => {
   try {
     const { studentID } = req.params;
-    const studentData = await Student.findById(studentID);
+    const studentData = await Student.findById(studentID).select("-password");
     res.status(200).json(studentData);
   } catch (err) {
     handleError(err, res);
@@ -62,7 +62,7 @@ const updateStudentInfo = async (req, res) => {
     };
     await Student.findByIdAndUpdate(studentID, credentials);
     res
-      .send(202)
+      .status(202)
       .json({ message: "Student information has been successfully updated" });
   } catch (err) {
     handleError(err, res);
@@ -73,7 +73,6 @@ const deleteStudentById = async (req, res) => {
   try {
     const { studentID } = req.params;
     await Student.findByIdAndDelete(studentID);
-
     res.status(200).json({
       message: "Student deleted successfully",
     });
