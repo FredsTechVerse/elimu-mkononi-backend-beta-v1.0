@@ -1,5 +1,4 @@
 const express = require("express");
-const axios = require("axios");
 const router = express.Router();
 const { google } = require("googleapis");
 
@@ -15,14 +14,12 @@ const oAuth2Client = new google.auth.OAuth2(
   redirectUri
 );
 
+// An event listener triggered when new tokens are obtained / when existing tokens are refreshed.
 oAuth2Client.on("tokens", (tokens) => {
+  console.log({ tokensEventHandler: tokens });
   if (tokens.refresh_token) {
-    // store the refresh_token in my database!
-    // console.log(
-    //   `Refresh Token generated ${JSON.stringify(tokens.refresh_token)}`
-    // );
+    // we should store the refresh_token in my database generically!
   }
-  // console.log(`Access Token generated ${JSON.stringify(tokens.access_token)}`);
 });
 
 router.get("/authorizationUri", (req, res) => {
@@ -39,13 +36,41 @@ router.post("/getToken", async (req, res) => {
     const { code } = req.body;
     if (code) {
       const { tokens } = await oAuth2Client.getToken(code);
+      console.log({ tokenStructure: tokens });
+      // TOKEN BODY STRUCTURE TO BE EXPECTED
+      // {
+      //   "access_token": "your-access-token",
+      //   "refresh_token": "your-refresh-token",
+      //   "scope": "scopes-requested",
+      //   "token_type": "Bearer",
+      //   "expiry_date": UNIX_TIMESTAMP
+      // }
       oAuth2Client.setCredentials(tokens);
+
+      // Where the oAuthClient.on("tokens",()=>{}) is triggered
       res.status(200).json(tokens);
     } else {
       res.status(404).json({ message: "Code not found" });
     }
   } catch (error) {
     res.status(500).json(error);
+  }
+});
+
+router.post("/refreshToken", async (req, res) => {
+  try {
+    const refreshToken = req.body.refreshToken; // Will use the refresh token stored in my DB
+    const credentials = await oAuth2Client.refreshToken(refreshToken);
+
+    const newAccessToken = credentials.tokens.access_token;
+    const newExpiration = credentials.tokens.expiry_date;
+
+    res.status(200).json({
+      accessToken: newAccessToken,
+      expiresIn: newExpiration,
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Token refresh failed." });
   }
 });
 

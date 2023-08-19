@@ -17,6 +17,12 @@ console.log(`Unit Body ${JSON.stringify(unitData)}`);
 - Write a list of the CRUD functionalities to go testing the go ticking while making the necessary adjustments.
 - I will group similar functionailites later and sort out by the path to the controller. But this has to happen after all the routes are working.
 
+#### MONGODB
+- Cluster - Several servers connected together to manage your database(s)... Yea thats right.A cluster can have multiple databases. 
+- Database - Simply a container for storing data usually in collections which are managed using a database management systems.
+- Externalizing file storage is a good and cost effective practise as the two can scale independently.
+- For my usecase , having all my projects in one cluster will be cost effective and simple to manage.
+
 #### MONGOOSE OPERATORS
 
 A way for us to interact with our data stored in a bucket , the database.
