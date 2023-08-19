@@ -70,7 +70,7 @@ router.delete("/tutor/:tutorID", deleteTutorById);
 router.post("/admin", registerAdmin);
 router.get("/admin", findAuthorizedAdmin);
 router.get("/all-admins", findAllAdmins);
-router.get("/admin/adminID", findAdminById);
+router.get("/admin/:adminID", findAdminById);
 router.put("/admin/:adminID", updateAdminInfo);
 router.delete("/admin/:adminID", deleteAdminById);
 

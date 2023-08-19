@@ -61,9 +61,6 @@ const createUnit = async (req, res) => {
       tutor: [tutorID],
     };
 
-    console.log(`Req Body ${JSON.stringify(req.body)}`);
-    console.log(`Unit Body ${JSON.stringify(unitData)}`);
-
     const newUnit = await Unit.create(unitData);
     newUnit.save();
     const { _id: unitID } = newUnit; // Extracting ID from staved Lesson
