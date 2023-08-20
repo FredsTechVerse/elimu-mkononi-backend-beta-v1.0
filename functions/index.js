@@ -11,7 +11,7 @@ if (process.env.NODE_ENV !== "production") {
 const routes = [
   { path: "/chapter", route: require("./routes/ChapterRoute") },
   { path: "/lesson", route: require("./routes/LessonRoute") },
-  { path: "/s3Direct", route: require("./routes/s3UploadRoute") },
+  { path: "/file", route: require("./routes/fileHandlerRoute") },
   { path: "/resources", route: require("./routes/ResourcesRoute") },
   { path: "/course", route: require("./routes/CourseRoute") },
   { path: "/notes", route: require("./routes/NotesRoute") },

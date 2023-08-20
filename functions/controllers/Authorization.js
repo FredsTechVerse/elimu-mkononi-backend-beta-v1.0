@@ -38,7 +38,7 @@ const authenticateToken = async (req, res, next) => {
       req.path !== "/auth/refresh-token" &&
       req.path !== "/auth/student" &&
       req.path !== "/auth/logout" &&
-      !req.path.startsWith("/s3Direct/")
+      !req.path.startsWith("/file/")
     ) {
       return res.sendStatus(403);
     } else if (
@@ -47,7 +47,7 @@ const authenticateToken = async (req, res, next) => {
       req.path === "/auth/logout" ||
       req.path === "/auth/student" ||
       req.path === "/auth/refresh-token" ||
-      req.path.startsWith("/s3Direct/")
+      req.path.startsWith("/file/")
     ) {
       req.user = null;
       return next();
