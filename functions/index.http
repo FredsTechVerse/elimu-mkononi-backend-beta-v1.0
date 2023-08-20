@@ -13,3 +13,20 @@ GET http://localhost:5000/elearning-module-a887d/us-central1/app/oAuth/authoriza
 GET http://localhost:4000/oAuth/getToken?code=4/0AZEOvhVHvn7_-tKFyfs1td7rGXLIZYsFMxvFYVIqAZ7ptKPB-BtnClD7XMGbxNVNTqlTEg
 ### NEW FETCH
 GET http://localhost:5000/elearning-module-a887d/us-central1/app/oAuth/getToken?code=4%2F0AZEOvhUb-4BqNManKZZy__qXJHynCkI8JEyVPfkTTfUBLsQBRSutrZ024arW5ciw9fvXaA&scope=https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fyoutube.upload
+
+### RESOURCE DELETE REQUEST
+DELETE http://localhost:4000/file/87574094c4fb91ac1ac979b5a48ab85e.plain
+
+### MAKING PAYMENT TO TINYPESA
+POST https://bulk-sms-production.up.railway.app/api/v1/account/pay
+content-type: application/json
+apikey:9d1d8bb393c14550a5dfae8a2a1d5bd3
+
+{"phone":"0112615416","amount":10}
+
+### SENDING AN SMS WITH TINYPESA
+POST https://bulk-sms-production.up.railway.app/api/v1/sms/send
+content-type: application/json
+apikey:9d1d8bb393c14550a5dfae8a2a1d5bd3
+
+{"phone":"0112615416","message":"Hello from tinypesa, testing multiple lines!","recipient":["0103452189","0112615416"]}
