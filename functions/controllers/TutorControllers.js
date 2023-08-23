@@ -1,6 +1,34 @@
 const Tutor = require("../models/TutorModel");
+const User = require("../models/UserModel");
 const bcrypt = require("bcrypt");
 const { handleError } = require("./ErrorHandling");
+
+const registerUser = async (req, res) => {
+  try {
+    console.log(
+      `Register user request acknowledged ${JSON.stringify(req.body)}`
+    );
+    // const hashedPassword = await bcrypt.hash(req.body.password, 10);
+    const credentials = {
+      DOB: req.body.DOB,
+      contact: req.body.contact,
+      email: req.body.email,
+      firstName: req.body.firstName,
+      gender: req.body.gender,
+      isInterestedToServe: req.body.isInterestedToServe,
+      lastName: req.body.lastName,
+      residence: req.body.residence,
+      serviceGroup: req.body.serviceGroup,
+    };
+    const newUser = await User.create(credentials);
+    newUser.save();
+    console.log({ newUserData: newUser });
+    res.sendStatus(201);
+  } catch (err) {
+    console.log(`Error while saving user ${JSON.stringify(err)}`);
+    handleError(err, res);
+  }
+};
 
 const registerTutor = async (req, res) => {
   try {
@@ -90,6 +118,7 @@ const deleteTutorById = async (req, res) => {
 };
 
 module.exports = {
+  registerUser,
   registerTutor,
   findAuthorizedTutor,
   findAllTutors,

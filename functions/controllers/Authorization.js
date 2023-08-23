@@ -66,7 +66,7 @@ const createTokenModel = async (req, res) => {
     const initialData = {
       data: [],
     };
-    consttokenData = await RefreshToken.create(initialData);
+    const tokenData = await RefreshToken.create(initialData);
     tokenData.save();
     res.sendStatus(200);
   } catch (err) {

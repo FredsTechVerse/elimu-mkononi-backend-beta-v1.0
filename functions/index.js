@@ -17,6 +17,9 @@ const routes = [
   { path: "/notes", route: require("./routes/NotesRoute") },
   { path: "/unit", route: require("./routes/UnitRoute") },
   { path: "/auth", route: require("./routes/AuthRoute") },
+  { path: "/student", route: require("./routes/StudentRoute") },
+  { path: "/tutor", route: require("./routes/TutorRoute") },
+  { path: "/admin", route: require("./routes/AdminRoute") },
   { path: "/oAuth", route: require("./routes/OAuthRoute") },
 ];
 
