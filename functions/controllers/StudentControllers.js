@@ -1,6 +1,6 @@
 const Student = require("../models/StudentModel");
 const bcrypt = require("bcrypt");
-const { sendSms } = require("../controllers/Communication");
+const { confirmUserRegistration } = require("../controllers/Communication");
 const { handleError } = require("./ErrorHandling");
 const registerStudent = async (req, res) => {
   try {
@@ -14,7 +14,11 @@ const registerStudent = async (req, res) => {
     };
     const newStudent = await Student.create(credentials);
     newStudent.save();
-    sendSms({ firstName: req.body.firstName, contact: req.body.contact });
+    confirmUserRegistration({
+      firstName: req.body.firstName,
+      contact: req.body.contact,
+      role: "student",
+    });
     res
       .status(201)
       .json({ message: "Student has been registered successfully." });

@@ -11,11 +11,11 @@ const {
 } = require("../controllers/AdminControllers");
 
 // ADMIN ROUTES
-router.post("/admin", registerAdmin);
-router.get("/admin", findAuthorizedAdmin);
+router.post("/", registerAdmin);
+router.get("/", findAuthorizedAdmin);
 router.get("/all-admins", findAllAdmins);
-router.get("/admin/:adminID", findAdminById);
-router.put("/admin/:adminID", updateAdminInfo);
-router.delete("/admin/:adminID", deleteAdminById);
+router.get("/:adminID", findAdminById);
+router.put("/:adminID", updateAdminInfo);
+router.delete("/:adminID", deleteAdminById);
 
 module.exports = router;

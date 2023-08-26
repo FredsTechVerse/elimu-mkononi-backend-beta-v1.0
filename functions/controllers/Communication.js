@@ -1,5 +1,5 @@
 const axios = require("axios");
-const sendSms = async ({ firstName, contact }) => {
+const confirmUserRegistration = async ({ firstName, contact, role }) => {
   try {
     console.log(`New user data ${JSON.stringify({ firstName, contact })}`);
     const config = {
@@ -10,7 +10,7 @@ const sendSms = async ({ firstName, contact }) => {
     };
     const smsPayload = {
       phone: "0112615416",
-      message: `Thank you ${firstName} for registering on Elimu Hub `,
+      message: `Congratulations ${firstName} for success registering as a ${role} on Elimu Hub.`,
       recipient: [contact],
     };
 
@@ -26,4 +26,4 @@ const sendSms = async ({ firstName, contact }) => {
   }
 };
 
-module.exports = { sendSms };
+module.exports = { confirmUserRegistration };

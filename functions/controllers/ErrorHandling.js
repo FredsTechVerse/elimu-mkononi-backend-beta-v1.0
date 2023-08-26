@@ -30,7 +30,7 @@ const handleRenewTokenError = (err, res) => {
 
 const handleJwtError = (err, res) => {
   if (err.name === "TokenExpiredError") {
-    return res.status(401).json({ message: "Token expired bana!" });
+    return res.status(401).json({ message: "Token expired" });
   }
   if (err.name === "JsonWebTokenError") {
     return res.status(401).json({ message: "Invalid token" });

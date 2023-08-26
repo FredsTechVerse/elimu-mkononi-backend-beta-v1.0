@@ -1,6 +1,6 @@
 const Admin = require("../models/AdminModel");
 const bcrypt = require("bcrypt");
-
+const { confirmUserRegistration } = require("../controllers/Communication");
 const { handleError } = require("./ErrorHandling");
 
 const registerAdmin = async (req, res) => {
@@ -15,6 +15,11 @@ const registerAdmin = async (req, res) => {
     };
     const newAdmin = await Admin.create(credentials);
     newAdmin.save();
+    confirmUserRegistration({
+      firstName: req.body.firstName,
+      contact: req.body.contact,
+      role: "admin",
+    });
     res.sendStatus(201);
   } catch (err) {
     handleError(err, res);

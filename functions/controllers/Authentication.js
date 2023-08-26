@@ -39,7 +39,6 @@ const logInUser = async (req, res) => {
     };
     const accessToken = generateAccessToken(user);
     const refreshToken = generateRefreshToken(user);
-    console.log({ accessToken, refreshToken });
     const { _id: tokenID } = await RefreshToken.findOne({ name: "tokens" });
     const refreshTokenData = await RefreshToken.findByIdAndUpdate(
       tokenID,

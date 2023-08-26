@@ -2,6 +2,7 @@ const Tutor = require("../models/TutorModel");
 const User = require("../models/UserModel");
 const bcrypt = require("bcrypt");
 const { handleError } = require("./ErrorHandling");
+const { confirmUserRegistration } = require("../controllers/Communication");
 
 const registerUser = async (req, res) => {
   try {
@@ -22,7 +23,7 @@ const registerUser = async (req, res) => {
     };
     const newUser = await User.create(credentials);
     newUser.save();
-    console.log({ newUserData: newUser });
+
     res.sendStatus(201);
   } catch (err) {
     console.log(`Error while saving user ${JSON.stringify(err)}`);
@@ -42,6 +43,11 @@ const registerTutor = async (req, res) => {
     };
     const newTutor = await Tutor.create(credentials);
     newTutor.save();
+    confirmUserRegistration({
+      firstName: req.body.firstName,
+      contact: req.body.contact,
+      role: "tutor",
+    });
     res.sendStatus(201);
   } catch (err) {
     handleError(err, res);
