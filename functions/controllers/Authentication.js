@@ -54,6 +54,7 @@ const logInUser = async (req, res) => {
       });
     }
   } catch (err) {
+    console.log(err);
     handleError(err, res);
   }
 };

@@ -36,16 +36,17 @@ const authenticateToken = async (req, res, next) => {
       req.path !== "/course/all-courses" &&
       req.path !== "/auth/login" &&
       req.path !== "/auth/refresh-token" &&
-      req.path !== "/auth/student" &&
+      req.path !== "/student" &&
       req.path !== "/auth/logout" &&
       !req.path.startsWith("/file/")
     ) {
+      console.log(`Req being rejected ${JSON.stringify(req.path)}`);
       return res.sendStatus(403);
     } else if (
       req.path === "/course/all-courses" ||
       req.path === "/auth/login" ||
       req.path === "/auth/logout" ||
-      req.path === "/auth/student" ||
+      req.path === "/student" ||
       req.path === "/auth/refresh-token" ||
       req.path.startsWith("/file/")
     ) {
