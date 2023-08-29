@@ -3,6 +3,7 @@ const { Schema } = mongoose;
 
 const NotesSchema = new Schema(
   {
+    lesson: { type: String, required: true },
     content: { type: String, required: true },
   },
   {

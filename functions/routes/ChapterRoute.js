@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 
 const {
+  aggregateChapter,
   createChapter,
   findAllChapters,
   findChapter,
@@ -11,6 +12,7 @@ const {
 } = require("../controllers/ChapterController");
 
 router.post("/", createChapter);
+router.get("/aggregated", aggregateChapter);
 router.get("/all-chapters", findAllChapters);
 router.get("/:chapterID", findChapter);
 router.get("/all-chapters-lessons", populateChapterLessons);

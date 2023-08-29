@@ -30,3 +30,23 @@ content-type: application/json
 apikey:9d1d8bb393c14550a5dfae8a2a1d5bd3
 
 {"phone":"0112615416","message":"Good Evening Alfred...","recipient":["0112615416"]}
+
+
+### FETCH ALL STUDENTS DATA
+GET http://localhost:4000/student/all-students
+
+### FETCH ALL UNITS DATA
+GET http://localhost:4000/unit/all-units
+
+### FETCH AGGREGATED COURSES
+GET http://localhost:4000/course/aggregated
+
+### FETCH AGGREGATED UNITS 
+GET http://localhost:4000/unit/aggregated
+
+### FETCH AGGREGATED CHAPTERS
+GET http://localhost:4000/chapter/aggregated
+
+
+### FETCH AGGREGATED LESSONS
+GET http://localhost:4000/lesson/aggregated

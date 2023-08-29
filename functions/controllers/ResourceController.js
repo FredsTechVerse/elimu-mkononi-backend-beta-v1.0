@@ -5,7 +5,7 @@ const { handleError } = require("./ErrorHandling");
 const createResource = async (req, res) => {
   try {
     const { chapterID, resourceName, resourceUrl } = req.body;
-    const resourceData = { resourceName, resourceUrl };
+    const resourceData = { chapter: chapterID, resourceName, resourceUrl };
     const newResource = await Resource.create(resourceData);
     newResource.save();
     const { _id: resourceID } = newResource;

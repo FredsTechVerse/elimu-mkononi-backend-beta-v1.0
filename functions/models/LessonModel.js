@@ -3,6 +3,7 @@ const { Schema } = mongoose;
 
 const LessonSchema = new Schema(
   {
+    chapter: { type: mongoose.Schema.Types.ObjectId, ref: "Chapter" },
     lessonNumber: { type: String, required: true },
     lessonName: { type: String, required: true, uppercase: true },
     lessonUrl: { type: String, required: true },

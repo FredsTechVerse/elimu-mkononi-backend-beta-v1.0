@@ -6,6 +6,7 @@ const createChapter = async (req, res) => {
   try {
     const { unitID, chapterNumber, chapterName, chapterDescription } = req.body;
     const chapterData = {
+      unit: unitID,
       chapterNumber,
       chapterName,
       chapterDescription,
@@ -30,6 +31,18 @@ const createChapter = async (req, res) => {
     } else {
       res.status(404).json({ message: "Unit not found" });
     }
+  } catch (err) {
+    handleError(err, res);
+  }
+};
+const aggregateChapter = async (req, res) => {
+  try {
+    console.log("Fetching aggregated chapters");
+    const chapterData = await Chapter.aggregate([
+      { $group: { _id: "$unit", chapterCount: { $sum: 1 } } },
+    ]);
+    console.log(chapterData);
+    res.sendStatus(200);
   } catch (err) {
     handleError(err, res);
   }
@@ -91,6 +104,7 @@ const deleteChapter = async (req, res) => {
 };
 
 module.exports = {
+  aggregateChapter,
   createChapter,
   findChapter,
   findAllChapters,

@@ -7,6 +7,7 @@ const createLesson = async (req, res) => {
     const { chapterID, lessonNumber, lessonName, lessonUrl } = req.body;
 
     const lessonData = {
+      chapter: chapterID,
       lessonNumber,
       lessonName,
       lessonUrl,
@@ -22,6 +23,19 @@ const createLesson = async (req, res) => {
     if (chapterData?._doc?.chapterLessons?.includes(lessonID)) {
       res.status(201).json(newLesson);
     }
+  } catch (err) {
+    handleError(err, res);
+  }
+};
+
+const aggregateLessons = async (req, res) => {
+  try {
+    const aggregatedLessons = await Lesson.aggregate([
+      { $group: { _id: "$chapter", lessonCount: { $sum: 1 } } },
+    ]);
+
+    console.log(aggregatedLessons);
+    res.sendStatus(200);
   } catch (err) {
     handleError(err, res);
   }
@@ -64,4 +78,10 @@ const deleteLesson = async (req, res) => {
   }
 };
 
-module.exports = { findLesson, createLesson, updateLesson, deleteLesson };
+module.exports = {
+  aggregateLessons,
+  findLesson,
+  createLesson,
+  updateLesson,
+  deleteLesson,
+};

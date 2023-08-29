@@ -5,7 +5,10 @@ const { handleError } = require("./ErrorHandling");
 const createNotes = async (req, res) => {
   try {
     const { lessonNotes, lessonID } = req.body;
-    const newNotes = await Notes.create({ content: lessonNotes });
+    const newNotes = await Notes.create({
+      content: lessonNotes,
+      lesson: lessonID,
+    });
     newNotes.save();
     const { _id: notesID } = newNotes;
     const lessonData = await Lesson.findByIdAndUpdate(

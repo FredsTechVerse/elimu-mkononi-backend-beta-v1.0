@@ -6,6 +6,7 @@ const { Schema } = mongoose;
 
 const ResourceSchema = new Schema(
   {
+    chapter: { type: mongoose.Schema.Types.ObjectId, ref: "Chapter" },
     resourceName: { type: String, required: true },
     resourceUrl: { type: String, required: true },
   },

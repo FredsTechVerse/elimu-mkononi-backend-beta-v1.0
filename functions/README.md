@@ -15,6 +15,9 @@ This project is a guide to deploying an Express app using Firebase Functions.
 
 ## TIPS I HAVE GATHERED ALONG THE WAY
 
+- Mongoose operators are preceded by a .sign followed by brackets eg .find() whereas mongodb operators are preceded by a $ sign and sometimes followed by curly braces.
+- To make data aggregation possible children have to keep track of parents so as to be able to group the children by the parents ID.
+- To populate parents data effectively , parents have to keep track of their children ID'S
 - While dealing with the s3 bucket , incase of conflict of policies , the more restrictive policy takes precedence eg when we define both a bucket and iam policy.
 - Youtube api scope is like policy in aws.
 - By handling errors for each request, it really helps avoid crushing the server without reasonable cause.

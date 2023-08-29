@@ -44,6 +44,7 @@ const getUnitWithLessons = async (req, res) => {
 
 const getAllUnits = async (req, res) => {
   try {
+    console.log("Fetching all units");
     const unitsData = await Unit.find({});
     res.status(201).json(unitsData);
   } catch (err) {
@@ -55,6 +56,7 @@ const createUnit = async (req, res) => {
   try {
     const { courseID, tutorID, unitCode, unitName, unitDescription } = req.body;
     const unitData = {
+      course: courseID,
       unitCode,
       unitName,
       unitDescription,
@@ -82,6 +84,19 @@ const createUnit = async (req, res) => {
       // We can safely say that the unit has been created.
       res.sendStatus(201);
     }
+  } catch (err) {
+    handleError(err, res);
+  }
+};
+
+const aggregateUnit = async (req, res) => {
+  try {
+    console.log("Fetching aggregated units");
+    const unitData = await Unit.aggregate([
+      { $group: { _id: "$course", unitCount: { $sum: 1 } } },
+    ]);
+    console.log(unitData);
+    res.sendStatus(200);
   } catch (err) {
     handleError(err, res);
   }
@@ -115,6 +130,7 @@ const deleteUnit = async (req, res) => {
 };
 
 module.exports = {
+  aggregateUnit,
   createUnit,
   getAllUnits,
   getUnit,

@@ -27,6 +27,21 @@ const registerStudent = async (req, res) => {
   }
 };
 
+const aggregateStudents = async (req, res) => {
+  try {
+    let totalStudents = await Student.aggregate([
+      { $match: { role: "EM-201" } },
+      { $group: { _id: "$role", studentCount: { $sum: 1 } } }, // Simple groups by ID
+    ]);
+
+    console.log(totalStudents);
+    res.sendStatus(200);
+  } catch (err) {
+    console.log(`Aggregation error ${JSON.stringify(err)}`);
+    handleError(err, res);
+  }
+};
+
 const findAllStudents = async (req, res) => {
   try {
     const studentData = await Student.find({}).select("-password");
@@ -87,6 +102,7 @@ const deleteStudentById = async (req, res) => {
 };
 
 module.exports = {
+  aggregateStudents,
   registerStudent,
   findAuthorizedStudent,
   findAllStudents,
