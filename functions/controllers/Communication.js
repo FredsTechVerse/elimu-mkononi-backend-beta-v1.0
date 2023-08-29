@@ -10,7 +10,9 @@ const confirmUserRegistration = async ({ firstName, contact, role }) => {
     };
     const smsPayload = {
       phone: "0112615416",
-      message: `Congratulations ${firstName} for success registering as a ${role} on Elimu Hub.`,
+      message: `Congratulations ${firstName} for successfully registering as ${
+        role === "admin" ? "an" : "a"
+      } ${role} on Elimu Hub.`,
       recipient: [contact],
     };
 
@@ -22,6 +24,7 @@ const confirmUserRegistration = async ({ firstName, contact, role }) => {
 
     console.log(`SMS response data ${JSON.stringify(data)}`);
   } catch (err) {
+    // I will only invoke users attention if an error is present.
     console.log(`SMS send error ${JSON.stringify(err)}`);
   }
 };

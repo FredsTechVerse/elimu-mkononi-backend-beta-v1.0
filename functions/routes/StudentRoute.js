@@ -12,9 +12,8 @@ const {
 } = require("../controllers/StudentControllers");
 router.post("/", registerStudent);
 router.get("/", findAuthorizedStudent);
-// router.get("/all-students", findAllStudents);
-router.get("/all-students", aggregateStudents);
-
+router.get("/all-students", findAllStudents);
+router.get("/aggregate", aggregateStudents);
 router.get("/:studentID", findStudentById);
 router.put("/:studentID", updateStudentInfo);
 router.delete("/:studentID", deleteStudentById);
