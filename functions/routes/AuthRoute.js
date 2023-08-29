@@ -8,6 +8,7 @@ const {
   logInUser,
   logOutUser,
   findAllUsers,
+  aggregateUsers,
 } = require("../controllers/Authentication");
 
 const {
@@ -24,5 +25,6 @@ router.delete("/logout", logOutUser);
 router.post("/refresh-token", renewTokens);
 router.get("/verify-access", verifyAccess);
 router.get("/all-users", findAllUsers);
+router.get("/aggregate", aggregateUsers);
 
 module.exports = router;

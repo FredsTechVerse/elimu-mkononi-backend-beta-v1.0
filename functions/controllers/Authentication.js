@@ -11,6 +11,34 @@ const {
   generateRefreshToken,
 } = require("./Authorization");
 
+const aggregateUsers = async (req, res) => {
+  try {
+    let totalStudents = await Student.aggregate([
+      { $group: { _id: "$role", studentCount: { $sum: 1 } } }, // Simple groups by ID
+    ]);
+    let totalTutors = await Tutor.aggregate([
+      { $group: { _id: "$role", tutorCount: { $sum: 1 } } },
+    ]);
+    let totalAdmins = await Admin.aggregate([
+      { $group: { _id: "$role", adminCount: { $sum: 1 } } },
+    ]);
+
+    const usersData = [...totalStudents, ...totalTutors, ...totalAdmins];
+
+    const refinedData = {
+      students: usersData[0].studentCount,
+      tutors: usersData[1].tutorCount,
+      admins: usersData[2].adminCount,
+    };
+
+    console.log(refinedData);
+    res.status(200).json(refinedData);
+  } catch (err) {
+    console.log(`User aggregation error ${JSON.stringify(err)}`);
+    handleError(err, res);
+  }
+};
+
 const logInUser = async (req, res) => {
   try {
     let userData = null;
@@ -96,4 +124,4 @@ const findAllUsers = async (req, res) => {
   }
 };
 
-module.exports = { logInUser, logOutUser, findAllUsers };
+module.exports = { logInUser, logOutUser, findAllUsers, aggregateUsers };

@@ -89,18 +89,80 @@ const createUnit = async (req, res) => {
   }
 };
 
+// .aggregate([
+//   { $group: { _id: "$course.courseTitle", unitCount: { $sum: 1 } } },
+// ]);
+
 const aggregateUnit = async (req, res) => {
   try {
     console.log("Fetching aggregated units");
     const unitData = await Unit.aggregate([
-      { $group: { _id: "$course", unitCount: { $sum: 1 } } },
+      {
+        $lookup: {
+          from: "courses", // Assuming your course collection name is "courses"
+          localField: "course",
+          foreignField: "_id",
+          as: "courseInformation",
+        },
+      },
+      {
+        $unwind: "$courseInformation",
+      },
+      {
+        $group: {
+          _id: "$courseInformation.courseTitle",
+          unitCount: { $sum: 1 },
+        },
+      },
     ]);
+
     console.log(unitData);
     res.sendStatus(200);
   } catch (err) {
+    console.log(err);
     handleError(err, res);
   }
 };
+
+// const aggregateUnit = async (req, res) => {
+//   try {
+//     console.log("Fetching aggregated units");
+
+//     const aggregatedData = await Unit.aggregate([
+//       {
+//         $lookup: {
+//           from: "courses", // Assuming your course collection name is "courses"
+//           localField: "course.courseTitle",
+//           foreignField: "courseTitle",
+//           as: "courseInfo",
+//         },
+//       },
+//       {
+//         $unwind: "$courseInfo",
+//       },
+//       {
+//         $group: {
+//           _id: "$courseInfo.courseTitle",
+//           units: {
+//             $push: {
+//               unitCode: "$unitCode",
+//               unitName: "$unitName",
+//               unitType: "$unitType",
+//               unitDescription: "$unitDescription",
+//             },
+//           },
+//           unitCount: { $sum: 1 },
+//         },
+//       },
+//     ]);
+
+//     console.log(aggregatedData);
+//     res.sendStatus(200);
+//   } catch (err) {
+//     console.log(err);
+//     handleError(err, res);
+//   }
+// };
 
 const updateUnit = async (req, res) => {
   try {
