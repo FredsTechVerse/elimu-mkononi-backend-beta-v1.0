@@ -8,10 +8,8 @@ This project is a guide to deploying an Express app using Firebase Functions.
 
 ## TO DO
 
-- Will transform the all users controller into an aggregation pipeline.
-- User should not be able to update password until proper protocol for authentication , decryption and encryption after update is followed
-- Write a list of the CRUD functionalities to go testing the go ticking while making the necessary adjustments.
-- I will group similar functionailites later and sort out by the path to the controller. But this has to happen after all the routes are working.
+- Apply data aggregation to simplify dashboard.
+- Work on password recovery , let user confirm contact , send reset code let it be submitted with the new password.
 
 ## TIPS I HAVE GATHERED ALONG THE WAY
 
