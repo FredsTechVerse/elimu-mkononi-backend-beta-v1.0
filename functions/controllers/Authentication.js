@@ -13,26 +13,13 @@ const {
 
 const aggregateUsers = async (req, res) => {
   try {
-    let totalStudents = await Student.aggregate([
-      { $group: { _id: "$role", studentCount: { $sum: 1 } } }, // Simple groups by ID
-    ]);
-    let totalTutors = await Tutor.aggregate([
-      { $group: { _id: "$role", tutorCount: { $sum: 1 } } },
-    ]);
-    let totalAdmins = await Admin.aggregate([
-      { $group: { _id: "$role", adminCount: { $sum: 1 } } },
-    ]);
+    let totalStudents = await Student.count();
+    let totalTutors = await Tutor.count();
+    let totalAdmins = await Admin.count();
 
-    const usersData = [...totalStudents, ...totalTutors, ...totalAdmins];
-
-    const refinedData = {
-      students: usersData[0].studentCount,
-      tutors: usersData[1].tutorCount,
-      admins: usersData[2].adminCount,
-    };
-
-    console.log(refinedData);
-    res.status(200).json(refinedData);
+    const usersCount = { totalStudents, totalTutors, totalAdmins };
+    console.log(usersCount);
+    res.status(200).json(usersCount);
   } catch (err) {
     console.log(`User aggregation error ${JSON.stringify(err)}`);
     handleError(err, res);
@@ -86,6 +73,59 @@ const logInUser = async (req, res) => {
   }
 };
 
+const generateRandomString = (length) => {
+  const characters =
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+  let result = " ";
+  const charactersLength = characters.length;
+  for (let i = 0; i < length; i++) {
+    result += characters.charAt(Math.floor(Math.random() * charactersLength));
+  }
+
+  return result;
+};
+
+const verifyContact = async (req, res) => {
+  try {
+    let userData = null;
+    userData = await Student.findOne({ contact: req.body.contact });
+    if (!userData) {
+      userData = await Tutor.findOne({ contact: req.body.contact });
+    }
+    if (!userData) {
+      userData = await Admin.findOne({ contact: req.body.contact });
+    }
+    if (!userData) {
+      return res.sendStatus(404);
+    }
+    const resetToken = generateRandomString(6);
+    const userID = userData?._id;
+    const role = userData?.role;
+    const credentials = { resetToken: resetToken };
+    const userInfo = { resetToken: resetToken, role: role, userID: userID };
+
+    console.log({ userInfo });
+
+    // Update data with the reset token.
+
+    if (role === "EM-201") {
+      await Student.findByIdAndUpdate(userID, credentials);
+      res.status(200).json(userInfo);
+    } else if (role === "EM-202") {
+      await Tutor.findByIdAndUpdate(userID, credentials);
+      res.status(200).json(userInfo);
+    } else if (role === "EM-203") {
+      await Admin.findByIdAndUpdate(userID, credentials);
+      res.status(200).json(userInfo);
+    } else {
+      res.status(500).json({ message: "Error occured while updating user." });
+    }
+  } catch (err) {
+    console.log(err);
+    handleError(err, res);
+  }
+};
+
 const logOutUser = async (req, res) => {
   try {
     if (!req.body.refreshToken) {
@@ -124,4 +164,10 @@ const findAllUsers = async (req, res) => {
   }
 };
 
-module.exports = { logInUser, logOutUser, findAllUsers, aggregateUsers };
+module.exports = {
+  logInUser,
+  logOutUser,
+  findAllUsers,
+  aggregateUsers,
+  verifyContact,
+};

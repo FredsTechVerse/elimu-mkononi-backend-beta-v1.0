@@ -1,4 +1,6 @@
 const axios = require("axios");
+
+// For interacting with the sms api m its only the message changing , contacts need to be supplied as arrays anyway.
 const confirmUserRegistration = async ({ firstName, contact, role }) => {
   try {
     console.log(`New user data ${JSON.stringify({ firstName, contact })}`);

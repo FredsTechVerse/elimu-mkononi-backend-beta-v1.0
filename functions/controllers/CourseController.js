@@ -15,11 +15,9 @@ const createCourse = async (req, res) => {
 
 const aggregateCourses = async (req, res) => {
   try {
-    const coursesBreakdown = await Course.aggregate([
-      { $group: { _id: "$courseTitle", courseCount: { $sum: 1 } } },
-    ]);
-    console.log(coursesBreakdown);
-    res.sendStatus(200);
+    const coursesCount = await Course.find().select("courseTitle -_id");
+    console.log({ coursesCount });
+    res.status(200).json({ coursesCount });
   } catch (err) {
     console.log(`Course aggregation error ${JSON.stringify(err)}`);
     handleError(err, res);

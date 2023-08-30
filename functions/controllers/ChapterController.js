@@ -38,10 +38,8 @@ const createChapter = async (req, res) => {
 const aggregateChapter = async (req, res) => {
   try {
     console.log("Fetching aggregated chapters");
-    const chapterData = await Chapter.aggregate([
-      { $group: { _id: "$unit", chapterCount: { $sum: 1 } } },
-    ]);
-    console.log(chapterData);
+    const chapterCount = await Chapter.count();
+    console.log({ chapterCount });
     res.sendStatus(200);
   } catch (err) {
     handleError(err, res);

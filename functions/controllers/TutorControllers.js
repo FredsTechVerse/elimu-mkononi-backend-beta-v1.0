@@ -54,6 +54,21 @@ const registerTutor = async (req, res) => {
   }
 };
 
+const confirmResetToken = async (req, res) => {
+  try {
+    const { tutorID } = req.params;
+    const { resetToken } = req.body;
+    const tutorData = await Tutor.findById(tutorID).select("-password");
+    if (tutorData?.resetToken.includes(resetToken)) {
+      res.status(200).json(tutorData);
+    } else {
+      res.status(401).json({ message: "The reset token is incorrect" });
+    }
+  } catch (err) {
+    handleError(err, res);
+  }
+};
+
 const findAllTutors = async (req, res) => {
   try {
     const tutorData = await Tutor.find({}).select("-password");
@@ -127,6 +142,7 @@ module.exports = {
   registerUser,
   registerTutor,
   findAuthorizedTutor,
+  confirmResetToken,
   findAllTutors,
   findTutorById,
   updateTutorInfo,

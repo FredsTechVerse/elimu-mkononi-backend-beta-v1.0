@@ -49,6 +49,7 @@ const findAuthorizedAdmin = async (req, res) => {
     const adminData = await Admin.findById(adminID).select("-password");
     res.status(200).json(adminData);
   } catch (err) {
+    console.log(err);
     handleError(err, res);
   }
 };
@@ -58,6 +59,21 @@ const findAdminById = async (req, res) => {
     const { adminID } = req.params;
     const adminData = await Admin.findById(adminID).select("-password");
     res.status(200).json(adminData);
+  } catch (err) {
+    handleError(err, res);
+  }
+};
+
+const confirmResetToken = async (req, res) => {
+  try {
+    const { adminID } = req.params;
+    const { resetToken } = req.body;
+    const adminData = await Admin.findById(adminID).select("-password");
+    if (adminData?.resetToken.includes(resetToken)) {
+      res.status(200).json(adminData);
+    } else {
+      res.status(401).json({ message: "The reset token is incorrect" });
+    }
   } catch (err) {
     handleError(err, res);
   }
@@ -87,6 +103,7 @@ const deleteAdminById = async (req, res) => {
 module.exports = {
   registerAdmin,
   findAuthorizedAdmin,
+  confirmResetToken,
   findAdminById,
   findAllAdmins,
   updateAdminInfo,

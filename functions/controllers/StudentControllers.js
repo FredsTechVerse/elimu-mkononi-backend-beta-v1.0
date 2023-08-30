@@ -27,6 +27,21 @@ const registerStudent = async (req, res) => {
   }
 };
 
+const confirmResetToken = async (req, res) => {
+  try {
+    const { studentID } = req.params;
+    const { resetToken } = req.body;
+    const studentData = await Student.findById(studentID).select("-password");
+    if (studentData?.resetToken.includes(resetToken)) {
+      res.status(200).json(studentData);
+    } else {
+      res.status(401).json({ message: "The reset token is incorrect" });
+    }
+  } catch (err) {
+    handleError(err, res);
+  }
+};
+
 const findAllStudents = async (req, res) => {
   try {
     const studentData = await Student.find({}).select("-password");
@@ -89,6 +104,7 @@ const deleteStudentById = async (req, res) => {
 module.exports = {
   registerStudent,
   findAuthorizedStudent,
+  confirmResetToken,
   findAllStudents,
   findStudentById,
   updateStudentInfo,
