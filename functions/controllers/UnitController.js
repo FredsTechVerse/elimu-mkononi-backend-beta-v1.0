@@ -68,13 +68,11 @@ const createUnit = async (req, res) => {
     const { _id: unitID } = newUnit; // Extracting ID from staved Lesson
 
     const courseData = await Course.findByIdAndUpdate(
-      //Returns / saves the new document in play.
       courseID,
       { $push: { units: unitID } }, //Adding to an array of elements.
       { new: true, useFindAndModify: false, runValidation: true } //Addition params for update validation.
     );
     const tutorData = await Tutor.findByIdAndUpdate(
-      //Returns / saves the new document in play.
       tutorID,
       { $push: { units: unitID } }, //Adding to an array of elements.
       { new: true, useFindAndModify: false, runValidation: true } //Addition params for update validation.
@@ -89,17 +87,12 @@ const createUnit = async (req, res) => {
   }
 };
 
-// .aggregate([
-//   { $group: { _id: "$course.courseTitle", unitCount: { $sum: 1 } } },
-// ]);
-
 const aggregateUnit = async (req, res) => {
   try {
-    console.log("Fetching aggregated units");
     const unitData = await Unit.aggregate([
       {
         $lookup: {
-          from: "courses", // Assuming your course collection name is "courses"
+          from: "courses",
           localField: "course",
           foreignField: "_id",
           as: "courseInformation",
@@ -115,54 +108,13 @@ const aggregateUnit = async (req, res) => {
         },
       },
     ]);
-
     console.log(unitData);
-    res.sendStatus(200);
+    res.status(200).send(unitData);
   } catch (err) {
     console.log(err);
     handleError(err, res);
   }
 };
-
-// const aggregateUnit = async (req, res) => {
-//   try {
-//     console.log("Fetching aggregated units");
-
-//     const aggregatedData = await Unit.aggregate([
-//       {
-//         $lookup: {
-//           from: "courses", // Assuming your course collection name is "courses"
-//           localField: "course.courseTitle",
-//           foreignField: "courseTitle",
-//           as: "courseInfo",
-//         },
-//       },
-//       {
-//         $unwind: "$courseInfo",
-//       },
-//       {
-//         $group: {
-//           _id: "$courseInfo.courseTitle",
-//           units: {
-//             $push: {
-//               unitCode: "$unitCode",
-//               unitName: "$unitName",
-//               unitType: "$unitType",
-//               unitDescription: "$unitDescription",
-//             },
-//           },
-//           unitCount: { $sum: 1 },
-//         },
-//       },
-//     ]);
-
-//     console.log(aggregatedData);
-//     res.sendStatus(200);
-//   } catch (err) {
-//     console.log(err);
-//     handleError(err, res);
-//   }
-// };
 
 const updateUnit = async (req, res) => {
   try {

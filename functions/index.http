@@ -33,7 +33,7 @@ apikey:9d1d8bb393c14550a5dfae8a2a1d5bd3
 
 
 ### FETCH ALL STUDENTS DATA
-GET http://localhost:4000/auth/aggregate
+GET http://localhost:4000/auth/aggregate-users
 
 ### FETCH ALL UNITS DATA
 GET http://localhost:4000/unit/all-units

@@ -25,6 +25,6 @@ router.delete("/logout", logOutUser);
 router.post("/refresh-token", renewTokens);
 router.get("/verify-access", verifyAccess);
 router.get("/all-users", findAllUsers);
-router.get("/aggregate", aggregateUsers);
+router.get("/aggregate-users", aggregateUsers);
 
 module.exports = router;
