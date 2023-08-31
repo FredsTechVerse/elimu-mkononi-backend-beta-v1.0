@@ -86,6 +86,10 @@ const generateRandomString = (length) => {
 };
 
 const verifyContact = async (req, res) => {
+  const { contact, email } = req.body;
+  console.log(
+    `Contact Verification Data ${JSON.stringify({ contact, email })}`
+  );
   try {
     let userData = null;
     userData = await Student.findOne({ contact: req.body.contact });
@@ -101,21 +105,28 @@ const verifyContact = async (req, res) => {
     const resetToken = generateRandomString(6);
     const userID = userData?._id;
     const role = userData?.role;
-    const credentials = { resetToken: resetToken };
-    const userInfo = { resetToken: resetToken, role: role, userID: userID };
+    const credentials = { resetToken };
+    const userInfo = { resetToken, role, userID };
+    const accessToken = generateAccessToken(userInfo);
 
     console.log({ userInfo });
-
-    // Update data with the reset token.
-
     if (role === "EM-201") {
-      await Student.findByIdAndUpdate(userID, credentials);
+      await Student.findByIdAndUpdate(userID, credentials, {
+        new: true,
+        upsert: true,
+      });
       res.status(200).json(userInfo);
     } else if (role === "EM-202") {
-      await Tutor.findByIdAndUpdate(userID, credentials);
+      await Tutor.findByIdAndUpdate(userID, credentials, {
+        new: true,
+        upsert: true,
+      });
       res.status(200).json(userInfo);
     } else if (role === "EM-203") {
-      await Admin.findByIdAndUpdate(userID, credentials);
+      await Admin.findByIdAndUpdate(userID, credentials, {
+        new: true,
+        upsert: true,
+      });
       res.status(200).json(userInfo);
     } else {
       res.status(500).json({ message: "Error occured while updating user." });

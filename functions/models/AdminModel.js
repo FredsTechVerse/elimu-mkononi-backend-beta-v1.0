@@ -11,7 +11,6 @@ const AdminSchema = new Schema(
     password: { type: String, required: true },
     contact: { type: String, required: true, unique: true },
     status: { type: String, required: true, default: "active" },
-    units: [{ type: mongoose.Schema.Types.ObjectId, ref: "Unit" }],
     role: {
       type: String,
       required: true,

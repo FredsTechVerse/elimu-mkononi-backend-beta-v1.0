@@ -12,6 +12,7 @@ const TutorSchema = new Schema(
     contact: { type: String, required: true, unique: true },
     status: { type: String, required: true, default: "active" },
     units: [{ type: mongoose.Schema.Types.ObjectId, ref: "Unit" }],
+    resetToken: { type: String },
     role: {
       type: String,
       required: true,

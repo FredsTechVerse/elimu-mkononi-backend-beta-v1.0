@@ -59,7 +59,8 @@ const confirmResetToken = async (req, res) => {
     const { tutorID } = req.params;
     const { resetToken } = req.body;
     const tutorData = await Tutor.findById(tutorID).select("-password");
-    if (tutorData?.resetToken.includes(resetToken)) {
+    if (tutorData?.resetToken === resetToken) {
+      console.log("Reset Token Confimed");
       res.status(200).json(tutorData);
     } else {
       res.status(401).json({ message: "The reset token is incorrect" });
@@ -126,6 +127,22 @@ const updateTutorInfo = async (req, res) => {
   }
 };
 
+const updateTutorPassword = async (req, res) => {
+  try {
+    console.log(req.body);
+    const { userID, password } = req.body;
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const credentials = {
+      password: hashedPassword,
+    };
+    await Tutor.findByIdAndUpdate(userID, credentials);
+    res
+      .status(202)
+      .json({ message: "Tutor information has been successfully updated" });
+  } catch (err) {
+    handleError(err, res);
+  }
+};
 const deleteTutorById = async (req, res) => {
   try {
     const { tutorID } = req.params;
@@ -146,5 +163,6 @@ module.exports = {
   findAllTutors,
   findTutorById,
   updateTutorInfo,
+  updateTutorPassword,
   deleteTutorById,
 };
