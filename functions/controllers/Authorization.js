@@ -39,7 +39,6 @@ const authenticateToken = async (req, res, next) => {
       req.path !== "/auth/verify-contact" &&
       req.path !== "/student" &&
       req.path !== "/auth/logout" &&
-      req.path !== "/tutor/password" &&
       !req.path.startsWith("/file/")
     ) {
       console.log(`Req being rejected ${JSON.stringify(req.path)}`);
@@ -51,7 +50,6 @@ const authenticateToken = async (req, res, next) => {
       req.path === "/auth/verify-contact" ||
       req.path === "/student" ||
       req.path === "/auth/refresh-token" ||
-      req.path === "/tutor/password" ||
       req.path.startsWith("/file/")
     ) {
       req.user = null;

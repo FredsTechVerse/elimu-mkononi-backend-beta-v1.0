@@ -76,7 +76,7 @@ const logInUser = async (req, res) => {
 const generateRandomString = (length) => {
   const characters =
     "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-  let result = " ";
+  let result = "";
   const charactersLength = characters.length;
   for (let i = 0; i < length; i++) {
     result += characters.charAt(Math.floor(Math.random() * charactersLength));
@@ -103,31 +103,32 @@ const verifyContact = async (req, res) => {
       return res.sendStatus(404);
     }
     const resetToken = generateRandomString(6);
+    console.log({ resetToken });
     const userID = userData?._id;
     const role = userData?.role;
-    const credentials = { resetToken };
     const userInfo = { resetToken, role, userID };
     const accessToken = generateAccessToken(userInfo);
+    const credentials = { resetToken };
 
-    console.log({ userInfo });
+    console.log({ userInfo, accessToken });
     if (role === "EM-201") {
       await Student.findByIdAndUpdate(userID, credentials, {
         new: true,
         upsert: true,
       });
-      res.status(200).json(userInfo);
+      res.status(200).json({ userInfo, accessToken });
     } else if (role === "EM-202") {
       await Tutor.findByIdAndUpdate(userID, credentials, {
         new: true,
         upsert: true,
       });
-      res.status(200).json(userInfo);
+      res.status(200).json({ userInfo, accessToken });
     } else if (role === "EM-203") {
       await Admin.findByIdAndUpdate(userID, credentials, {
         new: true,
         upsert: true,
       });
-      res.status(200).json(userInfo);
+      res.status(200).json({ userInfo, accessToken });
     } else {
       res.status(500).json({ message: "Error occured while updating user." });
     }
