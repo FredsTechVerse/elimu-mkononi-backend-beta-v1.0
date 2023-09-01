@@ -28,9 +28,7 @@ const createNotes = async (req, res) => {
 const findNote = async (req, res) => {
   try {
     const { notesID } = req.params;
-
     const noteData = await Notes.findById(notesID);
-
     res.json(noteData);
   } catch (err) {
     handleError(err, res);
@@ -42,8 +40,8 @@ const updateNotes = async (req, res) => {
     const { notesID } = req.params;
     const { lessonNotes } = req.body;
     const lessonData = { content: lessonNotes };
-    await Notes.findByIdAndUpdate(notesID, lessonData);
-    return res.status(202).json({ message: "Notes updated successfully" });
+    const notesData = await Notes.findByIdAndUpdate(notesID, lessonData);
+    return res.status(202).json(notesData);
   } catch (err) {
     handleError(err, res);
   }
