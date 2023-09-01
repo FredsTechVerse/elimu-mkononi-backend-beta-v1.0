@@ -34,7 +34,6 @@ const aggregateLessons = async (req, res) => {
       { $group: { _id: "$chapter", lessonCount: { $sum: 1 } } },
     ]);
 
-    console.log(aggregatedLessons);
     res.sendStatus(200);
   } catch (err) {
     handleError(err, res);

@@ -37,9 +37,7 @@ const createChapter = async (req, res) => {
 };
 const aggregateChapter = async (req, res) => {
   try {
-    console.log("Fetching aggregated chapters");
     const chapterCount = await Chapter.count();
-    console.log({ chapterCount });
     res.sendStatus(200);
   } catch (err) {
     handleError(err, res);

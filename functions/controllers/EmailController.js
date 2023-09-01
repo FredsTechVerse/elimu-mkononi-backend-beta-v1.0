@@ -66,13 +66,6 @@ const sendEmailVerificationCode = async ({
   emailVerificationCode,
   emails,
 }) => {
-  console.log({
-    firstName,
-    role,
-    subject,
-    emailVerificationCode,
-    emails,
-  });
   try {
     let areAllEmailsSent = false;
 

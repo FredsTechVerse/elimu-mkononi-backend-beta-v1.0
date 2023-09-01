@@ -41,7 +41,6 @@ const authenticateToken = async (req, res, next) => {
       req.path !== "/auth/logout" &&
       !req.path.startsWith("/file/")
     ) {
-      console.log(`Req being rejected ${JSON.stringify(req.path)}`);
       return res.status(403).json({ message: "Unauthorized URL" });
     } else if (
       req.path === "/course/all-courses" ||

@@ -7,14 +7,6 @@ const confirmUserRegistration = async ({
   role,
 }) => {
   try {
-    console.log(
-      `SMS data ${JSON.stringify({
-        firstName,
-        contact,
-        contactVerificationCode,
-        role,
-      })}`
-    );
     const config = {
       headers: {
         "Content-Type": "application/json",

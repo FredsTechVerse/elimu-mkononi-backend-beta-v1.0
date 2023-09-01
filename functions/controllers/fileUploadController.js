@@ -55,7 +55,6 @@ const getFile = async (req, res) => {
 const deleteFile = async (req, res) => {
   try {
     const { fileKey } = req.params;
-    console.log(`Delete request for ${fileKey} acknowledged`);
     const command = new DeleteObjectCommand({
       Bucket: process.env.AWS_BUCKET_NAME,
       Key: fileKey,
@@ -63,7 +62,6 @@ const deleteFile = async (req, res) => {
     await client.send(command);
     res.status(200).json({ message: "File deleted successfully!" });
   } catch (err) {
-    console.log(err);
     res.status(400).json({ message: "Could not delete file from S3 Bucket" });
   }
 };

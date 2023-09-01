@@ -22,10 +22,6 @@ const registerStudent = async (req, res) => {
     const newStudent = await Student.create(credentials);
     newStudent.save();
 
-    console.log({
-      generatedEmailVerificationCode: emailVerificationCode,
-      generatedContactVerificationCode: contactVerificationCode,
-    });
     confirmUserRegistration({
       firstName: req.body.firstName.toUpperCase(),
       contact: req.body.contact,
@@ -67,8 +63,6 @@ const confirmUserCredentials = async (req, res) => {
       contactVerification: contactVerificationCode,
       emailVerification: emailVerificationCode,
     } = req.body;
-    console.log("Confirming student credentials");
-    console.log({ studentID, contactVerificationCode, emailVerificationCode });
     const tutorData = await Student.findById(studentID).select("-password");
     let report = { isEmailVerified: false, isContactVerified: false };
     if (
@@ -106,7 +100,6 @@ const confirmUserCredentials = async (req, res) => {
       res.status(401).json({ message: "Contact is invalid" });
     }
   } catch (err) {
-    console.log(err.message);
     handleError(err, res);
   }
 };
@@ -160,7 +153,6 @@ const updateStudentInfo = async (req, res) => {
 
 const updateStudentPassword = async (req, res) => {
   try {
-    console.log(req.body);
     const { userID, password } = req.body;
     const hashedPassword = await bcrypt.hash(password, 10);
     const credentials = {

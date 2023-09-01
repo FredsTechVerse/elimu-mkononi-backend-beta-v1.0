@@ -44,14 +44,12 @@ const getUnitWithLessons = async (req, res) => {
 
 const getAllUnits = async (req, res) => {
   try {
-    console.log("Fetching all units");
     const unitsData = await Unit.find({});
     res.status(201).json(unitsData);
   } catch (err) {
     handleError(err, res);
   }
 };
-// Perfect Illustration of One to many relationship.
 const createUnit = async (req, res) => {
   try {
     const { courseID, tutorID, unitCode, unitName, unitDescription } = req.body;
@@ -107,10 +105,8 @@ const aggregateUnit = async (req, res) => {
         },
       },
     ]);
-    console.log(unitData);
     res.status(200).send(unitData);
   } catch (err) {
-    console.log(err);
     handleError(err, res);
   }
 };

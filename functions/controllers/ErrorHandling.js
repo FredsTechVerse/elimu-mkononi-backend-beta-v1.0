@@ -13,7 +13,6 @@ const handleError = (err, res) => {
     errorMessage = "Invalid ID";
   } else {
     errorMessage = err.message;
-    console.log(`Error handling controller : ${JSON.stringify(err.message)}`);
   }
 
   return res.status(statusCode).json({ message: errorMessage });

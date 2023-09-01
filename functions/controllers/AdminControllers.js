@@ -78,7 +78,6 @@ const confirmUserCredentials = async (req, res) => {
 
 const updateAdminPassword = async (req, res) => {
   try {
-    console.log(req.body);
     const { userID, password } = req.body;
     const hashedPassword = await bcrypt.hash(password, 10);
     const credentials = {
@@ -98,7 +97,6 @@ const findAuthorizedAdmin = async (req, res) => {
     const adminData = await Admin.findById(adminID).select("-password");
     res.status(200).json(adminData);
   } catch (err) {
-    console.log(err);
     handleError(err, res);
   }
 };

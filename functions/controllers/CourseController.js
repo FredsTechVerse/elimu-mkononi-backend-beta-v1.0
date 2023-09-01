@@ -16,10 +16,8 @@ const createCourse = async (req, res) => {
 const aggregateCourses = async (req, res) => {
   try {
     const coursesCount = await Course.find().select("courseTitle -_id");
-    console.log({ coursesCount });
     res.status(200).json({ coursesCount });
   } catch (err) {
-    console.log(`Course aggregation error ${JSON.stringify(err)}`);
     handleError(err, res);
   }
 };

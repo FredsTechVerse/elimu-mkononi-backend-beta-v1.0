@@ -17,12 +17,9 @@ const aggregateUsers = async (req, res) => {
     let totalStudents = await Student.count();
     let totalTutors = await Tutor.count();
     let totalAdmins = await Admin.count();
-
     const usersCount = { totalStudents, totalTutors, totalAdmins };
-    console.log(usersCount);
     res.status(200).json(usersCount);
   } catch (err) {
-    console.log(`User aggregation error ${JSON.stringify(err)}`);
     handleError(err, res);
   }
 };
@@ -69,7 +66,6 @@ const logInUser = async (req, res) => {
       });
     }
   } catch (err) {
-    console.log(err);
     handleError(err, res);
   }
 };
@@ -88,9 +84,6 @@ const generateRandomString = (length) => {
 
 const verifyContact = async (req, res) => {
   const { contact, email } = req.body;
-  console.log(
-    `Contact Verification Data ${JSON.stringify({ contact, email })}`
-  );
   try {
     let userData = null;
     userData = await Student.findOne({ contact: req.body.contact });
@@ -104,8 +97,6 @@ const verifyContact = async (req, res) => {
       return res.status(404).json({ message: "Invalid contact" });
     }
     const resetToken = generateRandomString(6);
-
-    console.log({ resetToken });
     const userID = userData?._id;
     const role = userData?.role;
     const userInfo = { resetToken, role, userID };
@@ -120,7 +111,6 @@ const verifyContact = async (req, res) => {
     };
     const accessToken = generateAccessToken(userInfo);
     const credentials = { resetToken };
-
     sendResetToken({
       firstName: userData?.firstName,
       emails: [req.body.email],
@@ -128,8 +118,6 @@ const verifyContact = async (req, res) => {
       role: userRole(),
       resetToken,
     });
-
-    console.log({ userInfo, accessToken });
     if (role === "EM-201") {
       await Student.findByIdAndUpdate(userID, credentials, {
         new: true,
@@ -152,7 +140,6 @@ const verifyContact = async (req, res) => {
       res.status(500).json({ message: "Error while updating user." });
     }
   } catch (err) {
-    console.log(err);
     handleError(err, res);
   }
 };
