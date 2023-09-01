@@ -1,35 +1,7 @@
 const Tutor = require("../models/TutorModel");
-const User = require("../models/UserModel");
 const bcrypt = require("bcrypt");
 const { handleError } = require("./ErrorHandling");
 const { confirmUserRegistration } = require("../controllers/Communication");
-
-const registerUser = async (req, res) => {
-  try {
-    console.log(
-      `Register user request acknowledged ${JSON.stringify(req.body)}`
-    );
-    // const hashedPassword = await bcrypt.hash(req.body.password, 10);
-    const credentials = {
-      DOB: req.body.DOB,
-      contact: req.body.contact,
-      email: req.body.email,
-      firstName: req.body.firstName,
-      gender: req.body.gender,
-      isInterestedToServe: req.body.isInterestedToServe,
-      lastName: req.body.lastName,
-      residence: req.body.residence,
-      serviceGroup: req.body.serviceGroup,
-    };
-    const newUser = await User.create(credentials);
-    newUser.save();
-
-    res.sendStatus(201);
-  } catch (err) {
-    console.log(`Error while saving user ${JSON.stringify(err)}`);
-    handleError(err, res);
-  }
-};
 
 const registerTutor = async (req, res) => {
   try {
@@ -48,7 +20,7 @@ const registerTutor = async (req, res) => {
       contact: req.body.contact,
       role: "tutor",
     });
-    res.sendStatus(201);
+    res.status(201).send(newTutor);
   } catch (err) {
     handleError(err, res);
   }
@@ -64,6 +36,36 @@ const confirmResetToken = async (req, res) => {
       res.status(200).json(tutorData);
     } else {
       res.status(401).json({ message: "The reset token is incorrect" });
+    }
+  } catch (err) {
+    handleError(err, res);
+  }
+};
+
+const confirmUserCredentials = async (req, res) => {
+  try {
+    const { tutorID } = req.params;
+    const {
+      contactVerification: contactVerificationCode,
+      emailVerification: emailVerificationCode,
+    } = req.body;
+    const tutorData = await Tutor.findById(tutorID).select("-password");
+
+    if (
+      tutorData.contactVerificationCode === contactVerificationCode &&
+      tutorData.emailVerificationCode === emailVerificationCode
+    ) {
+      res.status(200).json({ message: "Email and Contact Confirmed" });
+    } else if (
+      tutorData.contactVerificationCode === contactVerificationCode &&
+      tutorData.emailVerificationCode !== emailVerificationCode
+    ) {
+      res.status(401).json({ message: "Email is invalid" });
+    } else if (
+      tutorData.contactVerificationCode !== contactVerificationCode &&
+      tutorData.emailVerificationCode === emailVerificationCode
+    ) {
+      res.status(401).json({ message: "Contact is invalid" });
     }
   } catch (err) {
     handleError(err, res);
@@ -156,9 +158,9 @@ const deleteTutorById = async (req, res) => {
 };
 
 module.exports = {
-  registerUser,
   registerTutor,
   findAuthorizedTutor,
+  confirmUserCredentials,
   confirmResetToken,
   findAllTutors,
   findTutorById,

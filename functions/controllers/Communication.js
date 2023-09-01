@@ -1,9 +1,20 @@
 const axios = require("axios");
 
-// For interacting with the sms api m its only the message changing , contacts need to be supplied as arrays anyway.
-const confirmUserRegistration = async ({ firstName, contact, role }) => {
+const confirmUserRegistration = async ({
+  firstName,
+  contactVerificationCode,
+  contact,
+  role,
+}) => {
   try {
-    console.log(`New user data ${JSON.stringify({ firstName, contact })}`);
+    console.log(
+      `SMS data ${JSON.stringify({
+        firstName,
+        contact,
+        contactVerificationCode,
+        role,
+      })}`
+    );
     const config = {
       headers: {
         "Content-Type": "application/json",
@@ -12,9 +23,7 @@ const confirmUserRegistration = async ({ firstName, contact, role }) => {
     };
     const smsPayload = {
       phone: "0112615416",
-      message: `Congratulations ${firstName} for successfully registering as ${
-        role === "admin" ? "an" : "a"
-      } ${role} on Elimu Hub.`,
+      message: `Thankyou ${firstName}(${role}) for registering on Elimu Hub. Use ${contactVerificationCode} to verify contact.`,
       recipient: [contact],
     };
 
@@ -31,4 +40,32 @@ const confirmUserRegistration = async ({ firstName, contact, role }) => {
   }
 };
 
-module.exports = { confirmUserRegistration };
+const sendMessage = async ({ message, contact }) => {
+  try {
+    console.log(`New user data ${JSON.stringify({ message, contact })}`);
+    const config = {
+      headers: {
+        "Content-Type": "application/json",
+        apikey: "9d1d8bb393c14550a5dfae8a2a1d5bd3",
+      },
+    };
+    const smsPayload = {
+      phone: "0112615416",
+      message: `Congratulations ${message} for successfully registering as  on Elimu Hub.`,
+      recipient: [contact],
+    };
+
+    const { data } = await axios.post(
+      "https://bulk-sms-production.up.railway.app/api/v1/sms/send",
+      smsPayload,
+      config
+    );
+
+    console.log(`SMS response data ${JSON.stringify(data)}`);
+  } catch (err) {
+    // I will only invoke users attention if an error is present.
+    console.log(`SMS send error ${JSON.stringify(err)}`);
+  }
+};
+
+module.exports = { sendMessage, confirmUserRegistration };

@@ -3,7 +3,6 @@ const router = express.Router();
 
 // IMPORT CONTROLLERS
 //====================
-const { registerUser } = require("../controllers/TutorControllers");
 const {
   logInUser,
   logOutUser,
@@ -18,8 +17,10 @@ const {
   renewTokens,
 } = require("../controllers/Authorization");
 
+const { sendEmail } = require("../controllers/EmailController");
+
 // AUTHORIZATION ROUTES
-router.post("/user", registerUser);
+router.post("/email", sendEmail);
 router.post("/create-token", createTokenModel);
 router.post("/login", logInUser);
 router.delete("/logout", logOutUser);

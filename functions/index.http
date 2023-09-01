@@ -32,6 +32,17 @@ apikey:9d1d8bb393c14550a5dfae8a2a1d5bd3
 {"phone":"0112615416","message":"Good Evening Alfred...","recipient":["0112615416"]}
 
 
+### DEBUG EMAIL
+
+POST http://localhost:4000/auth/email
+content-type: application/json
+
+{
+    "contacts": ["alfredgithinji87@gmail.com"],
+    "subject":"READY FOR USE",
+    "text":"Hello there , text version can be externalized!"
+}
+
 ### FETCH AGGREGATED USERS
 GET http://localhost:4000/auth/aggregated-users
 

@@ -1,6 +1,6 @@
 const handleError = (err, res) => {
   let statusCode = 500;
-  let errorMessage = "Something went wrong";
+  let errorMessage = "Sorry,something went wrong";
 
   if (err.code === 11000) {
     statusCode = 409;
@@ -11,14 +11,17 @@ const handleError = (err, res) => {
   } else if (err.name === "CastError") {
     statusCode = 422;
     errorMessage = "Invalid ID";
+  } else {
+    errorMessage = err.message;
+    console.log(`Error handling controller : ${JSON.stringify(err.message)}`);
   }
-  console.log(`Error handling controller ${JSON.stringify(err)}`);
+
   return res.status(statusCode).json({ message: errorMessage });
 };
 
 const handleRenewTokenError = (err, res) => {
   if (err.name === "TokenExpiredError") {
-    return res.sendStatus(403);
+    return res.status(403).json({ message: "Token has expired" });
   }
   if (err.name === "JsonWebTokenError") {
     return res.status(401).json({ message: "Invalid token" });

@@ -42,7 +42,7 @@ const authenticateToken = async (req, res, next) => {
       !req.path.startsWith("/file/")
     ) {
       console.log(`Req being rejected ${JSON.stringify(req.path)}`);
-      return res.sendStatus(403);
+      return res.status(403).json({ message: "Unauthorized URL" });
     } else if (
       req.path === "/course/all-courses" ||
       req.path === "/auth/login" ||
@@ -80,12 +80,12 @@ const renewTokens = async (req, res) => {
   const refreshToken = req.body?.refreshToken;
 
   if (!refreshToken) {
-    return res.sendStatus(403);
+    return res.status(403).json({ message: "Refresh token not found" });
   }
 
   const refreshTokens = await RefreshToken.findOne({ name: "tokens" });
   if (!refreshTokens.data.includes(refreshToken)) {
-    return res.sendStatus(403);
+    return res.status(403).json({ message: "Refresh token is invalid" });
   }
 
   jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, payload) => {

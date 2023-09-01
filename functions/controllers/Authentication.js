@@ -6,6 +6,7 @@ const Tutor = require("../models/TutorModel");
 const Admin = require("../models/AdminModel");
 const RefreshToken = require("../models/RefreshTokensModel");
 const { handleError } = require("./ErrorHandling");
+const { sendResetToken } = require("../controllers/EmailController");
 const {
   generateAccessToken,
   generateRefreshToken,
@@ -29,26 +30,26 @@ const aggregateUsers = async (req, res) => {
 const logInUser = async (req, res) => {
   try {
     let userData = null;
-    userData = await Student.findOne({ firstName: req.body.firstName });
+    userData = await Student.findOne({ email: req.body.email });
     if (!userData) {
-      userData = await Tutor.findOne({ firstName: req.body.firstName });
+      userData = await Tutor.findOne({ email: req.body.email });
     }
     if (!userData) {
-      userData = await Admin.findOne({ firstName: req.body.firstName });
+      userData = await Admin.findOne({ email: req.body.email });
     }
     if (!userData) {
-      return res.sendStatus(404);
+      return res.status(404).json({ message: "Invalid username/password" });
     }
     const passwordMatches = await bcrypt.compare(
       req.body.password,
       userData.password
     );
     if (!passwordMatches) {
-      return res.status(401).json({ message: "The passwords do not match" });
+      return res.status(401).json({ message: "Invalid username/password" });
     }
     const user = {
       userID: userData._id,
-      firstName: userData.firstName,
+      email: userData.email,
       surname: userData.surname,
       role: userData.role,
     };
@@ -100,15 +101,33 @@ const verifyContact = async (req, res) => {
       userData = await Admin.findOne({ contact: req.body.contact });
     }
     if (!userData) {
-      return res.sendStatus(404);
+      return res.status(404).json({ message: "Invalid contact" });
     }
     const resetToken = generateRandomString(6);
+
     console.log({ resetToken });
     const userID = userData?._id;
     const role = userData?.role;
     const userInfo = { resetToken, role, userID };
+    const userRole = () => {
+      if (role === "EM-201") {
+        return "Student";
+      } else if (role === "EM-202") {
+        return "Tutor";
+      } else if (role === "EM-203") {
+        return "Admin";
+      }
+    };
     const accessToken = generateAccessToken(userInfo);
     const credentials = { resetToken };
+
+    sendResetToken({
+      firstName: userData?.firstName,
+      emails: [req.body.email],
+      subject: "PASSWORD RESET",
+      role: userRole(),
+      resetToken,
+    });
 
     console.log({ userInfo, accessToken });
     if (role === "EM-201") {
@@ -130,7 +149,7 @@ const verifyContact = async (req, res) => {
       });
       res.status(200).json({ userInfo, accessToken });
     } else {
-      res.status(500).json({ message: "Error occured while updating user." });
+      res.status(500).json({ message: "Error while updating user." });
     }
   } catch (err) {
     console.log(err);
@@ -169,7 +188,7 @@ const findAllUsers = async (req, res) => {
 
       res.status(200).json(totalUsers);
     } else {
-      res.sendStatus(401);
+      res.status(401).json({ message: "User action not allowed" });
     }
   } catch (err) {
     handleError(err, res);
@@ -182,4 +201,5 @@ module.exports = {
   findAllUsers,
   aggregateUsers,
   verifyContact,
+  generateRandomString,
 };

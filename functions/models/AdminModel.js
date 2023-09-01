@@ -11,6 +11,11 @@ const AdminSchema = new Schema(
     password: { type: String, required: true },
     contact: { type: String, required: true, unique: true },
     status: { type: String, required: true, default: "active" },
+    isEmailVerified: { type: Boolean, default: "false" },
+    isContactVerified: { type: Boolean, default: "false" },
+    contactVerificationCode: { type: String },
+    emailVerificationCode: { type: String },
+    resetToken: { type: String },
     role: {
       type: String,
       required: true,

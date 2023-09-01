@@ -4,6 +4,8 @@ const router = express.Router();
 const {
   registerStudent,
   findAuthorizedStudent,
+  updateStudentPassword,
+  confirmUserCredentials,
   confirmResetToken,
   findAllStudents,
   findStudentById,
@@ -11,7 +13,9 @@ const {
   deleteStudentById,
 } = require("../controllers/StudentControllers");
 router.post("/", registerStudent);
+router.post("/confirmation/:studentID", confirmUserCredentials);
 router.get("/", findAuthorizedStudent);
+router.put("/password", updateStudentPassword);
 router.get("/all-students", findAllStudents);
 router.get("/:studentID", findStudentById);
 router.put("/:studentID", updateStudentInfo);

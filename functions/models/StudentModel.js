@@ -10,7 +10,12 @@ const StudentSchema = new Schema(
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
     contact: { type: String, required: true, unique: true },
-    status: { type: String, required: true, default: "free" }, //Account status is free until payment is approved.
+    status: { type: String, required: true, default: "free" },
+    isEmailVerified: { type: Boolean, default: "false" },
+    isContactVerified: { type: Boolean, default: "false" },
+    contactVerificationCode: { type: String },
+    emailVerificationCode: { type: String },
+    resetToken: { type: String },
     role: {
       type: String,
       required: true,

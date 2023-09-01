@@ -1,27 +1,45 @@
 const Student = require("../models/StudentModel");
 const bcrypt = require("bcrypt");
 const { confirmUserRegistration } = require("../controllers/Communication");
+const { generateRandomString } = require("../controllers/Authentication");
+const { sendEmailVerificationCode } = require("../controllers/EmailController");
 const { handleError } = require("./ErrorHandling");
 const registerStudent = async (req, res) => {
   try {
     const hashedPassword = await bcrypt.hash(req.body.password, 10);
+    const emailVerificationCode = generateRandomString(6);
+    const contactVerificationCode = generateRandomString(6);
+
     const credentials = {
       firstName: req.body.firstName,
       surname: req.body.surname,
       email: req.body.email,
       contact: req.body.contact,
       password: hashedPassword,
+      emailVerificationCode,
+      contactVerificationCode,
     };
     const newStudent = await Student.create(credentials);
     newStudent.save();
-    confirmUserRegistration({
-      firstName: req.body.firstName,
-      contact: req.body.contact,
-      role: "student",
+
+    console.log({
+      generatedEmailVerificationCode: emailVerificationCode,
+      generatedContactVerificationCode: contactVerificationCode,
     });
-    res
-      .status(201)
-      .json({ message: "Student has been registered successfully." });
+    confirmUserRegistration({
+      firstName: req.body.firstName.toUpperCase(),
+      contact: req.body.contact,
+      role: "STUDENT",
+      contactVerificationCode,
+    });
+    sendEmailVerificationCode({
+      firstName: req.body.firstName,
+      emails: [req.body.email],
+      subject: "ACCOUNT CREATION ON ELIMU HUB",
+      role: "STUDENT",
+      emailVerificationCode,
+    });
+    res.status(201).send(newStudent);
   } catch (err) {
     handleError(err, res);
   }
@@ -38,6 +56,57 @@ const confirmResetToken = async (req, res) => {
       res.status(401).json({ message: "The reset token is incorrect" });
     }
   } catch (err) {
+    handleError(err, res);
+  }
+};
+
+const confirmUserCredentials = async (req, res) => {
+  try {
+    const { studentID } = req.params;
+    const {
+      contactVerification: contactVerificationCode,
+      emailVerification: emailVerificationCode,
+    } = req.body;
+    console.log("Confirming student credentials");
+    console.log({ studentID, contactVerificationCode, emailVerificationCode });
+    const tutorData = await Student.findById(studentID).select("-password");
+    let report = { isEmailVerified: false, isContactVerified: false };
+    if (
+      tutorData.contactVerificationCode === contactVerificationCode &&
+      tutorData.emailVerificationCode === emailVerificationCode
+    ) {
+      report.isContactVerified = true;
+      report.isEmailVerified = true;
+      await Student.findByIdAndUpdate(studentID, report, {
+        new: true,
+        upsert: true,
+      });
+      res.status(200).json({ message: "Email and Contact Confirmed" });
+    } else if (
+      tutorData.contactVerificationCode === contactVerificationCode &&
+      tutorData.emailVerificationCode !== emailVerificationCode
+    ) {
+      report.isContactVerified = true;
+      report.isEmailVerified = false;
+      await Student.findByIdAndUpdate(studentID, report, {
+        new: true,
+        upsert: true,
+      });
+      res.status(401).json({ message: "Email is invalid" });
+    } else if (
+      tutorData.contactVerificationCode !== contactVerificationCode &&
+      tutorData.emailVerificationCode === emailVerificationCode
+    ) {
+      report.isContactVerified = false;
+      report.isEmailVerified = true;
+      await Student.findByIdAndUpdate(studentID, report, {
+        new: true,
+        upsert: true,
+      });
+      res.status(401).json({ message: "Contact is invalid" });
+    }
+  } catch (err) {
+    console.log(err.message);
     handleError(err, res);
   }
 };
@@ -89,6 +158,23 @@ const updateStudentInfo = async (req, res) => {
   }
 };
 
+const updateStudentPassword = async (req, res) => {
+  try {
+    console.log(req.body);
+    const { userID, password } = req.body;
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const credentials = {
+      password: hashedPassword,
+    };
+    await Student.findByIdAndUpdate(userID, credentials);
+    res
+      .status(202)
+      .json({ message: "Tutor information has been successfully updated" });
+  } catch (err) {
+    handleError(err, res);
+  }
+};
+
 const deleteStudentById = async (req, res) => {
   try {
     const { studentID } = req.params;
@@ -104,9 +190,11 @@ const deleteStudentById = async (req, res) => {
 module.exports = {
   registerStudent,
   findAuthorizedStudent,
+  confirmUserCredentials,
   confirmResetToken,
   findAllStudents,
   findStudentById,
   updateStudentInfo,
+  updateStudentPassword,
   deleteStudentById,
 };

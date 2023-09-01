@@ -4,6 +4,7 @@ const router = express.Router();
 const {
   registerTutor,
   findAuthorizedTutor,
+  confirmUserCredentials,
   confirmResetToken,
   findAllTutors,
   findTutorById,
@@ -14,6 +15,7 @@ const {
 
 // TUTOR ROUTES
 router.post("/", registerTutor);
+router.post("/confirmation/:tutorID", confirmUserCredentials);
 router.put("/password", updateTutorPassword);
 router.get("/all-tutors", findAllTutors);
 router.get("/", findAuthorizedTutor);

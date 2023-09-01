@@ -79,7 +79,6 @@ const createUnit = async (req, res) => {
     );
 
     if (courseData.units.includes(unitID) && tutorData.units.includes(unitID)) {
-      // We can safely say that the unit has been created.
       res.sendStatus(201);
     }
   } catch (err) {
