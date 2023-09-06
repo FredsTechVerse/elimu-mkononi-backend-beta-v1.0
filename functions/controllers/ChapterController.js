@@ -65,9 +65,9 @@ const populateChapterLessons = async (req, res) => {
 const findChapter = async (req, res) => {
   const { chapterID } = req.params;
   try {
-    const chapterData = await Chapter.findById(chapterID).populate(
-      "chapterLessons"
-    );
+    const chapterData = await Chapter.findById(chapterID)
+      .populate("chapterLessons")
+      .populate("chapterResources");
     res.json(chapterData);
   } catch (err) {
     handleError(err, res);

@@ -29,7 +29,7 @@ POST https://bulk-sms-production.up.railway.app/api/v1/sms/send
 content-type: application/json
 apikey:9d1d8bb393c14550a5dfae8a2a1d5bd3
 
-{"phone":"0112615416","message":"Good Evening Alfred...","recipient":["0112615416"]}
+{"phone":"0112615416","message":"Hello Alfred ","recipient":["0112615416"]}
 
 
 ### DEBUG EMAIL

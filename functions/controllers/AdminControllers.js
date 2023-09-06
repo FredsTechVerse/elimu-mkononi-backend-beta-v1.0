@@ -1,16 +1,23 @@
 const Admin = require("../models/AdminModel");
 const bcrypt = require("bcrypt");
 const { confirmUserRegistration } = require("../controllers/Communication");
+const { generateRandomString } = require("../controllers/Authentication");
+const { sendEmail } = require("../controllers/EmailController");
 const { handleError } = require("./ErrorHandling");
 
 const registerAdmin = async (req, res) => {
   try {
     const hashedPassword = await bcrypt.hash(req.body.password, 10);
+    const emailVerificationCode = generateRandomString(6);
+    const contactVerificationCode = generateRandomString(6);
+
     const credentials = {
       firstName: req.body.firstName,
       surname: req.body.surname,
       email: req.body.email,
       contact: req.body.contact,
+      emailVerificationCode,
+      contactVerificationCode,
       password: hashedPassword,
     };
 
@@ -18,9 +25,17 @@ const registerAdmin = async (req, res) => {
     const newAdmin = await Admin.create(credentials);
     newAdmin.save();
     confirmUserRegistration({
-      firstName: req.body.firstName,
+      firstName: req.body.firstName.toUpperCase(),
       contact: req.body.contact,
-      role: "admin",
+      role: "Admin",
+      contactVerificationCode,
+    });
+
+    const message = `Hello ${req.body.firstName.toUpperCase()},${emailVerificationCode} is your email verification code.`;
+    sendEmail({
+      to: [req.body.email],
+      subject: "EMAIL VERIFICATION CODE FOR ADMIN ACCOUNT ON ELIMU HUB",
+      text: message,
     });
     res.status(201).send(newAdmin);
   } catch (err) {

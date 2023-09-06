@@ -38,6 +38,7 @@ const getSignedFileUrl = async (req, res) => {
 };
 const getFile = async (req, res) => {
   const { fileKey } = req.params;
+  console.log(`Fetching file ${fileKey}`);
   try {
     const downloadParams = {
       Bucket: process.env.AWS_BUCKET_NAME,
@@ -46,12 +47,20 @@ const getFile = async (req, res) => {
     const command = new GetObjectCommand(downloadParams);
     const response = await client.send(command);
 
-    // Stream the response directly to the client
     response.Body.pipe(res);
   } catch (error) {
     res.status(400).json({ message: "Could not retrieve file from S3" });
   }
 };
+
+const deleteResourceFromS3Bucket = async ({ resourceID }) => {
+  const command = new DeleteObjectCommand({
+    Bucket: process.env.AWS_BUCKET_NAME,
+    Key: resourceID,
+  });
+  await client.send(command);
+};
+
 const deleteFile = async (req, res) => {
   try {
     const { fileKey } = req.params;
@@ -66,4 +75,9 @@ const deleteFile = async (req, res) => {
   }
 };
 
-module.exports = { getSignedFileUrl, getFile, deleteFile };
+module.exports = {
+  getSignedFileUrl,
+  getFile,
+  deleteFile,
+  deleteResourceFromS3Bucket,
+};

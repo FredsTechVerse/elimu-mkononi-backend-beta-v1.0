@@ -2,7 +2,7 @@ const Student = require("../models/StudentModel");
 const bcrypt = require("bcrypt");
 const { confirmUserRegistration } = require("../controllers/Communication");
 const { generateRandomString } = require("../controllers/Authentication");
-const { sendEmailVerificationCode } = require("../controllers/EmailController");
+const { sendEmail } = require("../controllers/EmailController");
 const { handleError } = require("./ErrorHandling");
 const registerStudent = async (req, res) => {
   try {
@@ -28,12 +28,11 @@ const registerStudent = async (req, res) => {
       role: "STUDENT",
       contactVerificationCode,
     });
-    sendEmailVerificationCode({
-      firstName: req.body.firstName,
-      emails: [req.body.email],
-      subject: "ACCOUNT CREATION ON ELIMU HUB",
-      role: "STUDENT",
-      emailVerificationCode,
+    const message = `Hello ${req.body.firstName.toUpperCase()},${emailVerificationCode} is your email verification code.`;
+    sendEmail({
+      to: [req.body.email],
+      subject: "EMAIL VERIFICATION CODE FOR STUDENT ACCOUNT ON ELIMU HUB",
+      text: message,
     });
     res.status(201).send(newStudent);
   } catch (err) {

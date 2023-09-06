@@ -1,7 +1,68 @@
 const nodemailer = require("nodemailer");
-const sendEmail = async (req, res) => {
+const Email = require("../models/EmailModel");
+
+const sendEmail = async ({ to: emails, subject, text }) => {
   try {
-    const { contacts, subject, text } = req.body;
+    console.log({ emails, subject, text });
+    let areAllEmailsSent = false;
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: "gichia.alfred20@students.dkut.ac.ke",
+        pass: "E022-01-1027/2020",
+      },
+    });
+
+    const emailConfig = {
+      from: "gichia.alfred20@students.dkut.ac.ke",
+      to: emails,
+      subject: subject,
+      text: text,
+    };
+    const info = await transporter.sendMail(emailConfig);
+    if (info.accepted.length > 0) {
+      const emailData = await Email.create({
+        from: "gichia.alfred20@students.dkut.ac.ke",
+        to: info.accepted,
+        subject: subject,
+        text: text,
+        status: "delivered",
+      });
+      emailData.save();
+    }
+    if (info.rejected.length > 0) {
+      const emailData = await Email.create({
+        from: "gichia.alfred20@students.dkut.ac.ke",
+        to: info.rejected,
+        subject: subject,
+        text: text,
+        status: "rejected",
+      });
+      emailData.save();
+    }
+    emails.map((contact) => {
+      if (info.accepted.includes(contact)) {
+        areAllEmailsSent = true;
+      } else {
+        areAllEmailsSent = false;
+      }
+    });
+    if (areAllEmailsSent) {
+      console.log(
+        `Email success ${JSON.stringify({ acceptedEmails: info.accepted })}`
+      );
+    } else {
+      console.log(
+        `Email failure ${JSON.stringify({ rejectedEmails: info.rejected })}`
+      );
+    }
+  } catch (error) {
+    console.log(error.message);
+  }
+};
+const sendEmailController = async (req, res) => {
+  try {
+    const { to: contacts, subject, text } = req.body;
     let areAllEmailsSent = false;
 
     const html = `  <p className="test">
@@ -36,6 +97,27 @@ const sendEmail = async (req, res) => {
       // html: html,
     };
     const info = await transporter.sendMail(emailConfig);
+    if (info.accepted.length > 0) {
+      const emailData = await Email.create({
+        from: "gichia.alfred20@students.dkut.ac.ke",
+        to: info.accepted,
+        subject: subject,
+        text: text,
+        status: "delivered",
+      });
+      emailData.save();
+    }
+    if (info.rejected.length > 0) {
+      const emailData = await Email.create({
+        from: "gichia.alfred20@students.dkut.ac.ke",
+        to: info.rejected,
+        subject: subject,
+        text: text,
+        status: "rejected",
+      });
+      emailData.save();
+    }
+
     contacts.map((contact) => {
       if (info.accepted.includes(contact)) {
         areAllEmailsSent = true;
@@ -43,132 +125,25 @@ const sendEmail = async (req, res) => {
         areAllEmailsSent = false;
       }
     });
+
     if (areAllEmailsSent) {
       res.status(200).json({
-        message: "Email successfully sent",
+        message: "All emails have been delivered",
         acceptedEmails: info.accepted,
       });
     } else {
-      res.status(500).json({
-        message: "Some emails have not been sent",
+      res.status(200).json({
+        message: "Some emails have been delivered",
         rejectedEmails: info.rejected,
+        acceptedEmails: info.accepted,
       });
     }
   } catch (error) {
-    console.log(error);
+    console.log(`Error while sending emails ${JSON.stringify(error)}`);
   }
 };
 
-const sendEmailVerificationCode = async ({
-  firstName,
-  role,
-  subject,
-  emailVerificationCode,
-  emails,
-}) => {
-  try {
-    let areAllEmailsSent = false;
-
-    const message = `Hello ${firstName} (${role}) ,${emailVerificationCode} is your email verification code for your Elimu Hub account`;
-
-    const transporter = nodemailer.createTransport({
-      service: "gmail",
-      auth: {
-        user: "gichia.alfred20@students.dkut.ac.ke",
-        pass: "E022-01-1027/2020",
-      },
-    });
-
-    const emailConfig = {
-      from: "gichia.alfred20@students.dkut.ac.ke",
-      to: emails,
-      subject: subject,
-      text: message,
-    };
-    const info = await transporter.sendMail(emailConfig);
-    emails.map((contact) => {
-      if (info.accepted.includes(contact)) {
-        areAllEmailsSent = true;
-      } else {
-        areAllEmailsSent = false;
-      }
-    });
-    if (areAllEmailsSent) {
-      console.log(
-        `Email success ${JSON.stringify({ rejectedEmails: info.rejected })}`
-      ); // res.status(200).json({
-      //   message: "Email successfully sent",
-      //   acceptedEmails: info.accepted,
-      // });
-    } else {
-      console.log(
-        `Email failure ${JSON.stringify({ rejectedEmails: info.rejected })}`
-      );
-      // res.status(500).json({
-      //   message: "Some emails have not been sent",
-      //   rejectedEmails: info.rejected,
-      // });
-    }
-  } catch (error) {
-    console.log(error);
-  }
+module.exports = {
+  sendEmail,
+  sendEmailController,
 };
-
-const sendResetToken = async ({
-  firstName,
-  emails,
-  subject,
-  role,
-  resetToken,
-}) => {
-  console.log(
-    `Reset Token Information ${JSON.stringify({
-      firstName,
-      role,
-      subject,
-      resetToken,
-      emails,
-    })}`
-  );
-  try {
-    let areAllEmailsSent = false;
-
-    const message = `Hello ${firstName} ,${resetToken} is your password reset token for your (${role}) on Elimu Hub.`;
-
-    const transporter = nodemailer.createTransport({
-      service: "gmail",
-      auth: {
-        user: "gichia.alfred20@students.dkut.ac.ke",
-        pass: "E022-01-1027/2020",
-      },
-    });
-
-    const emailConfig = {
-      from: "gichia.alfred20@students.dkut.ac.ke",
-      to: emails,
-      subject: subject,
-      text: message,
-    };
-    const info = await transporter.sendMail(emailConfig);
-    emails.map((contact) => {
-      if (info.accepted.includes(contact)) {
-        areAllEmailsSent = true;
-      } else {
-        areAllEmailsSent = false;
-      }
-    });
-    if (areAllEmailsSent) {
-      console.log(
-        `Email success ${JSON.stringify({ rejectedEmails: info.rejected })}`
-      );
-    } else {
-      console.log(
-        `Email failure ${JSON.stringify({ rejectedEmails: info.rejected })}`
-      );
-    }
-  } catch (error) {
-    console.log(error);
-  }
-};
-
-module.exports = { sendEmail, sendEmailVerificationCode, sendResetToken };

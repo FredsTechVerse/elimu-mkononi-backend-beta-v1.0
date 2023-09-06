@@ -1,7 +1,6 @@
 const Lesson = require("../models/LessonModel");
 const Chapter = require("../models/ChapterModel");
 const { handleError } = require("./ErrorHandling");
-
 const createLesson = async (req, res) => {
   try {
     const { chapterID, lessonNumber, lessonName, lessonUrl } = req.body;
@@ -69,7 +68,6 @@ const updateLesson = async (req, res) => {
 const deleteLesson = async (req, res) => {
   try {
     const { lessonID } = req.params;
-
     await Lesson.findByIdAndDelete(lessonID);
     res.status(200).json({ message: "Lesson deleted successfully" });
   } catch (err) {

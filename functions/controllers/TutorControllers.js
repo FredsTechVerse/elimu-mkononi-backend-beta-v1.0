@@ -2,23 +2,36 @@ const Tutor = require("../models/TutorModel");
 const bcrypt = require("bcrypt");
 const { handleError } = require("./ErrorHandling");
 const { confirmUserRegistration } = require("../controllers/Communication");
-
+const { generateRandomString } = require("../controllers/Authentication");
+const { sendEmail } = require("../controllers/EmailController");
 const registerTutor = async (req, res) => {
   try {
     const hashedPassword = await bcrypt.hash(req.body.password, 10);
+    const emailVerificationCode = generateRandomString(6);
+    const contactVerificationCode = generateRandomString(6);
     const credentials = {
       firstName: req.body.firstName,
       surname: req.body.surname,
       email: req.body.email,
       contact: req.body.contact,
       password: hashedPassword,
+      emailVerificationCode,
+      contactVerificationCode,
     };
     const newTutor = await Tutor.create(credentials);
     newTutor.save();
+
     confirmUserRegistration({
-      firstName: req.body.firstName,
+      firstName: req.body.firstName.toUpperCase(),
       contact: req.body.contact,
-      role: "tutor",
+      role: "Tutor",
+      contactVerificationCode,
+    });
+    const message = `Hello ${req.body.firstName.toUpperCase()},${emailVerificationCode} is your email verification code.`;
+    sendEmail({
+      to: [req.body.email],
+      subject: "EMAIL VERIFICATION CODE FOR TUTOR ACCOUNT ON ELIMU HUB",
+      text: message,
     });
     res.status(201).send(newTutor);
   } catch (err) {

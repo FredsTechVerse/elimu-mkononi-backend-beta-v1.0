@@ -1,6 +1,7 @@
 const Resource = require("../models/ResourceModel");
 const Chapter = require("../models/ChapterModel");
 const { handleError } = require("./ErrorHandling");
+const { deleteResourceFromS3Bucket } = require("./fileUploadController");
 
 const createResource = async (req, res) => {
   try {
@@ -16,6 +17,9 @@ const createResource = async (req, res) => {
     );
 
     if (chapterData?._doc?.chapterResources?.includes(resourceID)) {
+      console.log(
+        "Respective chapter has been updated after resource creation."
+      );
       res.status(201).json(newResource);
     }
   } catch (err) {
@@ -56,6 +60,7 @@ const updateResource = async (req, res) => {
 const deleteResource = async (req, res) => {
   try {
     const { resourceID } = req.params;
+    await deleteResourceFromS3Bucket({ resourceID });
     await Resource.findByIdAndDelete(resourceID);
     res.status(200).json({ message: "Resource deleted successfully" });
   } catch (err) {

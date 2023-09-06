@@ -6,11 +6,24 @@ const Tutor = require("../models/TutorModel");
 const Admin = require("../models/AdminModel");
 const RefreshToken = require("../models/RefreshTokensModel");
 const { handleError } = require("./ErrorHandling");
-const { sendResetToken } = require("../controllers/EmailController");
+const { sendEmail } = require("../controllers/EmailController");
 const {
   generateAccessToken,
   generateRefreshToken,
 } = require("./Authorization");
+const { UserInfo } = require("firebase-admin/auth");
+
+const generateRandomString = (length) => {
+  const characters =
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+  let result = "";
+  const charactersLength = characters.length;
+  for (let i = 0; i < length; i++) {
+    result += characters.charAt(Math.floor(Math.random() * charactersLength));
+  }
+
+  return result;
+};
 
 const aggregateUsers = async (req, res) => {
   try {
@@ -26,121 +39,145 @@ const aggregateUsers = async (req, res) => {
 
 const logInUser = async (req, res) => {
   try {
-    let userData = null;
-    userData = await Student.findOne({ email: req.body.email });
-    if (!userData) {
-      userData = await Tutor.findOne({ email: req.body.email });
+    let userData = [];
+    const studentData = await Student.findOne({ email: req.body.email });
+    const tutorData = await Tutor.findOne({ email: req.body.email });
+    const adminData = await Admin.findOne({ email: req.body.email });
+
+    if (studentData) {
+      userData.push(studentData);
     }
-    if (!userData) {
-      userData = await Admin.findOne({ email: req.body.email });
+    if (tutorData) {
+      userData.push(tutorData);
     }
-    if (!userData) {
-      return res.status(404).json({ message: "Invalid username/password" });
+    if (adminData) {
+      userData.push(adminData);
     }
-    const passwordMatches = await bcrypt.compare(
-      req.body.password,
-      userData.password
-    );
-    if (!passwordMatches) {
+
+    if (userData.length === 0) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    let matchedUser = null;
+
+    for (const userInfo of userData) {
+      const isPasswordsMatch = await bcrypt.compare(
+        req.body.password,
+        userInfo.password
+      );
+
+      if (isPasswordsMatch) {
+        const user = {
+          userID: userInfo._id,
+          email: userInfo.email,
+          surname: userInfo.surname,
+          role: userInfo.role,
+        };
+        const accessToken = generateAccessToken(user);
+        const refreshToken = generateRefreshToken(user);
+        const { _id: tokenID } = await RefreshToken.findOne({ name: "tokens" });
+        const refreshTokenData = await RefreshToken.findByIdAndUpdate(
+          tokenID,
+          { $push: { data: refreshToken } },
+          { new: true, useFindAndModify: false, runValidation: true }
+        );
+        if (refreshTokenData._doc.data.includes(refreshToken)) {
+          matchedUser = {
+            accessToken,
+            refreshToken,
+            roles: [user.role],
+          };
+          break;
+        }
+      }
+    }
+
+    if (matchedUser) {
+      console.log(matchedUser);
+      res.status(200).json(matchedUser);
+    } else {
       return res.status(401).json({ message: "Invalid username/password" });
-    }
-    const user = {
-      userID: userData._id,
-      email: userData.email,
-      surname: userData.surname,
-      role: userData.role,
-    };
-    const accessToken = generateAccessToken(user);
-    const refreshToken = generateRefreshToken(user);
-    const { _id: tokenID } = await RefreshToken.findOne({ name: "tokens" });
-    const refreshTokenData = await RefreshToken.findByIdAndUpdate(
-      tokenID,
-      { $push: { data: refreshToken } },
-      { new: true, useFindAndModify: false, runValidation: true }
-    );
-    if (refreshTokenData._doc.data.includes(refreshToken)) {
-      res.status(200).json({
-        accessToken,
-        refreshToken,
-        roles: [user.role],
-      });
     }
   } catch (err) {
     handleError(err, res);
   }
-};
-
-const generateRandomString = (length) => {
-  const characters =
-    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-  let result = "";
-  const charactersLength = characters.length;
-  for (let i = 0; i < length; i++) {
-    result += characters.charAt(Math.floor(Math.random() * charactersLength));
-  }
-
-  return result;
 };
 
 const verifyContact = async (req, res) => {
-  const { contact, email } = req.body;
   try {
-    let userData = null;
-    userData = await Student.findOne({ contact: req.body.contact });
-    if (!userData) {
-      userData = await Tutor.findOne({ contact: req.body.contact });
+    // STEP 1 : FIND ACCOUNTS ASSOCIATED WITH CONTACT
+    const { email, contact, role } = req.body;
+    console.log(req.body);
+    let userData = [];
+    const studentData = await Student.findOne({ email, role, contact });
+    const tutorData = await Tutor.findOne({ email, role, contact });
+    const adminData = await Admin.findOne({ email, role, contact });
+
+    if (studentData) {
+      userData.push(studentData);
     }
-    if (!userData) {
-      userData = await Admin.findOne({ contact: req.body.contact });
+    if (tutorData) {
+      userData.push(tutorData);
     }
-    if (!userData) {
-      return res.status(404).json({ message: "Invalid contact" });
+    if (adminData) {
+      userData.push(adminData);
     }
-    const resetToken = generateRandomString(6);
-    const userID = userData?._id;
-    const role = userData?.role;
-    const userInfo = { resetToken, role, userID };
-    const userRole = () => {
-      if (role === "EM-201") {
-        return "Student";
-      } else if (role === "EM-202") {
-        return "Tutor";
-      } else if (role === "EM-203") {
-        return "Admin";
+
+    console.log(userData);
+
+    if (userData.length === 0) {
+      return res.status(404).json({ message: "Invalid Contact" });
+    }
+
+    // STEP 2 : MATCHING USER BY THEIR RESPECTIVE ROLE
+    for (const userInfo of userData) {
+      if (userInfo.role === req.body.role) {
+        const resetToken = generateRandomString(6);
+        const userID = userInfo?._id;
+        const role = userInfo?.role;
+        const userInformation = { resetToken, role, userID };
+        const userRole = () => {
+          if (role === "EM-201") {
+            return "Student";
+          } else if (role === "EM-202") {
+            return "Tutor";
+          } else if (role === "EM-203") {
+            return "Admin";
+          }
+        };
+        const accessToken = generateAccessToken(userInformation);
+        const credentials = { resetToken };
+        const message = `Hello ${
+          userInfo?.firstName
+        } ,${resetToken} is your password reset token for your ${userRole()} on Elimu Hub.`;
+
+        sendEmail({
+          to: [userInfo.email],
+          subject: "PASSWORD RESET",
+          text: message,
+        });
+
+        if (role === "EM-201") {
+          await Student.findByIdAndUpdate(userID, credentials, {
+            new: true,
+            upsert: true,
+          });
+        } else if (role === "EM-202") {
+          await Tutor.findByIdAndUpdate(userID, credentials, {
+            new: true,
+            upsert: true,
+          });
+        } else if (role === "EM-203") {
+          await Admin.findByIdAndUpdate(userID, credentials, {
+            new: true,
+            upsert: true,
+          });
+        }
+        res.status(200).json({ userInformation, accessToken });
       }
-    };
-    const accessToken = generateAccessToken(userInfo);
-    const credentials = { resetToken };
-    sendResetToken({
-      firstName: userData?.firstName,
-      emails: [req.body.email],
-      subject: "PASSWORD RESET",
-      role: userRole(),
-      resetToken,
-    });
-    if (role === "EM-201") {
-      await Student.findByIdAndUpdate(userID, credentials, {
-        new: true,
-        upsert: true,
-      });
-      res.status(200).json({ userInfo, accessToken });
-    } else if (role === "EM-202") {
-      await Tutor.findByIdAndUpdate(userID, credentials, {
-        new: true,
-        upsert: true,
-      });
-      res.status(200).json({ userInfo, accessToken });
-    } else if (role === "EM-203") {
-      await Admin.findByIdAndUpdate(userID, credentials, {
-        new: true,
-        upsert: true,
-      });
-      res.status(200).json({ userInfo, accessToken });
-    } else {
-      res.status(500).json({ message: "Error while updating user." });
     }
   } catch (err) {
-    handleError(err, res);
+    console.log(err.message);
+    handleError(err.message, res);
   }
 };
 
