@@ -1,14 +1,17 @@
 const Tutor = require("../models/TutorModel");
 const bcrypt = require("bcrypt");
 const { handleError } = require("./ErrorHandling");
-const { confirmUserRegistration } = require("../controllers/Communication");
 const { generateRandomString } = require("../controllers/Authentication");
 const { sendEmail } = require("../controllers/EmailController");
+const { sendMessage } = require("../controllers/MessageController");
+
 const registerTutor = async (req, res) => {
   try {
     const hashedPassword = await bcrypt.hash(req.body.password, 10);
     const emailVerificationCode = generateRandomString(6);
     const contactVerificationCode = generateRandomString(6);
+    const emailMessage = `Hello ${req.body.firstName.toUpperCase()},Tutor,${emailVerificationCode} is your email verification code.`;
+    const message = `Hello ${req.body.firstName.toUpperCase()},Tutor,${contactVerificationCode} is your contact verification code.`;
     const credentials = {
       firstName: req.body.firstName,
       surname: req.body.surname,
@@ -20,18 +23,14 @@ const registerTutor = async (req, res) => {
     };
     const newTutor = await Tutor.create(credentials);
     newTutor.save();
-
-    confirmUserRegistration({
-      firstName: req.body.firstName.toUpperCase(),
-      contact: req.body.contact,
-      role: "Tutor",
-      contactVerificationCode,
+    sendMessage({
+      recipients: [req.body.contact],
+      message: message,
     });
-    const message = `Hello ${req.body.firstName.toUpperCase()},${emailVerificationCode} is your email verification code.`;
     sendEmail({
       to: [req.body.email],
       subject: "EMAIL VERIFICATION CODE FOR TUTOR ACCOUNT ON ELIMU HUB",
-      text: message,
+      text: emailMessage,
     });
     res.status(201).send(newTutor);
   } catch (err) {

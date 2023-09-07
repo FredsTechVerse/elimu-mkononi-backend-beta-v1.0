@@ -7,7 +7,6 @@ const app = express();
 if (process.env.NODE_ENV !== "production") {
   require("dotenv").config();
 }
-
 const routes = [
   { path: "/chapter", route: require("./routes/ChapterRoute") },
   { path: "/message", route: require("./routes/MessageRoute") },

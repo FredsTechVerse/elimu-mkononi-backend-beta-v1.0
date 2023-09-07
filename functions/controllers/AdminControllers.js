@@ -1,8 +1,8 @@
 const Admin = require("../models/AdminModel");
 const bcrypt = require("bcrypt");
-const { confirmUserRegistration } = require("../controllers/Communication");
 const { generateRandomString } = require("../controllers/Authentication");
 const { sendEmail } = require("../controllers/EmailController");
+const { sendMessage } = require("../controllers/MessageController");
 const { handleError } = require("./ErrorHandling");
 
 const registerAdmin = async (req, res) => {
@@ -10,6 +10,8 @@ const registerAdmin = async (req, res) => {
     const hashedPassword = await bcrypt.hash(req.body.password, 10);
     const emailVerificationCode = generateRandomString(6);
     const contactVerificationCode = generateRandomString(6);
+    const emailMessage = `Hello ${req.body.firstName.toUpperCase()},Admin,${emailVerificationCode} is your email verification code.`;
+    const message = `Hello ${req.body.firstName.toUpperCase()},Admin,${contactVerificationCode} is your contact verification code.`;
 
     const credentials = {
       firstName: req.body.firstName,
@@ -24,18 +26,16 @@ const registerAdmin = async (req, res) => {
     // Generate reset token to be sent to email and as sms
     const newAdmin = await Admin.create(credentials);
     newAdmin.save();
-    confirmUserRegistration({
-      firstName: req.body.firstName.toUpperCase(),
-      contact: req.body.contact,
-      role: "Admin",
-      contactVerificationCode,
+
+    sendMessage({
+      recipients: [req.body.contact],
+      message: message,
     });
 
-    const message = `Hello ${req.body.firstName.toUpperCase()},${emailVerificationCode} is your email verification code.`;
     sendEmail({
       to: [req.body.email],
       subject: "EMAIL VERIFICATION CODE FOR ADMIN ACCOUNT ON ELIMU HUB",
-      text: message,
+      text: emailMessage,
     });
     res.status(201).send(newAdmin);
   } catch (err) {

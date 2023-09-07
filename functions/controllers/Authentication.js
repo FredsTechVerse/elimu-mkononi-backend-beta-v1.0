@@ -11,7 +11,6 @@ const {
   generateAccessToken,
   generateRefreshToken,
 } = require("./Authorization");
-const { UserInfo } = require("firebase-admin/auth");
 
 const generateRandomString = (length) => {
   const characters =
@@ -176,8 +175,7 @@ const verifyContact = async (req, res) => {
       }
     }
   } catch (err) {
-    console.log(err.message);
-    handleError(err.message, res);
+    handleError(err, res);
   }
 };
 
