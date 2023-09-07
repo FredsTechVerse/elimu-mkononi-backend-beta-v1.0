@@ -17,9 +17,6 @@ const createResource = async (req, res) => {
     );
 
     if (chapterData?._doc?.chapterResources?.includes(resourceID)) {
-      console.log(
-        "Respective chapter has been updated after resource creation."
-      );
       res.status(201).json(newResource);
     }
   } catch (err) {

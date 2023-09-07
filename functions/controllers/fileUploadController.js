@@ -38,7 +38,6 @@ const getSignedFileUrl = async (req, res) => {
 };
 const getFile = async (req, res) => {
   const { fileKey } = req.params;
-  console.log(`Fetching file ${fileKey}`);
   try {
     const downloadParams = {
       Bucket: process.env.AWS_BUCKET_NAME,

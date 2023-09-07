@@ -91,7 +91,6 @@ const logInUser = async (req, res) => {
     }
 
     if (matchedUser) {
-      console.log(matchedUser);
       res.status(200).json(matchedUser);
     } else {
       return res.status(401).json({ message: "Invalid username/password" });
@@ -105,7 +104,6 @@ const verifyContact = async (req, res) => {
   try {
     // STEP 1 : FIND ACCOUNTS ASSOCIATED WITH CONTACT
     const { email, contact, role } = req.body;
-    console.log(req.body);
     let userData = [];
     const studentData = await Student.findOne({ email, role, contact });
     const tutorData = await Tutor.findOne({ email, role, contact });
@@ -120,8 +118,6 @@ const verifyContact = async (req, res) => {
     if (adminData) {
       userData.push(adminData);
     }
-
-    console.log(userData);
 
     if (userData.length === 0) {
       return res.status(404).json({ message: "Invalid Contact" });

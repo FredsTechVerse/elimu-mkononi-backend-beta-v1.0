@@ -11,8 +11,6 @@ const smsConfig = {
 const sendMessage = async ({ message, recipients }) => {
   try {
     // Make sure recipients is an array of users.
-    console.log({ message, recipients });
-
     const processedContacts = recipients.map(
       (recipient) => `0${recipient.split("254")[1]}`
     );
@@ -26,16 +24,11 @@ const sendMessage = async ({ message, recipients }) => {
       smsPayload,
       smsConfig
     );
-
-    console.log(`Data after sending messages ${JSON.stringify(data)}`);
     const messagePayload = { ...smsPayload, status: "delivered" };
     const messageData = await Message.create(messagePayload);
     messageData.save();
     return data;
   } catch (err) {
-    console.log(
-      `Error message ${JSON.stringify(err.message)} ,${JSON.stringify(err)}`
-    );
     const emailMessage = `Error message ${JSON.stringify(
       err.message
     )} . Comprehensive error :${JSON.stringify(err)}`;
@@ -59,8 +52,6 @@ const sendMessage = async ({ message, recipients }) => {
 const messageController = async ({ req, res }) => {
   const { message, recipients } = req.body;
   const response = sendMessage({ message, recipients });
-
-  console.log(`Message function returned ${JSON.stringify(response)}`);
   res.status(200).json({ message: "Message successfully sent" });
 
   // Use an if statement based on the data returned to know what kind of response to return to user.
