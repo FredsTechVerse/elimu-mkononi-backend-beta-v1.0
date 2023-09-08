@@ -56,7 +56,12 @@ GET http://localhost:4000/unit/aggregated
 GET http://localhost:4000/chapter/aggregated
 
 ### FETCH AGGREGATED LESSONS
-GET http://localhost:4000/lesson/aggregated
+GET http://localhost:4000/lesson/aggregated64fadac357cd2f1690869b42
 
 ### SENDING MESSAGES VIA WHATSAPP
 GET https://web.whatsapp.com/send?phone="+254112615416"&text="Hello there "&app_absent=0
+### FETCH  LESSON
+GET http://localhost:4000/lesson/64fadfd35f429afdbf72b4c8
+
+### DELETE COURSES TRIAL
+DELETE  http://localhost:4000/course/64ee46299383122c30c43dfa

@@ -3,7 +3,7 @@ const { Schema } = mongoose;
 
 const NotesSchema = new Schema(
   {
-    lesson: { type: String, required: true },
+    lesson: { type: mongoose.Schema.Types.ObjectId, ref: "Lesson" },
     content: { type: String, required: true },
   },
   {

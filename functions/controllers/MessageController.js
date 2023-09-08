@@ -10,7 +10,6 @@ const smsConfig = {
 };
 const sendMessage = async ({ message, recipients }) => {
   try {
-    // Make sure recipients is an array of users.
     const processedContacts = recipients.map(
       (recipient) => `0${recipient.split("254")[1]}`
     );
