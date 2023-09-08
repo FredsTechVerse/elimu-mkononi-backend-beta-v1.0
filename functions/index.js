@@ -95,7 +95,7 @@ app.use((req, res, next) => {
 });
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
-// app.use(authenticateToken);
+app.use(authenticateToken);
 
 routes.forEach((route) => {
   app.use(route.path, route.route);

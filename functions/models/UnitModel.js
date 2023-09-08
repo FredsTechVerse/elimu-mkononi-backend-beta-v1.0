@@ -10,7 +10,11 @@ const UnitSchema = new Schema(
     unitDescription: { type: String, required: true },
     unitChapters: [{ type: mongoose.Schema.Types.ObjectId, ref: "Chapter" }],
     tutor: [{ type: mongoose.Schema.Types.ObjectId, ref: "Tutor" }],
-    course: { type: mongoose.Schema.Types.ObjectId, ref: "Course" },
+    course: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Course",
+      required: true,
+    },
   },
   {
     timestamps: true,

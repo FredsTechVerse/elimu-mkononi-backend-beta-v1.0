@@ -1,4 +1,5 @@
 const { getSignedUrl } = require("@aws-sdk/s3-request-presigner");
+const { sendEmail } = require("./EmailController");
 const {
   S3Client,
   GetObjectCommand,
@@ -33,6 +34,12 @@ const getSignedFileUrl = async (req, res) => {
     const signedUrl = await getSignedUrl(client, command, { expiresIn: 300 });
     res.status(201).json({ signedUrl, Key });
   } catch (err) {
+    sendEmail({
+      to: [process.env.TROUBLESHOOTING_EMAIL_ACCOUNT],
+      subject: "SIGNED URL GENERATION ERROR",
+      text: "Failed to generate signed url",
+    });
+
     res.status(500).json({ message: "Failed to generate signed url" });
   }
 };
@@ -52,10 +59,10 @@ const getFile = async (req, res) => {
   }
 };
 
-const deleteResourceFromS3Bucket = async ({ resourceID }) => {
+const deleteResourceFromS3Bucket = async ({ resourceName }) => {
   const command = new DeleteObjectCommand({
     Bucket: process.env.AWS_BUCKET_NAME,
-    Key: resourceID,
+    Key: resourceName,
   });
   await client.send(command);
 };

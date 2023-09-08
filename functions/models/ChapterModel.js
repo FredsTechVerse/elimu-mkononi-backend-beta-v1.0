@@ -4,7 +4,7 @@ const { Schema } = mongoose;
 
 const ChapterSchema = new Schema(
   {
-    unit: { type: mongoose.Schema.Types.ObjectId, ref: "Unit" },
+    unit: { type: mongoose.Schema.Types.ObjectId, ref: "Unit", required: true },
     chapterNumber: { type: String, required: true, unique: true },
     chapterName: { type: String, required: true, uppercase: true },
     chapterDescription: { type: String, required: true },

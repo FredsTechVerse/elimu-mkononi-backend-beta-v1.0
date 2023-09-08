@@ -1,10 +1,12 @@
 const Lesson = require("../models/LessonModel");
 const Chapter = require("../models/ChapterModel");
+const Notes = require("../models/NotesModel");
+const Resource = require("../models/ResourceModel");
 const { handleError } = require("./ErrorHandling");
+const { sendEmail } = require("./EmailController");
 const createLesson = async (req, res) => {
   try {
     const { chapterID, lessonNumber, lessonName, lessonUrl } = req.body;
-
     const lessonData = {
       chapter: chapterID,
       lessonNumber,
@@ -21,6 +23,15 @@ const createLesson = async (req, res) => {
     );
     if (chapterData?._doc?.chapterLessons?.includes(lessonID)) {
       res.status(201).json(newLesson);
+    } else {
+      sendEmail({
+        to: [process.env.TROUBLESHOOTING_EMAIL_ACCOUNT],
+        subject: "CHAPTER LESSON UPDATE ERROR",
+        text: "Something went wrong while updating chapter with lessonID",
+      });
+      res.status(500).json({
+        message: "Something went wrong while updating course with unit data",
+      });
     }
   } catch (err) {
     handleError(err, res);
@@ -68,7 +79,13 @@ const updateLesson = async (req, res) => {
 const deleteLesson = async (req, res) => {
   try {
     const { lessonID } = req.params;
-    await Lesson.findByIdAndDelete(lessonID);
+    const notesToDelete = await Notes.find({
+      lesson: lessonID,
+    }).select("_id");
+
+    await Lesson.deleteOne({ _id: lessonID });
+    await Notes.deleteMany({ _id: { $in: notesToDelete } });
+
     res.status(200).json({ message: "Lesson deleted successfully" });
   } catch (err) {
     handleError(err, res);

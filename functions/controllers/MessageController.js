@@ -23,6 +23,16 @@ const sendMessage = async ({ message, recipients }) => {
       smsPayload,
       smsConfig
     );
+    const { balance } = data.data;
+    if (balance < 10 && balance > 8) {
+      sendEmail({
+        to: [process.env.TROUBLESHOOTING_EMAIL_ACCOUNT],
+        subject: "SMS RECHARGE REMINDER",
+        text: `Kindly recharge sms bundles. Current balance ${JSON.stringify(
+          balance
+        )}`,
+      });
+    }
     const messagePayload = { ...smsPayload, status: "delivered" };
     const messageData = await Message.create(messagePayload);
     messageData.save();
@@ -48,17 +58,10 @@ const sendMessage = async ({ message, recipients }) => {
   }
 };
 
-const messageController = async ({ req, res }) => {
+const messageController = async (req, res) => {
   const { message, recipients } = req.body;
-  const response = sendMessage({ message, recipients });
+  sendMessage({ message, recipients });
   res.status(200).json({ message: "Message successfully sent" });
-
-  // Use an if statement based on the data returned to know what kind of response to return to user.
-  // if (response) {
-  //   res.status(200).json({ message: "Message successfully sent" });
-  // } else {
-  //   res.status(400).json({ message: "Some messages have not been sent" });
-  // }
 };
 
 const findAllMessages = async (req, res) => {

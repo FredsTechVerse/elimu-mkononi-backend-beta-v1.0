@@ -3,9 +3,13 @@
 const Unit = require("../models/UnitModel");
 const Course = require("../models/CourseModel");
 const Tutor = require("../models/TutorModel");
-
-// ERROR HANDLING
+const Chapter = require("../models/ChapterModel");
+const Resource = require("../models/ResourceModel");
+const Lesson = require("../models/LessonModel");
+const Notes = require("../models/NotesModel");
 const { handleError } = require("./ErrorHandling");
+const { deleteResourceFromS3Bucket } = require("./fileUploadController");
+const { sendEmail } = require("./EmailController");
 
 const getUnit = async (req, res) => {
   const { unitID } = req.params;
@@ -78,6 +82,15 @@ const createUnit = async (req, res) => {
 
     if (courseData.units.includes(unitID) && tutorData.units.includes(unitID)) {
       res.sendStatus(201);
+    } else {
+      sendEmail({
+        to: [process.env.TROUBLESHOOTING_EMAIL_ACCOUNT],
+        subject: "COURSE UNIT UPDATE ERROR",
+        text: "Something went wrong while updating course with unitID",
+      });
+      res.status(500).json({
+        message: "Something went wrong while updating course with unit data",
+      });
     }
   } catch (err) {
     handleError(err, res);
@@ -129,9 +142,33 @@ const updateUnit = async (req, res) => {
 };
 
 const deleteUnit = async (req, res) => {
-  const { unitID } = req.params;
   try {
-    await Unit.findByIdAndDelete(unitID);
+    const { unitID } = req.params;
+
+    const chaptersToDelete = await Chapter.find({
+      unit: unitID,
+    }).select("_id");
+    const lessonsToDelete = await Lesson.find({
+      chapter: { $in: chaptersToDelete },
+    }).select("_id");
+    const resourcesToDelete = await Resource.find({
+      chapter: { $in: chaptersToDelete },
+    }).select("_id resourceUrl");
+    const notesToDelete = await Notes.find({
+      lesson: { $in: lessonsToDelete },
+    }).select("_id");
+
+    await Unit.deleteOne({ _id: unitID });
+    await Chapter.deleteMany({ _id: { $in: chaptersToDelete } });
+    await Lesson.deleteMany({ _id: { $in: lessonsToDelete } });
+    await Resource.deleteMany({
+      _id: { $in: resourcesToDelete.map((resource) => resource._id) },
+    });
+    resourcesToDelete.map((resource) => {
+      deleteResourceFromS3Bucket({ resourceName: resource.resourceUrl });
+    });
+    await Notes.deleteMany({ _id: { $in: notesToDelete } });
+
     res.status(200).json({ message: "Unit deleted successfully" });
   } catch (err) {
     handleError(err, res);
