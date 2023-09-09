@@ -58,10 +58,9 @@ const deleteResource = async (req, res) => {
   try {
     const { resourceID } = req.params;
     const { resourceUrl } = req.body;
-    console.log({ resourceID, resourceUrl });
-    await deleteResourceFromS3Bucket({ resourceName: resourceUrl });
-    await Resource.findByIdAndDelete(resourceID);
     res.status(200).json({ message: "Resource deleted successfully" });
+    await Resource.findByIdAndDelete(resourceID);
+    await deleteResourceFromS3Bucket({ resourceName: resourceUrl });
   } catch (err) {
     handleError(err, res);
   }

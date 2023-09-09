@@ -158,18 +158,22 @@ const deleteUnit = async (req, res) => {
       lesson: { $in: lessonsToDelete },
     }).select("_id");
 
-    await Unit.deleteOne({ _id: unitID });
-    await Chapter.deleteMany({ _id: { $in: chaptersToDelete } });
-    await Lesson.deleteMany({ _id: { $in: lessonsToDelete } });
-    await Resource.deleteMany({
-      _id: { $in: resourcesToDelete.map((resource) => resource._id) },
-    });
-    resourcesToDelete.map((resource) => {
-      deleteResourceFromS3Bucket({ resourceName: resource.resourceUrl });
-    });
-    await Notes.deleteMany({ _id: { $in: notesToDelete } });
-
     res.status(200).json({ message: "Unit deleted successfully" });
+
+    await Promise.all([
+      Unit.deleteOne({ _id: unitID }),
+      Chapter.deleteMany({ _id: { $in: chaptersToDelete } }),
+      Lesson.deleteMany({ _id: { $in: lessonsToDelete } }),
+      Resource.deleteMany({
+        _id: { $in: resourcesToDelete.map((resource) => resource._id) },
+      }),
+      Promise.all(
+        resourcesToDelete.map((resource) =>
+          deleteResourceFromS3Bucket({ resourceName: resource.resourceUrl })
+        )
+      ),
+      Notes.deleteMany({ _id: { $in: notesToDelete } }),
+    ]);
   } catch (err) {
     handleError(err, res);
   }

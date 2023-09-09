@@ -63,11 +63,51 @@ const updateCourse = async (req, res) => {
   }
 };
 
+// const deleteCourse = async (req, res) => {
+//   try {
+//     // STEP 1: FINDING THE ID'S
+//     //==========================
+// const { courseID } = req.params;
+// const unitsToDelete = await Unit.find({ course: courseID }).select("_id");
+// const chaptersToDelete = await Chapter.find({
+//   unit: { $in: unitsToDelete },
+// }).select("_id");
+// const lessonsToDelete = await Lesson.find({
+//   chapter: { $in: chaptersToDelete },
+// }).select("_id ");
+// const resourcesToDelete = await Resource.find({
+//   chapter: { $in: chaptersToDelete },
+// }).select("_id resourceUrl");
+// const notesToDelete = await Notes.find({
+//   lesson: { $in: lessonsToDelete },
+// }).select("_id");
+
+//     // STEP 2 : DELETING THE RECORDS
+//     // =============================
+//     await Course.deleteOne({ _id: courseID });
+//     await Unit.deleteMany({ _id: { $in: unitsToDelete } });
+//     await Chapter.deleteMany({ _id: { $in: chaptersToDelete } });
+//     await Lesson.deleteMany({ _id: { $in: lessonsToDelete } });
+//     await Resource.deleteMany({
+//       _id: { $in: resourcesToDelete.map((resource) => resource._id) },
+//     });
+//     resourcesToDelete.map((resource) => {
+//       deleteResourceFromS3Bucket({ resourceName: resource.resourceUrl });
+//     });
+//     await Notes.deleteMany({ _id: { $in: notesToDelete } });
+
+//     res.status(200).json({ message: "Course deleted successfully" });
+//   } catch (err) {
+//     handleError(err, res);
+//   }
+// };
+
 const deleteCourse = async (req, res) => {
   try {
-    // STEP 1: FINDING THE ID'S
-    //==========================
     const { courseID } = req.params;
+
+    // STEP 1: FINDING THE ID'S IN PARALLEL
+    const courseToDelete = await Course.findById(courseID);
     const unitsToDelete = await Unit.find({ course: courseID }).select("_id");
     const chaptersToDelete = await Chapter.find({
       unit: { $in: unitsToDelete },
@@ -82,21 +122,25 @@ const deleteCourse = async (req, res) => {
       lesson: { $in: lessonsToDelete },
     }).select("_id");
 
-    // STEP 2 : DELETING THE RECORDS
-    // =============================
-    await Course.deleteOne({ _id: courseID });
-    await Unit.deleteMany({ _id: { $in: unitsToDelete } });
-    await Chapter.deleteMany({ _id: { $in: chaptersToDelete } });
-    await Lesson.deleteMany({ _id: { $in: lessonsToDelete } });
-    await Resource.deleteMany({
-      _id: { $in: resourcesToDelete.map((resource) => resource._id) },
-    });
-    resourcesToDelete.map((resource) => {
-      deleteResourceFromS3Bucket({ resourceName: resource.resourceUrl });
-    });
-    await Notes.deleteMany({ _id: { $in: notesToDelete } });
-
     res.status(200).json({ message: "Course deleted successfully" });
+
+    // STEP 2: DELETING THE RECORDS IN PARALLEL
+    await Promise.all([
+      Course.deleteOne({ _id: courseID }),
+      deleteResourceFromS3Bucket({ resourceName: courseToDelete.courseImage }),
+      Unit.deleteMany({ _id: { $in: unitsToDelete } }),
+      Chapter.deleteMany({ _id: { $in: chaptersToDelete } }),
+      Lesson.deleteMany({ _id: { $in: lessonsToDelete } }),
+      Resource.deleteMany({
+        _id: { $in: resourcesToDelete.map((resource) => resource._id) },
+      }),
+      Promise.all(
+        resourcesToDelete.map((resource) =>
+          deleteResourceFromS3Bucket({ resourceName: resource.resourceUrl })
+        )
+      ),
+      Notes.deleteMany({ _id: { $in: notesToDelete } }),
+    ]);
   } catch (err) {
     handleError(err, res);
   }

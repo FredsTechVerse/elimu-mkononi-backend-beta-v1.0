@@ -64,4 +64,4 @@ GET https://web.whatsapp.com/send?phone="+254112615416"&text="Hello there "&app_
 GET http://localhost:4000/lesson/64fadfd35f429afdbf72b4c8
 
 ### DELETE COURSES TRIAL
-DELETE  http://localhost:4000/course/64ee46299383122c30c43dfa
+DELETE  http://localhost:4000/course/64fbf326b1ccf748e07eab38

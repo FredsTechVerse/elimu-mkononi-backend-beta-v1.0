@@ -83,10 +83,11 @@ const deleteLesson = async (req, res) => {
       lesson: lessonID,
     }).select("_id");
 
-    await Lesson.deleteOne({ _id: lessonID });
-    await Notes.deleteMany({ _id: { $in: notesToDelete } });
-
     res.status(200).json({ message: "Lesson deleted successfully" });
+    Promise.all([
+      await Lesson.deleteOne({ _id: lessonID }),
+      await Notes.deleteMany({ _id: { $in: notesToDelete } }),
+    ]);
   } catch (err) {
     handleError(err, res);
   }
