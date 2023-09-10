@@ -16,10 +16,10 @@ const handleError = (err, res) => {
     errorMessage = err.message;
   }
 
-  const emailMessage = `Error Name ${errorMessage.toUpperCase()} ,Error ${err.message.toUpperCase()} , Comprehensive error ${JSON.stringify(
+  const emailMessage = `${errorMessage.toUpperCase()} Message ${err.message.toUpperCase()} , Error ${JSON.stringify(
     err
   )} `;
-  console.log(err);
+  console.log(emailMessage);
   sendEmail({
     to: process.env.TROUBLESHOOTING_EMAIL_ACCOUNT,
     subject: "SERVER ERROR",
@@ -53,7 +53,7 @@ const handleJwtError = (err, res) => {
     return res.status(401).json({ message: "Invalid token" });
   }
 
-  const emailMessage = `Error Name : ${err.name.toUpperCase()} , Comprehensive error : ${JSON.stringify(
+  const emailMessage = `${err.name.toUpperCase()}.Comprehensive error : ${JSON.stringify(
     err
   )} `;
   sendEmail({
