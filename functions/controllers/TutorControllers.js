@@ -26,11 +26,13 @@ const registerTutor = async (req, res) => {
     sendMessage({
       recipients: [req.body.contact],
       message: message,
+      role: "EM-202",
     });
     sendEmail({
       to: [req.body.email],
       subject: "EMAIL VERIFICATION CODE FOR TUTOR ACCOUNT ON ELIMU HUB",
       text: emailMessage,
+      role: "EM-202",
     });
     res.status(201).send(newTutor);
   } catch (err) {

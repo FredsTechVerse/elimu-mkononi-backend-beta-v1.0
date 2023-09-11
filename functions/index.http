@@ -18,18 +18,18 @@ GET http://localhost:5000/elearning-module-a887d/us-central1/app/oAuth/getToken?
 POST http://localhost:4000/auth/create-token
 
 ### MAKING PAYMENT TO TINYPESA
-POST https://bulk-sms-production.up.railway.app/api/v1/account/pay
+POST https://bulksms-asenawritescode.koyeb.app/api/v1/account/pay
 content-type: application/json
 apikey:9d1d8bb393c14550a5dfae8a2a1d5bd3
 
 {"phone":"0112615416","amount":10}
 
 ### SENDING AN SMS WITH TINYPESA
-POST https://bulk-sms-production.up.railway.app/api/v1/sms/send
+POST https://bulksms-asenawritescode.koyeb.app/api/v1/sms/send
 content-type: application/json
 apikey:9d1d8bb393c14550a5dfae8a2a1d5bd3
 
-{"phone":"0112615416","message":"Hello Alfred ","recipient":["0112615416"]}
+{"phone":"0112615416","message":"Testing endpoint ","recipient":["0112615416"]}
 
 
 ### DEBUG EMAIL

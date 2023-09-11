@@ -1,7 +1,10 @@
 const nodemailer = require("nodemailer");
 const Email = require("../models/EmailModel");
 
-const sendEmail = async ({ to: emails, subject, text }) => {
+const sendEmail = async ({ to: emails, subject, text, role }) => {
+  console.log(
+    `Sending email ${JSON.stringify({ emails, subject, text, role })}`
+  );
   // HTML BODY SAMPLE (sent as {html:html} instead of {text:text})
   // const html = `  <p className="test">
   //   Lorem ipsum dolor sit amet consectetur adipisicing elit. Iusto,
@@ -39,8 +42,9 @@ const sendEmail = async ({ to: emails, subject, text }) => {
       const emailData = await Email.create({
         from: process.env.EMAIL_ACCOUNT,
         to: info.accepted,
-        subject: subject,
-        text: text,
+        subject,
+        text,
+        role,
         status: "delivered",
       });
       emailData.save();
@@ -49,8 +53,9 @@ const sendEmail = async ({ to: emails, subject, text }) => {
       const emailData = await Email.create({
         from: process.env.EMAIL_ACCOUNT,
         to: info.rejected,
-        subject: subject,
-        text: text,
+        subject,
+        text,
+        role,
         status: "rejected",
       });
       emailData.save();

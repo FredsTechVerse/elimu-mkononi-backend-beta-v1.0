@@ -1,4 +1,8 @@
 const Message = require("../models/MessageModel");
+const Student = require("../models/StudentModel");
+const Tutor = require("../models/TutorModel");
+const Admin = require("../models/AdminModel");
+
 const { handleError } = require("./ErrorHandling");
 const { sendEmail } = require("./EmailController");
 const axios = require("axios");
@@ -8,8 +12,11 @@ const smsConfig = {
     apikey: process.env.SMS_API_KEY,
   },
 };
-const sendMessage = async ({ message, recipients }) => {
+const sendMessage = async ({ message, recipients, role }) => {
   try {
+    console.log(
+      `Sending message ${JSON.stringify({ message, recipients, role })}`
+    );
     const processedContacts = recipients.map(
       (recipient) => `0${recipient.split("254")[1]}`
     );
@@ -19,7 +26,7 @@ const sendMessage = async ({ message, recipients }) => {
       recipient: [...processedContacts],
     };
     const { data } = await axios.post(
-      "https://bulk-sms-production.up.railway.app/api/v1/sms/send",
+      `${process.env.SMS_BASE_URL}/api/v1/sms/send`,
       smsPayload,
       smsConfig
     );
@@ -33,7 +40,7 @@ const sendMessage = async ({ message, recipients }) => {
         )}`,
       });
     }
-    const messagePayload = { ...smsPayload, status: "delivered" };
+    const messagePayload = { ...smsPayload, status: "delivered", role };
     const messageData = await Message.create(messagePayload);
     messageData.save();
     return data;
@@ -45,23 +52,88 @@ const sendMessage = async ({ message, recipients }) => {
       to: [process.env.TROUBLESHOOTING_EMAIL_ACCOUNT],
       subject: "SMS SERVICE HAS BEEN INTERRUPTED",
       text: emailMessage,
+      role,
     });
     const smsPayload = {
       phone: process.env.SMS_CONTACT,
       message: message,
       recipient: [...recipients],
     };
-    const messagePayload = { ...smsPayload, status: "rejected" };
+    const messagePayload = { ...smsPayload, status: "rejected", role };
+    console.log({ messagePayload });
+
     const messageData = await Message.create(messagePayload);
     messageData.save();
     return err;
   }
 };
 
-const messageController = async (req, res) => {
-  const { message, recipients } = req.body;
-  sendMessage({ message, recipients });
-  res.status(200).json({ message: "Message successfully sent" });
+const messageIndividual = async (req, res) => {
+  const { message, recipients, email, role } = req.body;
+  console.log(req.body);
+
+  sendEmail({
+    to: [email],
+    subject: "ELIMU HUB",
+    text: message,
+    role,
+  });
+  sendMessage({ message, recipients, role });
+  res.status(200).json({ message: "Message sent" });
+};
+const messageStudents = async (req, res) => {
+  const { message, role } = req.body;
+  const studentsData = await Student.find().select("email contact");
+  console.log({ studentsData });
+
+  sendEmail({
+    to: studentsData.map((student) => student.email),
+    subject: "ELIMU HUB",
+    text: message,
+    role,
+  });
+  sendMessage({
+    message,
+    recipients: studentsData.map((student) => student.contact),
+    role,
+  });
+  res.status(200).json({ message: "Messages have been sent" });
+};
+const messageTutors = async (req, res) => {
+  const { message, role } = req.body;
+  const tutorsData = await Tutor.find().select("email contact");
+  console.log({ tutorsData });
+
+  sendEmail({
+    to: tutorsData.map((tutor) => tutor.email),
+    subject: "ELIMU HUB",
+    text: message,
+    role,
+  });
+  sendMessage({
+    message,
+    recipients: tutorsData.map((tutor) => tutor.contact),
+    role,
+  });
+  res.status(200).json({ message: "Messages have been sent" });
+};
+const messageAdmins = async (req, res) => {
+  const { message, role } = req.body;
+  const adminsData = await Admin.find().select("email contact");
+  console.log({ adminsData });
+
+  sendEmail({
+    to: adminsData.map((admin) => admin.email),
+    subject: "ELIMU HUB",
+    text: message,
+    role,
+  });
+  sendMessage({
+    message,
+    recipients: adminsData.map((admin) => admin.contact),
+    role,
+  });
+  res.status(200).json({ message: "Messages have been sent" });
 };
 
 const findAllMessages = async (req, res) => {
@@ -93,7 +165,10 @@ const deleteMessage = async (req, res) => {
 
 module.exports = {
   sendMessage,
-  messageController,
+  messageIndividual,
+  messageStudents,
+  messageTutors,
+  messageAdmins,
   findAllMessages,
   findMessage,
   deleteMessage,

@@ -30,12 +30,14 @@ const registerAdmin = async (req, res) => {
     sendMessage({
       recipients: [req.body.contact],
       message: message,
+      role: "EM-203",
     });
 
     sendEmail({
       to: [req.body.email],
       subject: "EMAIL VERIFICATION CODE FOR ADMIN ACCOUNT ON ELIMU HUB",
       text: emailMessage,
+      role: "EM-203",
     });
     res.status(201).send(newAdmin);
   } catch (err) {
