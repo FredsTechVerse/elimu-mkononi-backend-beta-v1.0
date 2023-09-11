@@ -10,6 +10,7 @@ if (process.env.NODE_ENV !== "production") {
 const routes = [
   { path: "/chapter", route: require("./routes/ChapterRoute") },
   { path: "/message", route: require("./routes/MessageRoute") },
+  { path: "/email", route: require("./routes/EmailRoute") },
   { path: "/lesson", route: require("./routes/LessonRoute") },
   { path: "/file", route: require("./routes/fileHandlerRoute") },
   { path: "/resources", route: require("./routes/ResourcesRoute") },

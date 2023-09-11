@@ -1,5 +1,6 @@
 const nodemailer = require("nodemailer");
 const Email = require("../models/EmailModel");
+const { handleError } = require("./ErrorHandling");
 
 const sendEmail = async ({ to: emails, subject, text, role }) => {
   console.log(
@@ -85,7 +86,17 @@ const sendEmailController = async (req, res) => {
   }
 };
 
+const findAllEmails = async (req, res) => {
+  try {
+    const emailData = await Email.find();
+    res.status(200).send(emailData);
+  } catch (err) {
+    handleError(err);
+  }
+};
+
 module.exports = {
   sendEmail,
   sendEmailController,
+  findAllEmails,
 };
