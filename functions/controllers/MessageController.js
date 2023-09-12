@@ -14,9 +14,6 @@ const smsConfig = {
 };
 const sendMessage = async ({ message, recipients, role }) => {
   try {
-    console.log(
-      `Sending message ${JSON.stringify({ message, recipients, role })}`
-    );
     const processedContacts = recipients.map(
       (recipient) => `0${recipient.split("254")[1]}`
     );
@@ -31,7 +28,7 @@ const sendMessage = async ({ message, recipients, role }) => {
       smsConfig
     );
     const { balance } = data.data;
-    if (balance < 10 && balance > 8) {
+    if (balance <= 10.0 && balance >= 5.0) {
       sendEmail({
         to: [process.env.TROUBLESHOOTING_EMAIL_ACCOUNT],
         subject: "SMS RECHARGE REMINDER",
@@ -60,7 +57,6 @@ const sendMessage = async ({ message, recipients, role }) => {
       recipient: [...recipients],
     };
     const messagePayload = { ...smsPayload, status: "rejected", role };
-    console.log({ messagePayload });
 
     const messageData = await Message.create(messagePayload);
     messageData.save();
@@ -70,7 +66,6 @@ const sendMessage = async ({ message, recipients, role }) => {
 
 const messageIndividual = async (req, res) => {
   const { message, recipients, email, role } = req.body;
-  console.log(req.body);
 
   sendEmail({
     to: [email],
@@ -84,7 +79,6 @@ const messageIndividual = async (req, res) => {
 const messageStudents = async (req, res) => {
   const { message, role } = req.body;
   const studentsData = await Student.find().select("email contact");
-  console.log({ studentsData });
 
   sendEmail({
     to: studentsData.map((student) => student.email),
@@ -102,7 +96,6 @@ const messageStudents = async (req, res) => {
 const messageTutors = async (req, res) => {
   const { message, role } = req.body;
   const tutorsData = await Tutor.find().select("email contact");
-  console.log({ tutorsData });
 
   sendEmail({
     to: tutorsData.map((tutor) => tutor.email),
@@ -120,7 +113,6 @@ const messageTutors = async (req, res) => {
 const messageAdmins = async (req, res) => {
   const { message, role } = req.body;
   const adminsData = await Admin.find().select("email contact");
-  console.log({ adminsData });
 
   sendEmail({
     to: adminsData.map((admin) => admin.email),

@@ -16,7 +16,6 @@ const oAuth2Client = new google.auth.OAuth2(
 
 // An event listener triggered when new tokens are obtained / when existing tokens are refreshed.
 oAuth2Client.on("tokens", (tokens) => {
-  console.log({ tokensEventHandler: tokens });
   if (tokens.refresh_token) {
     // we should store the refresh_token in my database generically!
   }

@@ -3,9 +3,6 @@ const Email = require("../models/EmailModel");
 const { handleError } = require("./ErrorHandling");
 
 const sendEmail = async ({ to: emails, subject, text, role }) => {
-  console.log(
-    `Sending email ${JSON.stringify({ emails, subject, text, role })}`
-  );
   // HTML BODY SAMPLE (sent as {html:html} instead of {text:text})
   // const html = `  <p className="test">
   //   Lorem ipsum dolor sit amet consectetur adipisicing elit. Iusto,

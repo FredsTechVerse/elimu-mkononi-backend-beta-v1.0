@@ -22,7 +22,13 @@ POST https://bulksms-asenawritescode.koyeb.app/api/v1/account/pay
 content-type: application/json
 apikey:9d1d8bb393c14550a5dfae8a2a1d5bd3
 
-{"phone":"0112615416","amount":10}
+{"phone":"0112615416","amount":20}
+###
+POST https://bulksms-asenawritescode.koyeb.app/api/v1/account/balance
+content-type: application/json
+apikey:9d1d8bb393c14550a5dfae8a2a1d5bd3
+
+{"phone":"0112615416"}
 
 ### SENDING AN SMS WITH TINYPESA
 POST https://bulksms-asenawritescode.koyeb.app/api/v1/sms/send
