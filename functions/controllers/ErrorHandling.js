@@ -19,7 +19,6 @@ const handleError = (err, res) => {
   const emailMessage = `${errorMessage.toUpperCase()} Message ${err.message.toUpperCase()} , Error ${JSON.stringify(
     err
   )} `;
-  console.log(emailMessage);
   sendEmail({
     to: process.env.TROUBLESHOOTING_EMAIL_ACCOUNT,
     subject: "SERVER ERROR",
