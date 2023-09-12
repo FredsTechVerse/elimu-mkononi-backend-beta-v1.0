@@ -53,9 +53,9 @@ const authenticateToken = async (req, res, next) => {
       req.path === "/student" ||
       req.path === "/auth/refresh-token" ||
       req.path.startsWith("/file/") ||
-      !req.path.startsWith("/student/confirmation/") ||
-      !req.path.startsWith("/tutor/confirmation/") ||
-      !req.path.startsWith("/admin/confirmation/")
+      req.path.startsWith("/student/confirmation/") ||
+      req.path.startsWith("/tutor/confirmation/") ||
+      req.path.startsWith("/admin/confirmation/")
     ) {
       req.user = null;
       return next();
