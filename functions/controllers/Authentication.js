@@ -73,9 +73,8 @@ const logInUser = async (req, res) => {
         };
         const accessToken = generateAccessToken(user);
         const refreshToken = generateRefreshToken(user);
-        const { _id: tokenID } = await RefreshToken.findOne({ name: "tokens" });
-        const refreshTokenData = await RefreshToken.findByIdAndUpdate(
-          tokenID,
+        const refreshTokenData = await RefreshToken.findOneAndUpdate(
+          { name: "tokens" },
           { $push: { data: refreshToken } },
           { new: true, useFindAndModify: false, runValidation: true }
         );
@@ -85,14 +84,12 @@ const logInUser = async (req, res) => {
             refreshToken,
             roles: [user.role],
           };
-          break;
+          res.status(200).json(matchedUser);
         }
+        break;
       }
     }
-
-    if (matchedUser) {
-      res.status(200).json(matchedUser);
-    } else {
+    if (!matchedUser) {
       return res.status(401).json({ message: "Invalid username/password" });
     }
   } catch (err) {
