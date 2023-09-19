@@ -2,24 +2,7 @@ const nodemailer = require("nodemailer");
 const Email = require("../models/EmailModel");
 const { handleError } = require("./ErrorHandling");
 
-const sendEmail = async ({ to: emails, subject, text, role }) => {
-  // HTML BODY SAMPLE (sent as {html:html} instead of {text:text})
-  // const html = `  <p className="test">
-  //   Lorem ipsum dolor sit amet consectetur adipisicing elit. Iusto,
-  //   obcaecati.
-  //   <a
-  //     href="http://localhost:3000"
-  //     style={{
-  //       backgroundColor: "blue",
-  //       display: "block",
-  //       color: "white",
-  //       height: "50px",
-  //       width: "250px",
-  //     }}
-  //   >
-  //     Go to home
-  //   </a>
-  // </p>`;
+const sendEmail = async ({ to: emails, subject, text, role = "EM-203" }) => {
   try {
     const transporter = nodemailer.createTransport({
       service: "gmail",

@@ -81,12 +81,12 @@ const findChapter = async (req, res) => {
 const updateChapter = async (req, res) => {
   try {
     const { chapterID } = req.params;
-    const { chapterNumber, chapterName, chapterDescription } = req.body;
+    const { chapterName, chapterDescription } = req.body;
     const chapterData = {
-      chapterNumber,
       chapterName,
       chapterDescription,
     };
+    console.log(`Updating chapter ${chapterID} ${JSON.stringify(chapterData)}`);
     await Chapter.findByIdAndUpdate(chapterID, chapterData);
     res.status(202).send({ message: "Chapter updated successfully!" });
   } catch (err) {

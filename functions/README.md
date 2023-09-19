@@ -24,3 +24,26 @@ This project is a guide to deploying an Express app using Firebase Functions.
 ## OPTIMIZATIONS
 
 - Refactor auth controllers futher by passing the role ... Do this optimization , make sure they work properly... Then see how we can even improve perfomance using react hook forms.
+
+### USING NODEMAILER
+
+- We can send emails as a html body by setting {html:html} instead of {text:text}
+
+```js
+const html = `  <p className="test">
+    Lorem ipsum dolor sit amet consectetur adipisicing elit. Iusto,
+    obcaecati.
+    <a
+      href="http://localhost:3000"
+      style={{
+        backgroundColor: "blue",
+        display: "block",
+        color: "white",
+        height: "50px",
+        width: "250px",
+      }}
+    >
+      Go to home
+    </a>
+  </p>`;
+```

@@ -62,10 +62,9 @@ const findLesson = async (req, res) => {
 const updateLesson = async (req, res) => {
   try {
     const { lessonID } = req.params;
-    const { lessonNumber, lessonName, lessonUrl } = req.body;
+    const { lessonName, lessonUrl } = req.body;
 
     const lessonData = {
-      lessonNumber,
       lessonName,
       lessonUrl,
     };
