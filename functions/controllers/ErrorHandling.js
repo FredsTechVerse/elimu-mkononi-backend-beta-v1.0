@@ -5,25 +5,24 @@ const handleError = (err, res) => {
 
   if (err.code === 11000) {
     statusCode = 409;
-    errorMessage = "This document already exists!";
+    errorMessage =
+      "It seems that this information already exists in the database.";
   } else if (err.name === "ValidationError") {
     statusCode = 400;
     errorMessage = err.message;
   } else if (err.name === "CastError") {
     statusCode = 422;
-    errorMessage = "Invalid ID";
+    errorMessage = "The resource identity is invalid or doesn't exist.";
   } else {
     errorMessage = err.message;
   }
 
-  const emailMessage = `${errorMessage.toUpperCase()} Message ${err.message.toUpperCase()} , Error ${JSON.stringify(
-    err
-  )} `;
+  const emailMessage = `Error description , ${JSON.stringify(err)} `;
 
   // console.log(emailMessage);
   sendEmail({
     to: process.env.TROUBLESHOOTING_EMAIL_ACCOUNT,
-    subject: "SERVER ERROR",
+    subject: err.message.toUpperCase(),
     text: emailMessage,
   });
   return res.status(statusCode).json({ message: errorMessage });
