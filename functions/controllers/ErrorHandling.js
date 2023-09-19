@@ -5,8 +5,7 @@ const handleError = (err, res) => {
 
   if (err.code === 11000) {
     statusCode = 409;
-    errorMessage =
-      "It seems that this information already exists in the database.";
+    errorMessage = "This information already exists";
   } else if (err.name === "ValidationError") {
     statusCode = 400;
     errorMessage = err.message;
