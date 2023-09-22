@@ -8,11 +8,11 @@ This project is a guide to deploying an Express app using Firebase Functions.
 
 ## TO DO
 
-- Apply data aggregation to simplify dashboard.
-- Work on password recovery , let user confirm contact , send reset code let it be submitted with the new password.
+- Reinstall modules with package.lock cleared and retry deployment.
 
 ## TIPS I HAVE GATHERED ALONG THE WAY
 
+- Firebase tools works with version 16 or higher.
 - Mongoose operators are preceded by a .sign followed by brackets eg .find() whereas mongodb operators are preceded by a $ sign and sometimes followed by curly braces.
 - To make data aggregation possible children have to keep track of parents so as to be able to group the children by the parents ID.
 - To populate parents data effectively , parents have to keep track of their children ID'S

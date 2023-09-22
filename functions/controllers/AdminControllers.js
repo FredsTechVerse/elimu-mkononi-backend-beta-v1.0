@@ -70,22 +70,40 @@ const confirmUserCredentials = async (req, res) => {
       contactVerification: contactVerificationCode,
       emailVerification: emailVerificationCode,
     } = req.body;
-    const tutorData = await Admin.findById(adminID).select("-password");
-
+    const userData = await Admin.findById(adminID).select("-password");
+    let credentials = { isEmailVerified: false, isContactVerified: false };
     if (
-      tutorData.contactVerificationCode === contactVerificationCode &&
-      tutorData.emailVerificationCode === emailVerificationCode
+      userData.contactVerificationCode === contactVerificationCode &&
+      userData.emailVerificationCode === emailVerificationCode
     ) {
+      credentials.isContactVerified = true;
+      credentials.isEmailVerified = true;
+      await Admin.findByIdAndUpdate(adminID, credentials, {
+        new: true,
+        upsert: true,
+      });
       res.status(200).json({ message: "Email and Contact Confirmed" });
     } else if (
-      tutorData.contactVerificationCode === contactVerificationCode &&
-      tutorData.emailVerificationCode !== emailVerificationCode
+      userData.contactVerificationCode === contactVerificationCode &&
+      userData.emailVerificationCode !== emailVerificationCode
     ) {
+      credentials.isContactVerified = true;
+      credentials.isEmailVerified = false;
+      await Admin.findByIdAndUpdate(adminID, credentials, {
+        new: true,
+        upsert: true,
+      });
       res.status(401).json({ message: "Email is invalid" });
     } else if (
-      tutorData.contactVerificationCode !== contactVerificationCode &&
-      tutorData.emailVerificationCode === emailVerificationCode
+      userData.contactVerificationCode !== contactVerificationCode &&
+      userData.emailVerificationCode === emailVerificationCode
     ) {
+      credentials.isContactVerified = false;
+      credentials.isEmailVerified = true;
+      await Admin.findByIdAndUpdate(adminID, credentials, {
+        new: true,
+        upsert: true,
+      });
       res.status(401).json({ message: "Contact is invalid" });
     }
   } catch (err) {

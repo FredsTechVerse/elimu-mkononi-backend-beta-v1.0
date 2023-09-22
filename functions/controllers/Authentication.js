@@ -7,6 +7,8 @@ const Admin = require("../models/AdminModel");
 const RefreshToken = require("../models/RefreshTokensModel");
 const { handleError } = require("./ErrorHandling");
 const { sendEmail } = require("../controllers/EmailController");
+const { sendMessage } = require("../controllers/MessageController");
+
 const {
   generateAccessToken,
   generateRefreshToken,
@@ -38,55 +40,109 @@ const aggregateUsers = async (req, res) => {
 
 const logInUser = async (req, res) => {
   try {
-    let userData = [];
+    let usersFound = [];
     const studentData = await Student.findOne({ email: req.body.email });
     const tutorData = await Tutor.findOne({ email: req.body.email });
     const adminData = await Admin.findOne({ email: req.body.email });
 
     if (studentData) {
-      userData.push(studentData);
+      usersFound.push(studentData);
     }
     if (tutorData) {
-      userData.push(tutorData);
+      usersFound.push(tutorData);
     }
     if (adminData) {
-      userData.push(adminData);
+      usersFound.push(adminData);
     }
-
-    if (userData.length === 0) {
+    if (usersFound.length === 0) {
       return res.status(404).json({ message: "User not found" });
     }
+
     let matchedUser = null;
 
-    for (const userInfo of userData) {
+    // QUEST TO FIND SPECIFIC USER
+
+    for (const userFound of usersFound) {
       const isPasswordsMatch = await bcrypt.compare(
         req.body.password,
-        userInfo.password
+        userFound.password
       );
 
       if (isPasswordsMatch) {
-        const user = {
-          userID: userInfo._id,
-          email: userInfo.email,
-          surname: userInfo.surname,
-          role: userInfo.role,
+        const userInformation = {
+          userID: userFound._id,
+          email: userFound.email,
+          surname: userFound.surname,
+          role: userFound.role,
         };
-        const accessToken = generateAccessToken(user);
-        const refreshToken = generateRefreshToken(user);
-        const refreshTokenData = await RefreshToken.findOneAndUpdate(
+        const accessToken = generateAccessToken(userInformation);
+        const refreshToken = generateRefreshToken(userInformation);
+        await RefreshToken.findOneAndUpdate(
           { name: "tokens" },
           { $push: { data: refreshToken } },
           { new: true, useFindAndModify: false, runValidation: true }
         );
-        if (refreshTokenData._doc.data.includes(refreshToken)) {
-          matchedUser = {
-            accessToken,
-            refreshToken,
-            roles: [user.role],
-          };
+        matchedUser = {
+          accessToken,
+          refreshToken,
+          roles: [userInformation.role], //I am passing the user role inside and outside payload
+        };
+
+        if (userFound.isContactVerified && userFound.isEmailVerified) {
           res.status(200).json(matchedUser);
+          break;
+        } else {
+          // We need to generate and send a new pair of email and contact verification codes
+          const newEmailVerificationCode = generateRandomString(6);
+          const newContactVerificationCode = generateRandomString(6);
+          const newVerificationCodes = {
+            contactVerificationCode: newContactVerificationCode,
+            emailVerificationCode: newEmailVerificationCode,
+          };
+
+          const emailMessage = `Hello ${userFound.firstName.toUpperCase()},Tutor,${newEmailVerificationCode} is your email verification code.`;
+          const message = `Hello ${userFound.firstName.toUpperCase()},${newContactVerificationCode} is your contact verification code.`;
+
+          if (userFound.role === "EM-201") {
+            await Student.findByIdAndUpdate(
+              userFound._id,
+              newVerificationCodes,
+              {
+                new: true,
+                upsert: true,
+              }
+            );
+          } else if (userFound.role === "EM-202") {
+            await Tutor.findByIdAndUpdate(userFound._id, newVerificationCodes, {
+              new: true,
+              upsert: true,
+            });
+          } else if (userFound.role === "EM-203") {
+            await Admin.findByIdAndUpdate(userFound._id, newVerificationCodes, {
+              new: true,
+              upsert: true,
+            });
+          }
+
+          sendMessage({
+            recipients: [userFound.contact],
+            message: message,
+            role: "EM-202",
+          });
+          sendEmail({
+            to: [userFound.email],
+            subject: "EMAIL VERIFICATION CODE FOR TUTOR ACCOUNT ON ELIMU HUB",
+            text: emailMessage,
+            role: "EM-202",
+          });
+
+          res.status(401).json({
+            message: "Account not verified",
+            userID: userFound._id,
+            role: userFound.role,
+          });
+          break;
         }
-        break;
       }
     }
     if (!matchedUser) {
@@ -100,73 +156,64 @@ const logInUser = async (req, res) => {
 const verifyContact = async (req, res) => {
   try {
     // STEP 1 : FIND ACCOUNTS ASSOCIATED WITH CONTACT
-    const { email, contact, role } = req.body;
-    let userData = [];
-    const studentData = await Student.findOne({ email, role, contact });
-    const tutorData = await Tutor.findOne({ email, role, contact });
-    const adminData = await Admin.findOne({ email, role, contact });
+    const { email, contact, role: passedRole } = req.body;
+    let userData = null;
 
-    if (studentData) {
-      userData.push(studentData);
-    }
-    if (tutorData) {
-      userData.push(tutorData);
-    }
-    if (adminData) {
-      userData.push(adminData);
+    if (passedRole === "EM-201") {
+      userData = await Student.findOne({ email, role: passedRole, contact });
+    } else if (passedRole === "EM-202") {
+      userData = await Tutor.findOne({ email, role: passedRole, contact });
+    } else if (passedRole === "EM-203") {
+      userData = await Admin.findOne({ email, role: passedRole, contact });
     }
 
-    if (userData.length === 0) {
+    if (!userData) {
       return res.status(404).json({ message: "Invalid Contact" });
     }
 
-    // STEP 2 : MATCHING USER BY THEIR RESPECTIVE ROLE
-    for (const userInfo of userData) {
-      if (userInfo.role === req.body.role) {
-        const resetToken = generateRandomString(6);
-        const userID = userInfo?._id;
-        const role = userInfo?.role;
-        const userInformation = { resetToken, role, userID };
-        const userRole = () => {
-          if (role === "EM-201") {
-            return "Student";
-          } else if (role === "EM-202") {
-            return "Tutor";
-          } else if (role === "EM-203") {
-            return "Admin";
-          }
-        };
-        const accessToken = generateAccessToken(userInformation);
-        const credentials = { resetToken };
-        const message = `Hello ${
-          userInfo?.firstName
-        } ,${resetToken} is your password reset token for your ${userRole()} on Elimu Hub.`;
-
-        sendEmail({
-          to: [userInfo.email],
-          subject: "PASSWORD RESET",
-          text: message,
-        });
-
-        if (role === "EM-201") {
-          await Student.findByIdAndUpdate(userID, credentials, {
-            new: true,
-            upsert: true,
-          });
-        } else if (role === "EM-202") {
-          await Tutor.findByIdAndUpdate(userID, credentials, {
-            new: true,
-            upsert: true,
-          });
-        } else if (role === "EM-203") {
-          await Admin.findByIdAndUpdate(userID, credentials, {
-            new: true,
-            upsert: true,
-          });
-        }
-        res.status(200).json({ userInformation, accessToken });
+    // We generate the necessary credentials
+    const resetToken = generateRandomString(6);
+    const userID = userData?._id;
+    const role = userData?.role;
+    const userInformation = { resetToken, role, userID };
+    const decryptUserRole = () => {
+      if (role === "EM-201") {
+        return "Student";
+      } else if (role === "EM-202") {
+        return "Tutor";
+      } else if (role === "EM-203") {
+        return "Admin";
       }
+    };
+    const accessToken = generateAccessToken(userInformation);
+    const generatedResetToken = { resetToken };
+    const message = `Hello ${
+      userData?.firstName
+    } ,${resetToken} is your password reset token for your ${decryptUserRole()} account, Elimu Hub`;
+
+    sendEmail({
+      to: [userData.email],
+      subject: "PASSWORD RESET",
+      text: message,
+    });
+
+    if (role === "EM-201") {
+      await Student.findByIdAndUpdate(userID, generatedResetToken, {
+        new: true,
+        upsert: true,
+      });
+    } else if (role === "EM-202") {
+      await Tutor.findByIdAndUpdate(userID, generatedResetToken, {
+        new: true,
+        upsert: true,
+      });
+    } else if (role === "EM-203") {
+      await Admin.findByIdAndUpdate(userID, generatedResetToken, {
+        new: true,
+        upsert: true,
+      });
     }
+    return res.status(200).json({ role, userID, accessToken });
   } catch (err) {
     handleError(err, res);
   }

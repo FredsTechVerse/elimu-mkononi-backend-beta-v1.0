@@ -62,37 +62,37 @@ const confirmUserCredentials = async (req, res) => {
       contactVerification: contactVerificationCode,
       emailVerification: emailVerificationCode,
     } = req.body;
-    const tutorData = await Student.findById(studentID).select("-password");
-    let report = { isEmailVerified: false, isContactVerified: false };
+    const userData = await Student.findById(studentID).select("-password");
+    let credentials = { isEmailVerified: false, isContactVerified: false };
     if (
-      tutorData.contactVerificationCode === contactVerificationCode &&
-      tutorData.emailVerificationCode === emailVerificationCode
+      userData.contactVerificationCode === contactVerificationCode &&
+      userData.emailVerificationCode === emailVerificationCode
     ) {
-      report.isContactVerified = true;
-      report.isEmailVerified = true;
-      await Student.findByIdAndUpdate(studentID, report, {
+      credentials.isContactVerified = true;
+      credentials.isEmailVerified = true;
+      await Student.findByIdAndUpdate(studentID, credentials, {
         new: true,
         upsert: true,
       });
       res.status(200).json({ message: "Email and Contact Confirmed" });
     } else if (
-      tutorData.contactVerificationCode === contactVerificationCode &&
-      tutorData.emailVerificationCode !== emailVerificationCode
+      userData.contactVerificationCode === contactVerificationCode &&
+      userData.emailVerificationCode !== emailVerificationCode
     ) {
-      report.isContactVerified = true;
-      report.isEmailVerified = false;
-      await Student.findByIdAndUpdate(studentID, report, {
+      credentials.isContactVerified = true;
+      credentials.isEmailVerified = false;
+      await Student.findByIdAndUpdate(studentID, credentials, {
         new: true,
         upsert: true,
       });
       res.status(401).json({ message: "Email is invalid" });
     } else if (
-      tutorData.contactVerificationCode !== contactVerificationCode &&
-      tutorData.emailVerificationCode === emailVerificationCode
+      userData.contactVerificationCode !== contactVerificationCode &&
+      userData.emailVerificationCode === emailVerificationCode
     ) {
-      report.isContactVerified = false;
-      report.isEmailVerified = true;
-      await Student.findByIdAndUpdate(studentID, report, {
+      credentials.isContactVerified = false;
+      credentials.isEmailVerified = true;
+      await Student.findByIdAndUpdate(studentID, credentials, {
         new: true,
         upsert: true,
       });

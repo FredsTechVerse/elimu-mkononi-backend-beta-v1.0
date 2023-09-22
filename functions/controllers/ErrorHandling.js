@@ -17,7 +17,7 @@ const handleError = (err, res) => {
   }
 
   const emailMessage = `Error description , ${JSON.stringify(err)} `;
-
+  // console.log(err);
   // console.log(emailMessage);
   sendEmail({
     to: process.env.TROUBLESHOOTING_EMAIL_ACCOUNT,
