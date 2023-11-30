@@ -13,8 +13,8 @@ const {
 
 router.post("/", createLesson);
 router.get("/aggregated", aggregateLessons);
-router.get("/:lessonID", findLesson);
-router.put("/:lessonID", updateLesson);
-router.delete("/:lessonID", deleteLesson);
+router.get("/:videoID", findLesson);
+router.put("/:videoID", updateLesson);
+router.delete("/:videoID", deleteLesson);
 
 module.exports = router;

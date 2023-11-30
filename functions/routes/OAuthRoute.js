@@ -16,7 +16,12 @@ const oAuth2Client = new google.auth.OAuth2(
 
 // An event listener triggered when new tokens are obtained / when existing tokens are refreshed.
 oAuth2Client.on("tokens", (tokens) => {
+  console.log(
+    "A new bunch of tokens have been received!It must necessrily not contain the refresh token"
+  );
+  console.log({ tokens });
   if (tokens.refresh_token) {
+    console.log({ refreshTokenToBeKeptSafely: tokens.refresh_token });
     // we should store the refresh_token in my database generically!
   }
 });
@@ -30,11 +35,13 @@ router.get("/authorizationUri", (req, res) => {
   res.status(200).json(authUri);
 });
 
+// For exchanging the code with a token.
 router.post("/getToken", async (req, res) => {
   try {
     const { code } = req.body;
     if (code) {
       const { tokens } = await oAuth2Client.getToken(code);
+      console.log({ tokens });
       oAuth2Client.setCredentials(tokens);
       res.status(200).json(tokens);
     } else {
@@ -51,6 +58,7 @@ router.post("/getToken", async (req, res) => {
 router.post("/refreshToken", async (req, res) => {
   try {
     const refreshToken = req.body.refreshToken;
+    console.log({ refreshToken });
     const credentials = await oAuth2Client.refreshToken(refreshToken);
 
     res.status(200).json({

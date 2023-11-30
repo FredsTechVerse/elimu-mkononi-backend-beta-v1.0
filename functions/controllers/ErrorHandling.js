@@ -10,6 +10,7 @@ const handleError = (err, res) => {
     statusCode = 400;
     errorMessage = err.message;
   } else if (err.name === "CastError") {
+    console.log(err);
     statusCode = 422;
     errorMessage = "The resource identity is invalid or doesn't exist.";
   } else {

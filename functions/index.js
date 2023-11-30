@@ -12,6 +12,7 @@ const routes = [
   { path: "/message", route: require("./routes/MessageRoute") },
   { path: "/email", route: require("./routes/EmailRoute") },
   { path: "/lesson", route: require("./routes/LessonRoute") },
+  { path: "/video", route: require("./routes/VideoRoute") },
   { path: "/file", route: require("./routes/fileHandlerRoute") },
   { path: "/resources", route: require("./routes/ResourcesRoute") },
   { path: "/course", route: require("./routes/CourseRoute") },
@@ -20,6 +21,8 @@ const routes = [
   { path: "/auth", route: require("./routes/AuthRoute") },
   { path: "/student", route: require("./routes/StudentRoute") },
   { path: "/tutor", route: require("./routes/TutorRoute") },
+  { path: "/viewer", route: require("./routes/ViewerRoute") },
+  { path: "/admin-viewer", route: require("./routes/AdminViewerRoute") },
   { path: "/admin", route: require("./routes/AdminRoute") },
   { path: "/oAuth", route: require("./routes/OAuthRoute") },
 ];
@@ -74,7 +77,7 @@ app.use((req, res, next) => {
 });
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
-app.use(authenticateToken);
+// app.use(authenticateToken);
 
 routes.forEach((route) => {
   app.use(route.path, route.route);
@@ -84,8 +87,8 @@ app.get("/", (req, res) => {
   res.status(200).json({ message: "Hello from warmup server." });
 });
 
-// app.listen("4000", () => {
-//   console.log("Listening on port 4000");
-// });
+app.listen("4000", () => {
+  console.log("Listening on port 4000");
+});
 
-exports.app = functions.https.onRequest(app);
+// exports.app = functions.https.onRequest(app);

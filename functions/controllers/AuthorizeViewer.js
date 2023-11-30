@@ -39,9 +39,7 @@ const authenticateToken = async (req, res, next) => {
       req.path !== "/auth/verify-contact" &&
       req.path !== "/student" &&
       req.path !== "/auth/logout" &&
-      !req.path.startsWith("/file/") &&
       !req.path.startsWith("/student/confirmation/") &&
-      !req.path.startsWith("/tutor/confirmation/") &&
       !req.path.startsWith("/admin/confirmation/")
     ) {
       return res.status(403).json({ message: "Unauthorized URL" });
@@ -52,9 +50,7 @@ const authenticateToken = async (req, res, next) => {
       req.path === "/auth/verify-contact" ||
       req.path === "/student" ||
       req.path === "/auth/refresh-token" ||
-      req.path.startsWith("/file/") ||
       req.path.startsWith("/student/confirmation/") ||
-      req.path.startsWith("/tutor/confirmation/") ||
       req.path.startsWith("/admin/confirmation/")
     ) {
       req.user = null;

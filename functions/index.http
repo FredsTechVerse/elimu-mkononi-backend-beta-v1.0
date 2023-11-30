@@ -1,6 +1,21 @@
 ### GET REQUEST
 POST http://localhost:5000/elearning-module-a887d/us-central1/app/auth/create-token
 
+### FETCHING ALL COURSES
+GET http://localhost:4000/course/all-courses
+
+### FETCH ALL VIDEOS
+GET http://localhost:4000/video/all-videos
+
+### FETCHING AUTHORIZED URL
+GET http://localhost:4000/oAuth/authorizationUri
+
+### TEST OUT REFRESH TOKEN LOGIC
+POST http://localhost:4000/oAuth/refreshToken
+content-type: application/json
+
+{"refreshToken":"1//03naPS-t4fOULCgYIARAAGAMSNwF-L9IrsYCHmlb8CLfv1qNj-m5bK7Mf-G6Ee16PQxrpqWK_ilp_noBCX3dzbbZDKPFSlzdNWjE"}
+
 ### POST REQUEST
 POST http://localhost:4000/auth/createTokenModel
 
@@ -77,3 +92,19 @@ GET http://localhost:4000/lesson/64fadfd35f429afdbf72b4c8
 
 ### DELETE COURSES TRIAL
 DELETE  http://localhost:4000/course/64fbf326b1ccf748e07eab38
+
+### RETRIEVING STATIONS METADATA Base 64 Encode (apiKey:apiSecret)
+GET  https://datahub.tahmo.org/services/assets/v2/stations
+Authorization:Basic U2Vuc29yRHhLZW55YTo2R1VYektpI3d2RHZa
+
+### POST REQUEST
+POST https://us-central1-tahmo-quality-control.cloudfunctions.net/ret
+
+{
+    "apiKey": "SensorDxKenya",
+    "apiSecret": "6GUXzKi#wvDvZ",
+    "bucket_name": "tahmo-endpoints-data"
+}
+
+### TAHMO GET REQUEST FOR STATIONS DATA PER DATE.
+GET https://us-central1-tahmo-quality-control.cloudfunctions.net/GET-from-BigQ?startDate=2023-10-01&endDate=2023-10-02
