@@ -9,7 +9,7 @@ const registerViewer = async (req, res) => {
     const hashedPassword = await bcrypt.hash(req.body.password, 10);
     const emailVerificationCode = generateRandomString(6);
     const emailMessage = `Hello ${req.body.firstName.toUpperCase()},Student,${emailVerificationCode} is your email verification code.`;
-
+    console.log(req.body);
     const credentials = {
       firstName: req.body.firstName,
       surname: req.body.surname,
@@ -50,6 +50,8 @@ const confirmResetToken = async (req, res) => {
 const confirmUserCredentials = async (req, res) => {
   try {
     const { viewerID } = req.params;
+    console.log("Confirming user credentials");
+    console.log({ viewerID });
     const { emailVerification: emailVerificationCode } = req.body;
     const userData = await Viewer.findById(viewerID).select("-password");
     let credentials = { isEmailVerified: false };

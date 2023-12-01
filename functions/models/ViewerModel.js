@@ -25,6 +25,6 @@ const ViewerModel = new Schema(
   }
 );
 
-const Viewer = mongoose.model("Student", ViewerModel);
+const Viewer = mongoose.model("Viewer", ViewerModel);
 
 module.exports = Viewer;

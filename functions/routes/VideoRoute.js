@@ -10,10 +10,12 @@ const {
   updateVideo,
   deleteVideo,
 } = require("../controllers/VideoController");
-
+router.get("/", (req, res) => {
+  res.status(200).send("You have reached videos route");
+});
 router.post("/", createVideo);
-router.get("/:videoID", findVideo);
 router.get("/all-videos", findAllVideos);
+router.get("/:videoID", findVideo);
 router.put("/:videoID", updateVideo);
 router.delete("/:videoID", deleteVideo);
 

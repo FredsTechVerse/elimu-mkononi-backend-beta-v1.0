@@ -25,6 +25,6 @@ const AdminViewerSchema = new Schema(
   }
 );
 
-const AdminViewer = mongoose.model("Admin", AdminViewerSchema);
+const AdminViewer = mongoose.model("AdminViewer", AdminViewerSchema);
 
 module.exports = AdminViewer;

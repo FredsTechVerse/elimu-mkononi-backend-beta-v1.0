@@ -23,8 +23,7 @@ const createVideo = async (req, res) => {
 
 const findAllVideos = async (req, res) => {
   try {
-    console.log("Fetching all videos");
-    const videosData = await Video.find({});
+    const videosData = await Video.find();
     console.log({ videosData });
     res.json(videosData);
   } catch (err) {

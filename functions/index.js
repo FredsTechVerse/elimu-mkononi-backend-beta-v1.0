@@ -12,7 +12,6 @@ const routes = [
   { path: "/message", route: require("./routes/MessageRoute") },
   { path: "/email", route: require("./routes/EmailRoute") },
   { path: "/lesson", route: require("./routes/LessonRoute") },
-  { path: "/video", route: require("./routes/VideoRoute") },
   { path: "/file", route: require("./routes/fileHandlerRoute") },
   { path: "/resources", route: require("./routes/ResourcesRoute") },
   { path: "/course", route: require("./routes/CourseRoute") },
@@ -22,9 +21,11 @@ const routes = [
   { path: "/student", route: require("./routes/StudentRoute") },
   { path: "/tutor", route: require("./routes/TutorRoute") },
   { path: "/viewer", route: require("./routes/ViewerRoute") },
-  { path: "/admin-viewer", route: require("./routes/AdminViewerRoute") },
   { path: "/admin", route: require("./routes/AdminRoute") },
   { path: "/oAuth", route: require("./routes/OAuthRoute") },
+  { path: "/video", route: require("./routes/VideoRoute") },
+  { path: "/auth-viewer", route: require("./routes/AuthenticateViewerRoute") },
+  { path: "/admin-viewer", route: require("./routes/AdminViewerRoute") },
 ];
 
 // CONNECTION TO DATABASE,

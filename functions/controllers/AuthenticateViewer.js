@@ -38,6 +38,8 @@ const aggregateUsers = async (req, res) => {
 
 const logInUser = async (req, res) => {
   try {
+    console.log("Logging in user ");
+    console.log(req.body);
     let usersFound = [];
     const viewerData = await Viewer.findOne({ email: req.body.email });
     const adminData = await AdminViewer.findOne({ email: req.body.email });
@@ -63,6 +65,8 @@ const logInUser = async (req, res) => {
         userFound.password
       );
 
+      console.log({ isPasswordsMatch });
+
       if (isPasswordsMatch) {
         const userInformation = {
           userID: userFound._id,
@@ -83,20 +87,19 @@ const logInUser = async (req, res) => {
           roles: [userInformation.role], //I am passing the user role inside and outside payload
         };
 
-        if (userFound.isContactVerified && userFound.isEmailVerified) {
+        console.log({ matchedUser });
+
+        if (userFound.isEmailVerified) {
           res.status(200).json(matchedUser);
           break;
         } else {
           // We need to generate and send a new pair of email and contact verification codes
           const newEmailVerificationCode = generateRandomString(6);
-          const newContactVerificationCode = generateRandomString(6);
           const newVerificationCodes = {
-            contactVerificationCode: newContactVerificationCode,
             emailVerificationCode: newEmailVerificationCode,
           };
 
           const emailMessage = `Hello ${userFound.firstName.toUpperCase()},Tutor,${newEmailVerificationCode} is your email verification code.`;
-          const message = `Hello ${userFound.firstName.toUpperCase()},${newContactVerificationCode} is your contact verification code.`;
 
           if (userFound.role === "EM-201") {
             await Viewer.findByIdAndUpdate(
