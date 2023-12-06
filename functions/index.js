@@ -24,6 +24,7 @@ const routes = [
   { path: "/admin", route: require("./routes/AdminRoute") },
   { path: "/oAuth", route: require("./routes/OAuthRoute") },
   { path: "/video", route: require("./routes/VideoRoute") },
+  { path: "/comment", route: require("./routes/CommentRoute") },
   { path: "/auth-viewer", route: require("./routes/AuthenticateViewerRoute") },
   { path: "/admin-viewer", route: require("./routes/AdminViewerRoute") },
 ];

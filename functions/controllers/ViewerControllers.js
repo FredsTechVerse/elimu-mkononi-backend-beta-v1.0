@@ -8,7 +8,7 @@ const registerViewer = async (req, res) => {
   try {
     const hashedPassword = await bcrypt.hash(req.body.password, 10);
     const emailVerificationCode = generateRandomString(6);
-    const emailMessage = `Hello ${req.body.firstName.toUpperCase()},Student,${emailVerificationCode} is your email verification code.`;
+    const emailMessage = `Hello ${req.body.firstName.toUpperCase()},Viewer,${emailVerificationCode} is your email verification code.`;
     console.log(req.body);
     const credentials = {
       firstName: req.body.firstName,
@@ -61,6 +61,7 @@ const confirmUserCredentials = async (req, res) => {
         new: true,
         upsert: true,
       });
+      console.log("Email Confirmed");
       res.status(200).json({ message: "Email Confirmed" });
     } else {
       credentials.isEmailVerified = false;
@@ -71,6 +72,7 @@ const confirmUserCredentials = async (req, res) => {
       res.status(401).json({ message: "Email is invalid" });
     }
   } catch (err) {
+    console.log("Error!Confirming user credentials");
     handleError(err, res);
   }
 };

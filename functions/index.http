@@ -3,6 +3,8 @@ POST http://localhost:5000/elearning-module-a887d/us-central1/app/auth/create-to
 
 ### FETCHING ALL COURSES
 GET http://localhost:4000/course/all-courses
+### FETCHING ALL COURSES
+DELETE http://localhost:4000/viewer/656a2bb0176b2d6b31478bb6
 
 ### FETCH ALL VIDEOS
 GET http://localhost:4000/video/all-videos

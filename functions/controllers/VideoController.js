@@ -2,12 +2,23 @@ const Video = require("../models/VideoModel");
 const { handleError } = require("./ErrorHandling");
 const createVideo = async (req, res) => {
   console.log("Creating video");
+  console.log(req.body);
   try {
-    const { videoTitle, publisher, producer, genre, ageRating, videoUrl } =
-      req.body;
+    const {
+      videoTitle,
+      videoBanner,
+      videoDescription,
+      publisher,
+      producer,
+      genre,
+      ageRating,
+      videoUrl,
+    } = req.body;
 
     const newVideo = await Video.create({
       videoTitle,
+      videoBanner: videoBanner.url,
+      videoDescription,
       publisher,
       producer,
       genre,
@@ -24,7 +35,7 @@ const createVideo = async (req, res) => {
 const findAllVideos = async (req, res) => {
   try {
     const videosData = await Video.find();
-    console.log({ videosData });
+    // console.log({ videosData });
     res.json(videosData);
   } catch (err) {
     handleError(err, res);
@@ -34,7 +45,8 @@ const findAllVideos = async (req, res) => {
 const findVideo = async (req, res) => {
   try {
     const { videoID } = req.params;
-    const lessonData = await Video.findById(videoID).populate("lessonNotes");
+    console.log(`Fetching Video ${videoID}`);
+    const lessonData = await Video.findById(videoID);
     res.json(lessonData);
   } catch (err) {
     handleError(err, res);

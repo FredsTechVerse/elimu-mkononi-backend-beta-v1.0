@@ -99,7 +99,7 @@ const logInUser = async (req, res) => {
             emailVerificationCode: newEmailVerificationCode,
           };
 
-          const emailMessage = `Hello ${userFound.firstName.toUpperCase()},Tutor,${newEmailVerificationCode} is your email verification code.`;
+          const emailMessage = `Hello ${userFound.firstName.toUpperCase()},${newEmailVerificationCode} is your new email verification code.`;
 
           if (userFound.role === "EM-201") {
             await Viewer.findByIdAndUpdate(
@@ -122,7 +122,7 @@ const logInUser = async (req, res) => {
           }
           sendEmail({
             to: [userFound.email],
-            subject: "EMAIL VERIFICATION CODE FOR TUTOR ACCOUNT ON ELIMU HUB",
+            subject: "NEW EMAIL VERIFICATION CODE",
             text: emailMessage,
             role: "EM-202",
           });
