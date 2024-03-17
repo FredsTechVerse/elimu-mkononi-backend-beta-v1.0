@@ -61,6 +61,7 @@ const authenticateToken = async (req, res, next) => {
       return next();
     } else {
       const payload = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+      console.log({userPayload:payload})
       req.user = payload;
       return next();
     }

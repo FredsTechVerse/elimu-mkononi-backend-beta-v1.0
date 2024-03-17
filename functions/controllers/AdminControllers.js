@@ -128,7 +128,7 @@ const updateAdminPassword = async (req, res) => {
 };
 const findAuthorizedAdmin = async (req, res) => {
   try {
-    const { userID: adminID } = req.user;
+    const { userID: adminID } = req?.user;
     const adminData = await Admin.findById(adminID).select("-password");
     res.status(200).json(adminData);
   } catch (err) {

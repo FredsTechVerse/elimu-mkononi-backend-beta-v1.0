@@ -114,7 +114,7 @@ const findAllTutors = async (req, res) => {
 
 const findAuthorizedTutor = async (req, res) => {
   try {
-    const { userID: tutorID } = req.user;
+    const { userID: tutorID } = req?.user;
     const tutorData = await Tutor.findById(tutorID)
       .select("-password")
       .populate({
